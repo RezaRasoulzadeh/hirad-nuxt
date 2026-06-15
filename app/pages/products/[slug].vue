@@ -53,13 +53,11 @@
                   </span>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full sm:w-auto">
-                  <a href="tel:+982166420839" class="btn btn-primary flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25V16.74c0-.491-.321-.922-.805-1.012l-3.473-.632a2.25 2.25 0 00-1.847.892l-1.248 1.556c-2.595-1.354-4.743-3.501-6.097-6.098l1.556-1.248a2.25 2.25 0 00.892-1.848l-.632-3.473a2.25 2.25 0 00-1.012-.805H4.75A2.25 2.25 0 002.25 4.75V6.75z" />
-                    </svg>
+                  <a href="tel:+989352557163" class="btn btn-primary outline-1 outline-offset-3 outline-dashed outline-transparent hover:outline-primary text-base-content flex items-center gap-2 py-6 rounded-xl">
+                    <Phone class="size-5"/>
                     استعلام قیمت و موجودی
                   </a>
-                  <a href="tel:+982166429816" class="btn btn-outline border-base-300 hover:border-primary flex items-center gap-2">
+                  <a href="tel:+982166420839" class="btn btn-dash btn-primary text-base-content flex items-center gap-2 py-6 rounded-xl">
                     تماس با کارشناس فنی
                   </a>
                 </div>
@@ -95,7 +93,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { WifiOff } from 'lucide-vue-next'
+import { Phone, WifiOff } from 'lucide-vue-next'
 import { useProduct } from '~/composables/useProduct'
 import { useRuntimeConfig, useAsyncData } from '#app'
 import { useCategories } from '~/composables/useCategories'

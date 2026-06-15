@@ -1,7 +1,7 @@
 <template>
   <section class="container mx-auto px-4 lg:px-0 py-8">
-    <div class="flex flex-col lg:flex-row gap-1 items-stretch">
-      <div class="w-full lg:w-1/3 h-[50vh] bg-base-200 rounded-t-3xl lg:rounded-none lg:rounded-s-3xl overflow-hidden">
+    <div class="flex flex-col gap-1 items-stretch">
+      <div class="w-full h-[50vh] bg-base-200 rounded-t-3xl overflow-hidden">
         <img
           :src="coverImageUrl || placeholderImg"
           :alt="title"
@@ -11,7 +11,7 @@
           class="w-full h-full object-cover aspect-auto"
         />
       </div>
-      <div class="w-full lg:w-2/3 flex flex-col justify-center bg-base-200 rounded-b-3xl lg:rounded-none lg:rounded-e-3xl lg:border-s-2 lg:border-base-300 p-8 lg:ps-12 gap-4">
+      <div class="w-full flex flex-col justify-center bg-base-200 rounded-b-3xl p-8 lg:ps-12 gap-4">
         <h1 class="text-2xl md:text-3xl font-black text-primary leading-snug">
           {{ hero.title_fa }}
         </h1>
