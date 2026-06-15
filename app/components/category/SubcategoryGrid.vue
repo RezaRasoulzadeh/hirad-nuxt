@@ -9,14 +9,16 @@
                         class="size-24 rounded-2xl bg-base-200 flex items-center justify-center transition-colors overflow-hidden">
                         <img :src="child.image_url ? resolveUrl(child.image_url) : placeholderImg" :alt="child.name"
                             :data-error="!child.image_url ? 'true' : undefined" @error="handleImgError"
-                            class="size-16 object-contain transition-all group-hover:not-data-error:filter-[invert(21%)_sepia(41%)_saturate(2097%)_hue-rotate(312deg)_brightness(91%)_contrast(97%)]"
-                            loading="lazy" />
+                            class="size-16 object-contain transition-all 
+    group-hover:not-data-error:filter-[invert(21%)_sepia(41%)_saturate(2097%)_hue-rotate(312deg)_brightness(91%)_contrast(97%)]
+    [:is([data-theme=dark],.dark)_&]:not-data-error:filter-[brightness(0)_invert(80%)]
+    [:is([data-theme=dark],.dark)_&]:group-hover:not-data-error:filter-[invert(21%)_sepia(41%)_saturate(2097%)_hue-rotate(312deg)_brightness(91%)_contrast(97%)]" loading="lazy" />
                     </div>
                     <div>
                         <p class="font-bold text-base-content group-hover:text-primary transition-colors leading-snug">
-                            {{ child.name }}
+                            {{ child.name }} | {{ child.meta_title ?? "" }}
                         </p>
-                        <p class="text-xs text-base-content/40 font-sans mt-0.5">
+                        <p class="text-xs text-base-content/50 font-sans mt-0.5">
                             {{ child.meta_title || '' }}
                         </p>
                     </div>
@@ -25,31 +27,33 @@
         </template>
 
         <template v-else>
-            <div class="flex items-center gap-3 mb-4">
-                <p class="text-sm text-base-content/60">تعداد محصولات این دسته‌ب بندی:</p>
-                <span class="text-primary font-bold text-sm">—</span>
-            </div>
-            <div class="flex flex-col items-center justify-center py-16 gap-3 text-center px-4">
-                <div class="bg-base-200 rounded-full p-5">
-                    <Package class="size-8 text-base-content" />
-                </div>
-                <p class="text-base-content font-bold">محصولی یافت نشد</p>
-                <p class="text-base-content/50 text-sm">محصولات این دسته‌بندی به زودی اضافه خواهند شد.</p>
-            </div>
+            <ProductList :products="products" :total="total" :pending="pending" :error="error" :has-more="hasMore"
+                :resolve-url="resolveUrl" @retry="$emit('retry')" @load-more="$emit('load-more')" />
         </template>
 
     </section>
 </template>
 
 <script setup lang="ts">
-import { Package } from 'lucide-vue-next'
 import placeholderImg from '~/assets/placeholder.png'
 import type { Category } from '~/composables/useCategories'
+import type { Product } from '~/composables/useProductList'
+import ProductList from '~/components/product/ProductList.vue'
 
 defineProps<{
     hasChildren: boolean
     sortedChildren: Category[]
     resolveUrl: (path?: string | null) => string
+    products: Product[]
+    total: number
+    pending: boolean
+    error: Error | null
+    hasMore: boolean
+}>()
+
+defineEmits<{
+    retry: []
+    'load-more': []
 }>()
 
 const handleImgError = (e: Event) => {

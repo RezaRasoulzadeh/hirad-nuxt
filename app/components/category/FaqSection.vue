@@ -1,20 +1,20 @@
 <template>
-  <section class="container mx-auto px-4 lg:px-0 pb-20">
+  <section class="bg-base-200 mx-auto px-4 py-6 lg:py-14 lg:px-0 mb-16">
     <div class="flex flex-col items-center text-center mb-8">
       <span class="text-xs font-bold tracking-[0.2em] text-primary uppercase mb-3">FAQ</span>
       <h2 class="text-2xl md:text-3xl font-black text-base-content tracking-tight">سوالات متداول</h2>
       <div class="h-1 w-12 bg-primary mt-4 rounded-full opacity-80" />
     </div>
 
-    <div class="mx-auto max-w-4xl divide-y divide-base-200/50">
+    <div class="mx-auto max-w-4xl divide-y space-y-2 divide-base-200/50">
       <div
         v-for="(faq, idx) in items"
         :key="faq.id"
-        class="group py-2"
+        class="group p-4 bg-base-100 rounded-2xl"
       >
         <button
           @click="toggle(idx)"
-          class="flex w-full items-center justify-between gap-3 py-4 text-right font-bold text-base-content hover:text-primary transition-colors select-none cursor-pointer"
+          class="flex w-full items-center justify-between gap-3 text-right font-bold text-base-content hover:text-primary transition-colors select-none cursor-pointer"
         >
           <span>{{ faq.title.fa }}</span>
           <ChevronDown 
@@ -28,7 +28,7 @@
           :style="{ gridTemplateRows: activeIndex === idx ? '1fr' : '0fr' }"
         >
           <div class="overflow-hidden">
-            <div class="pb-4 pt-1 text-sm text-base-content/70 leading-relaxed">
+            <div class="mt-3 pt-3 border-t border-t-base-300 text-sm text-base-content/70 leading-relaxed">
               {{ faq.description.fa }}
             </div>
           </div>

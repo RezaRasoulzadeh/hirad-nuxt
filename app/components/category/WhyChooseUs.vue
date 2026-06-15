@@ -1,8 +1,8 @@
 <template>
   <section class="container w-full mx-auto px-6 py-8 md:py-16" dir="rtl">
     <div class="flex flex-col items-center text-center mb-10 px-4">
-      <span class="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">
-        Why Us
+      <span class="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3" dir="ltr">
+        Why Choose Us?
       </span>
       <h2 class="text-base-content text-3xl md:text-3xl font-black tracking-tight">
         چرا ما را انتخاب کنید؟

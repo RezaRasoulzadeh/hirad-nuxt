@@ -1,7 +1,6 @@
 <template>
   <div ref="containerRef" class="relative flex-1 order-1 md:order-2 bg-base-100">
     <div class="relative w-full" style="padding-bottom: 56.25%;">
-      <!-- Updated loading behavior from eager to lazy -->
       <img
         src="~/assets/hero.jpg"
         alt="تجهیزات صنعتی هیراد"

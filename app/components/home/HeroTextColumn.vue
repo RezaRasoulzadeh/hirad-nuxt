@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col justify-center px-8 md:px-12 lg:px-20 py-12 md:py-16 md:w-[38%] lg:w-[35%] shrink-0 order-2 md:order-1">
-    <p class="text-primary font-bold text-sm tracking-widest uppercase mb-3 opacity-80 text-center md:text-start">
+    <p class="text-primary font-bold text-sm tracking-widest uppercase mb-3 text-center md:text-start">
       شرکت تجهیز فرآیند هیراد
     </p>
 
@@ -33,14 +33,14 @@
         :to="item.url ?? '/'"
         class="group flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] hover:bg-primary/8 border border-transparent hover:border-primary/20 hover:-translate-x-1"
       >
-        <div class="icon-mask size-10 shrink-0 bg-base-content/30 group-hover:bg-primary transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)]" :style="maskStyle(item.icon ?? '')" />
+        <div class="icon-mask size-10 shrink-0 bg-base-content group-hover:bg-primary transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)]" :style="maskStyle(item.icon ?? '')" />
         <div class="flex flex-col gap-0.5 min-w-0">
           <span class="text-base font-bold text-base-content group-hover:text-primary transition-colors duration-200">
             {{ (item.title_fa ?? '').split('|')[0]?.trim() ?? '' }} | {{ (item.meta_title ?? '').split('|')[0]?.trim() ?? '' }}
           </span>
-          <span class="text-sm text-base-content/40 truncate">{{ item.sub_title_fa ?? '' }}</span>
+          <span class="text-sm text-base-content/70 truncate">{{ item.sub_title_fa ?? '' }}</span>
         </div>
-        <ChevronLeft class="size-5 text-base-content/20 group-hover:text-primary transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] mr-auto shrink-0 group-hover:translate-x-0" />
+        <ChevronLeft class="size-5 text-base-content/40 group-hover:text-primary transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] mr-auto shrink-0 group-hover:translate-x-0" />
       </NuxtLink>
     </div>
   </div>

@@ -10,13 +10,13 @@
       </p>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+    <div class="flex flex-wrap justify-center gap-4">
       <div
         v-for="app in items"
         :key="app.id"
-        class="group flex flex-col items-center text-center gap-3 bg-base-100 border border-base-200 hover:border-primary rounded-2xl p-6 transition-all duration-200 hover:-translate-y-0.5"
+        class="group flex flex-col items-center text-center gap-3 bg-base-100 border border-base-200 rounded-2xl p-6 transition-all duration-200 hover:-translate-y-0.5 w-full sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] xl:w-[calc(20%-0.8rem)]"
       >
-        <div class="size-22 rounded-2xl bg-base-200 group-hover:bg-primary/10 flex items-center justify-center transition-colors overflow-hidden">
+        <div class="size-22 rounded-2xl bg-base-200 flex items-center justify-center transition-colors overflow-hidden">
           <img
             v-if="app.icon"
             :src="resolveUrl(app.icon)"

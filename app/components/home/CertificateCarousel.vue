@@ -66,7 +66,7 @@
                     <h3 class="text-lg font-black text-primary">{{ item.title_fa }}</h3>
                     
                   </div>
-                  <p class="text-xs leading-relaxed text-center text-base-content/80 overflow-y-auto max-h-70 pl-1">
+                  <p class="text-sm leading-relaxed text-center text-base-content/80 overflow-y-auto max-h-70 pl-1">
                     {{ item.description_fa }}
                   </p>
                 </div>

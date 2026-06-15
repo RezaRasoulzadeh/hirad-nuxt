@@ -40,7 +40,7 @@
           <!-- Catalogue -->
           <div class="w-full lg:w-5/12 flex justify-center">
             <img src="~/assets/catalogue.png" alt="کاتالوگ هیراد"
-              class="max-h-105 object-contain drop-shadow-2xl transition-transform duration-300 hover:-translate-y-2 hover:scale-120" />
+              class="max-h-105 object-contain drop-shadow-2xl transition-transform duration-300 hover:-translate-y-2 hover:scale-110" />
           </div>
 
         </div>
