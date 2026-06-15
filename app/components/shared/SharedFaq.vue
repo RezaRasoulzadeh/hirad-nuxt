@@ -38,10 +38,9 @@
   </section>
 </template>
 
+
 <script setup lang="ts">
-import { ref } from 'vue'
-import { ChevronDown } from 'lucide-vue-next'
-import type { FaqItem } from '~/composables/useCategoryPage'
+import { ChevronDown } from 'lucide-vue-next';
 
 defineProps<{
   items: FaqItem[]

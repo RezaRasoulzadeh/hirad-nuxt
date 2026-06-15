@@ -8,7 +8,7 @@
         {{ title }}
       </h2>
       <div class="bg-primary h-1 w-12 mt-4 rounded-full opacity-80" />
-      <p class="text-base-content/70 max-w-2xl mx-auto text-sm leading-relaxed mt-4">
+      <p class="text-base-content/70  mx-auto text-sm leading-relaxed mt-4">
         {{ summary }}
       </p>
     </div>

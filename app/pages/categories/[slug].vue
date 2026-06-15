@@ -61,10 +61,10 @@ import { useProductList } from '~/composables/useProductList'
 import CategoryHero from '~/components/category/CategoryHero.vue'
 import CategoryBanner from '~/components/category/CategoryBanner.vue'
 import SubcategoryGrid from '~/components/category/SubcategoryGrid.vue'
-import ApplicationsSection from '~/components/category/ApplicationsSection.vue'
+import ApplicationsSection from '~/components/shared/SharedApplications.vue'
 import AskForQuote from '~/components/category/AskForQuote.vue'
 import WhyChooseUs from '~/components/category/WhyChooseUs.vue'
-import FaqSection from '~/components/category/FaqSection.vue'
+import FaqSection from '~/components/shared/SharedFaq.vue'
 
 const route = useRoute()
 const slug = computed(() => route.params.slug as string)

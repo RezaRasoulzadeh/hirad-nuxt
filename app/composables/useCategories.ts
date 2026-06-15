@@ -28,7 +28,7 @@ export const useCategories = () => {
   const error = useState<Error | null>('categories-error', () => null)
 
   const fetchCategories = async () => {
-    if (categories.value.length > 0) return
+    if (categories.value && categories.value.length > 0) return
 
     loading.value = true
     error.value = null
@@ -54,10 +54,45 @@ export const useCategories = () => {
 
   const getCategoriesByType = (type: 'product' | 'about' | 'blog') => {
     return computed(() => {
-      if (!Array.isArray(categories.value)) return []
+      if (!categories.value || !Array.isArray(categories.value)) return []
       return categories.value.filter(
         cat => cat && cat.category_type === type && cat.parent_id === null
       )
+    })
+  }
+
+  // Recursive flat search to find a category by ID inside a nested tree structure
+  const findCategoryById = (nodes: Category[], id: string): Category | null => {
+    if (!nodes || !Array.isArray(nodes)) return null
+    for (const node of nodes) {
+      if (!node) continue
+      if (node.id === id) return node
+      if (node.children && node.children.length > 0) {
+        const found = findCategoryById(node.children, id)
+        if (found) return found
+      }
+    }
+    return null
+  };
+
+  const getCategoryLineage = (categoryId?: string | null) => {
+    return computed(() => {
+      if (!categoryId || !categories.value || categories.value.length === 0) {
+        return { currentCategory: null, parentCategory: null }
+      }
+
+      const current = findCategoryById(categories.value, categoryId)
+      if (!current) return { currentCategory: null, parentCategory: null }
+
+      let parent: Category | null = null
+      if (current.parent_id) {
+        parent = findCategoryById(categories.value, current.parent_id)
+      }
+
+      return {
+        currentCategory: current,
+        parentCategory: parent
+      }
     })
   }
 
@@ -66,6 +101,7 @@ export const useCategories = () => {
     loading,
     error,
     fetchCategories,
+    getCategoryLineage,
     productCategories: getCategoriesByType('product'),
     aboutCategories: getCategoriesByType('about'),
     blogCategories: getCategoriesByType('blog')
