@@ -1,120 +1,126 @@
 <template>
-  <section class="hero-section relative w-full overflow-hidden bg-base-200" style="min-height: 560px;">
-
-    <!-- Background image from gallery -->
-    <div class="absolute inset-0 z-0">
-      <img
-        v-if="gallery[0]"
-        :src="getUrl(gallery[0].url)"
-        :alt="gallery[0].title_fa"
-        class="w-full h-full object-cover object-center"
+  <section ref="sectionRef" class="relative w-full min-h-[90vh] overflow-hidden bg-base-100">
+    <div class="flex flex-col md:flex-row md:items-stretch">
+      <HeroTextColumn 
+        :meta-title="page?.meta_title ?? ''"
+        :gallery="gallery"
+        :active-slide="activeSlide"
+        :items="items"
+        :mask-style="maskStyle"
+        @select-slide="goToSlide"
       />
-      <div class="absolute inset-0 bg-gradient-to-l from-base-100/10 via-base-100/30 to-base-100/80" />
+      <HeroHotspotImage 
+        :items="items"
+        :hotspots="hotspots"
+        :mask-style="maskStyle"
+      />
     </div>
 
-    <!-- Text block — right side (RTL) -->
-    <div class="relative z-10 flex flex-col justify-center h-full min-h-[560px] px-8 lg:px-20 py-16 max-w-lg">
-      <p class="text-primary font-bold text-sm tracking-widest uppercase mb-3 opacity-80">
-        {{ page?.meta_title }}
-      </p>
-      <h1 class="text-3xl lg:text-4xl font-black text-base-content leading-snug mb-4">
-        {{ gallery[0]?.title_fa }}
-      </h1>
-      <p class="text-base-content/60 text-sm leading-relaxed">
-        {{ page?.summary }}
-      </p>
-    </div>
-
-    <!-- Hotspot buttons — positioned over image -->
-    <div class="absolute inset-0 z-20 pointer-events-none">
-      <button
-        v-for="(spot, i) in hotspots"
-        :key="i"
-        class="hotspot pointer-events-auto absolute"
-        :style="{ top: spot.top, left: spot.left }"
-        @mouseenter="activeIndex = i"
-        @mouseleave="activeIndex = null"
-        @focus="activeIndex = i"
-        @blur="activeIndex = null"
-        @click="navigateTo(items[i]?.url)"
-        :aria-label="items[i]?.title_fa"
-      >
-        <!-- Plus ring -->
-        <span class="hotspot-ring" :class="{ active: activeIndex === i }">
-          <span class="hotspot-dot">
-            <Plus class="size-4 text-white" />
-          </span>
-        </span>
-
-        <!-- Popup card -->
-        <Transition name="pop">
-          <div
-            v-if="activeIndex === i && items[i]"
-            class="hotspot-card"
-            :class="spot.cardAlign"
-          >
-            <div
-              class="icon-mask size-10 mb-2 mx-auto bg-primary"
-              :style="maskStyle(items[i].icon)"
-            />
-            <p class="text-sm font-bold text-base-content leading-tight">{{ items[i].title_fa }}</p>
-            <p class="text-xs text-base-content/50 mt-0.5 leading-snug">{{ items[i].sub_title_fa }}</p>
-          </div>
-        </Transition>
-      </button>
-    </div>
-
-    <!-- Category strip at bottom -->
-    <div class="absolute bottom-0 left-0 right-0 z-30 bg-base-100/80 backdrop-blur-md border-t border-base-300">
-      <div class="flex items-stretch divide-x divide-x-reverse divide-base-300 overflow-x-auto">
-        <NuxtLink
-          v-for="item in items"
-          :key="item.url"
-          :to="item.url"
-          class="cat-strip-item group flex items-center gap-3 px-6 py-4 flex-1 min-w-[160px] transition-colors duration-200 hover:bg-primary/5"
-        >
-          <div
-            class="icon-mask size-8 shrink-0 bg-base-content/40 group-hover:bg-primary transition-colors duration-200"
-            :style="maskStyle(item.icon)"
-          />
-          <div class="flex flex-col gap-0 min-w-0">
-            <span class="text-sm font-semibold text-base-content group-hover:text-primary transition-colors duration-200 truncate">
-              {{ item.title_fa.split('|')[0].trim() }}
-            </span>
-            <span class="text-xs text-base-content/40 truncate">{{ item.sub_title_fa }}</span>
-          </div>
-        </NuxtLink>
+    <div 
+      @click="scrollDown"
+      class="hidden xl:flex absolute bottom-8 left-1/2 -translate-x-1/2 flex-col items-center gap-3 z-30 cursor-pointer pointer-events-auto select-none group"
+    >
+      <span class="text-[10px] font-sans font-bold tracking-[0.125em] text-base-content/50 uppercase transition-colors group-hover:text-base-content/70">
+        Scroll
+      </span>
+      <div class="relative w-6 h-10 rounded-3xl border-2 border-base-content/30 flex items-start justify-center pt-2 group-hover:border-base-content/50 transition-colors">
+        <div class="w-1 h-2.5 bg-primary rounded-full animate-scroll-wheel"></div>
       </div>
+      <ArrowDown class="size-3.5 text-base-content/40 transition-all group-hover:translate-y-0.5 group-hover:text-base-content/60" />
     </div>
 
+    <div class="xl:hidden w-full px-4 border-t border-base-300">
+      <NuxtLink
+        v-for="item in items"
+        :key="item.url ?? ''"
+        :to="item.url ?? '/'"
+        class="group flex items-center gap-4 px-6 py-4 border-b border-base-300 last:border-b-0 transition-colors duration-200 hover:bg-primary/5"
+      >
+        <div class="icon-mask size-10 shrink-0 bg-base-content/30 group-hover:bg-primary transition-colors duration-200" :style="maskStyle(item.icon ?? '')" />
+        <div class="flex flex-col gap-0.5 min-w-0">
+          <span class="text-base font-bold text-base-content group-hover:text-primary transition-colors duration-200">
+            {{ (item.title_fa ?? '').split('|')[0]?.trim() ?? '' }} | {{ (item.meta_title ?? '').split('|')[0]?.trim() ?? '' }}
+          </span>
+          <span class="text-sm text-base-content/40 truncate">{{ item.sub_title_fa ?? '' }}</span>
+        </div>
+        <ChevronLeft class="size-5 text-base-content/20 group-hover:text-primary transition-colors duration-200 mr-auto shrink-0" />
+      </NuxtLink>
+    </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { Plus } from 'lucide-vue-next'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ChevronLeft, ArrowDown } from 'lucide-vue-next'
 import type { HomePage } from '~/composables/useHomePage'
+import { useCategories } from '~/composables/useCategories'
+import HeroTextColumn from './HeroTextColumn.vue'
+import HeroHotspotImage from './HeroHotspotImage.vue'
 
-const props = defineProps<{
-  page: HomePage | null
-}>()
-
+const props = defineProps<{ page: HomePage | null }>()
 const config = useRuntimeConfig()
-const baseUrl = config?.public?.apiBase || 'http://localhost:3000/api'
+const baseUrl = config?.public?.apiBase ?? 'http://localhost:3000/api'
 
-const activeIndex = ref<number | null>(null)
+const { fetchCategories, productCategories } = useCategories()
 
-const items = computed(() => props.page?.content?.ItemSection ?? [])
+const sectionRef = ref<HTMLElement | null>(null)
+const activeSlide = ref(0)
+let slideTimer: ReturnType<typeof setInterval> | null = null
+
+const items = computed(() => {
+  return productCategories.value.map(cat => ({
+    url: `/categories/${cat.slug}`,
+    icon: cat.image_url ?? '',
+    title_fa: cat.name,
+    meta_title: cat.meta_title,
+    sub_title_fa: cat.description ?? ''
+  }))
+})
+
 const gallery = computed(() => props.page?.content?.image_gallery ?? [])
 
-const getUrl = (url: string) => {
-  if (!url) return ''
-  if (url.startsWith('http://') || url.startsWith('https://')) return url
-  return `${baseUrl.replace('/api', '')}${url.startsWith('/') ? '' : '/'}${url}`
+const scrollDown = () => {
+  if (sectionRef.value) {
+    const nextElement = sectionRef.value.nextElementSibling
+    if (nextElement) {
+      nextElement.scrollIntoView({ behavior: 'smooth' })
+    } else {
+      window.scrollTo({
+        top: sectionRef.value.offsetHeight,
+        behavior: 'smooth'
+      })
+    }
+  }
 }
 
-const maskStyle = (url: string) => {
-  const src = getUrl(url)
+const goToSlide = (i: number) => {
+  activeSlide.value = i
+  resetTimer()
+}
+
+const nextSlide = () => {
+  if (gallery.value.length > 0) {
+    activeSlide.value = (activeSlide.value + 1) % gallery.value.length
+  }
+}
+
+const resetTimer = () => {
+  if (slideTimer) clearInterval(slideTimer)
+  slideTimer = setInterval(nextSlide, 4000)
+}
+
+onMounted(async () => {
+  await fetchCategories()
+  if (gallery.value.length > 1) resetTimer()
+})
+
+onUnmounted(() => {
+  if (slideTimer) clearInterval(slideTimer)
+})
+
+const maskStyle = (url: string): Record<string, string> => {
+  if (!url) return {}
+  const src = url.startsWith('http') ? url : `${baseUrl}${url.startsWith('/') ? '' : '/'}${url}`
   return {
     maskImage: `url(${src})`,
     maskRepeat: 'no-repeat',
@@ -127,96 +133,30 @@ const maskStyle = (url: string) => {
   }
 }
 
-// Hotspot positions over the industrial image — tweak to match your background image
 const hotspots = [
-  { top: '28%', left: '62%', cardAlign: 'card-top-right' },   // Valves — top valve area
-  { top: '52%', left: '44%', cardAlign: 'card-top-left' },    // Connectors — center fittings
-  { top: '65%', left: '28%', cardAlign: 'card-top-right' },   // Pipes — pipe run left
-  { top: '38%', left: '55%', cardAlign: 'card-bottom-right' },// Flanges — flange cluster
+  { top: '28%', left: '60%', cardAlign: 'card-left' },
+  { top: '55%', left: '43%', cardAlign: 'card-right' },
+  { top: '68%', left: '26%', cardAlign: 'card-left' },
+  { top: '38%', left: '52%', cardAlign: 'card-left' },
 ]
 </script>
 
 <style scoped>
-/* Hotspot button */
-.hotspot {
-  transform: translate(-50%, -50%);
+@keyframes scroll-wheel {
+  0% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateY(12px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
 }
-
-.hotspot-ring {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: 9999px;
-  border: 2px solid var(--color-primary);
-  background: color-mix(in oklch, var(--color-primary) 20%, transparent);
-  backdrop-filter: blur(4px);
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.hotspot-ring.active,
-.hotspot-ring:hover {
-  background: var(--color-primary);
-  box-shadow: 0 0 0 6px color-mix(in oklch, var(--color-primary) 25%, transparent);
-}
-
-.hotspot-dot {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Pulse animation on hotspots */
-.hotspot-ring::before {
-  content: '';
-  position: absolute;
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: 9999px;
-  border: 2px solid var(--color-primary);
-  animation: pulse-ring 2s ease-out infinite;
-  pointer-events: none;
-}
-
-@keyframes pulse-ring {
-  0%   { transform: scale(1); opacity: 0.6; }
-  100% { transform: scale(2); opacity: 0; }
-}
-
-/* Popup card */
-.hotspot-card {
-  position: absolute;
-  width: 160px;
-  background: var(--color-base-100);
-  border: 1px solid var(--color-base-300);
-  border-radius: 1rem;
-  padding: 0.875rem;
-  text-align: center;
-  box-shadow: 0 8px 32px rgb(0 0 0 / 0.15);
-  pointer-events: none;
-  z-index: 10;
-}
-
-.card-top-right  { bottom: calc(100% + 12px); left: 50%; transform: translateX(-10%); }
-.card-top-left   { bottom: calc(100% + 12px); right: 50%; transform: translateX(10%); }
-.card-bottom-right { top: calc(100% + 12px); left: 50%; transform: translateX(-10%); }
-.card-bottom-left  { top: calc(100% + 12px); right: 50%; transform: translateX(10%); }
-
-/* Pop transition */
-.pop-enter-active { transition: opacity 0.15s ease, transform 0.15s ease; }
-.pop-leave-active { transition: opacity 0.1s ease, transform 0.1s ease; }
-.pop-enter-from  { opacity: 0; transform: translateX(-10%) scale(0.92); }
-.pop-leave-to    { opacity: 0; transform: translateX(-10%) scale(0.92); }
-
-/* Icon mask */
-.icon-mask {
-  display: block;
-}
-
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .hotspot-ring::before { animation: none; }
+.animate-scroll-wheel {
+  animation: scroll-wheel 2s infinite ease-in-out;
 }
 </style>

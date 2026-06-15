@@ -15,7 +15,7 @@
         </button>
       </div>
 
-      <div dir="ltr" class="grow overflow-y-auto overflow-x-hidden">
+      <div dir="ltr" class="grow overflow-y-auto overflow-x-hidden no-scrollbar">
         <div dir="rtl" class="p-4">
           <div v-if="loading" class="flex justify-center items-center py-12">
             <span class="loading loading-spinner loading-md text-primary"></span>
@@ -143,3 +143,14 @@ const sortedCategories = computed(() => {
     .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
 })
 </script>
+
+<style scoped>
+/* Target WebKit and standard engines inside this component scope */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+</style>

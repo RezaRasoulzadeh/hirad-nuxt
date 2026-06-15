@@ -1,22 +1,19 @@
 <template>
   <div dir="rtl" class="min-h-screen bg-base-100 text-base-content font-sans">
-    <input id="layout-drawer" type="checkbox" class="drawer-toggle" v-model="isDrawerOpen" />
+    <input id="layout-drawer" type="checkbox" class="drawer-toggle" aria-label="منوی کشویی محصولات"
+      v-model="isDrawerOpen" />
 
     <div class="drawer-content flex flex-col min-h-screen">
       <LayoutHeader @open-drawer="isDrawerOpen = true" />
 
-      <main class="grow w-full px-4 lg:px-16 mx-auto max-w-[1920px]">
+      <main class="grow w-full">
         <slot />
       </main>
 
-      <LayoutFooter />
+      <LayoutFooter @open-drawer="isDrawerOpen = true"/>
     </div>
 
-    <LayoutDrawer
-      @close="isDrawerOpen = false"
-      :loading="loading"
-      :categories="categories"
-    />
+    <LayoutDrawer @close="isDrawerOpen = false" :loading="loading" :categories="categories" />
   </div>
 </template>
 
@@ -57,11 +54,13 @@ await callOnce('layout-categories', async () => {
   .drawer-side {
     align-items: flex-end;
   }
-  .drawer-toggle ~ .drawer-side .drawer-overlay + * {
+
+  .drawer-toggle~.drawer-side .drawer-overlay+* {
     transform: translateY(100%);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .drawer-toggle:checked ~ .drawer-side .drawer-overlay + * {
+
+  .drawer-toggle:checked~.drawer-side .drawer-overlay+* {
     transform: translateY(0);
   }
 }
