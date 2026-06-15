@@ -1,5 +1,5 @@
 <template>
-  <section class="bg-base-200 mx-auto px-4 py-6 lg:py-14 lg:px-0 mb-16">
+  <section class="bg-base-100 mx-auto px-4 py-6 lg:py-14 lg:px-0">
     <div class="flex flex-col items-center text-center mb-8">
       <span class="text-xs font-bold tracking-[0.2em] text-primary uppercase mb-3">FAQ</span>
       <h2 class="text-2xl md:text-3xl font-black text-base-content tracking-tight">سوالات متداول</h2>
@@ -10,7 +10,7 @@
       <div
         v-for="(faq, idx) in items"
         :key="faq.id"
-        class="group p-4 bg-base-100 rounded-2xl"
+        class="group p-4 bg-base-200 rounded-2xl"
       >
         <button
           @click="toggle(idx)"
