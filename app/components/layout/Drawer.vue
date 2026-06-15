@@ -49,7 +49,7 @@
                 <ul class="before:right-4 before:left-auto mr-3 ml-0 pr-3 pl-0 gap-2 border-r border-neutral-200 dark:border-neutral-800">
                   <li v-for="child in [...cat.children].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))" :key="child?.id">
                     <NuxtLink 
-                      :to="`/products/${child?.slug}`" 
+                      :to="`/categories/${child?.slug}`" 
                       @click="$emit('close')" 
                       active-class="neutral-link"
                       exact-class="neutral-link"

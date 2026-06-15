@@ -68,13 +68,15 @@ const activeSlide = ref(0)
 let slideTimer: ReturnType<typeof setInterval> | null = null
 
 const items = computed(() => {
-  return productCategories.value.map(cat => ({
-    url: `/categories/${cat.slug}`,
-    icon: cat.image_url ?? '',
-    title_fa: cat.name,
-    meta_title: cat.meta_title,
-    sub_title_fa: cat.description ?? ''
-  }))
+  return [...productCategories.value]
+    .sort((a, b) => a.sort_order - b.sort_order)
+    .map(cat => ({
+      url: `/categories/${cat.slug}`,
+      icon: cat.image_url ?? '',
+      title_fa: cat.name,
+      meta_title: cat.meta_title,
+      sub_title_fa: cat.description ?? ''
+    }))
 })
 
 const gallery = computed(() => props.page?.content?.image_gallery ?? [])
