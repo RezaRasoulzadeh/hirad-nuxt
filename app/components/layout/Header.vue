@@ -96,26 +96,7 @@
 
       <div class="navbar-end w-auto shrink-0 flex items-center gap-3 justify-end">
 
-        <div ref="searchContainer" class="flex items-center justify-end h-10">
-          <div
-            class="flex items-center border border-neutral-200 dark:border-neutral-800 rounded-xl bg-base-100 overflow-hidden transition-[width,border-color] duration-300 ease-in-out"
-            :class="isSearchOpen ? 'w-44 sm:w-64 border-primary/50' : 'w-10 border-transparent bg-transparent'">
-            <button @click="isSearchOpen ? handleSearch() : (isSearchOpen = true)"
-              class="btn btn-ghost btn-circle btn-sm size-10 shrink-0" aria-label="Search">
-              <Search class="size-5" />
-            </button>
-
-            <input ref="searchInput" v-model="searchQuery" type="text" placeholder="جستجو..."
-              class="input input-sm border-0 focus:outline-none w-full bg-transparent px-1 text-sm transition-opacity duration-200"
-              :class="isSearchOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'"
-              @keyup.enter="handleSearch" />
-
-            <button v-if="isSearchOpen" @click="isSearchOpen = false"
-              class="btn btn-ghost btn-sm btn-circle size-8 shrink-0 text-neutral-400 hover:text-base-content mr-1">
-              <X class="size-4" />
-            </button>
-          </div>
-        </div>
+        <Search />
 
         <button @click="toggleTheme" class="btn btn-ghost btn-circle swap swap-rotate" aria-label="Toggle Theme">
           <Sun v-if="isDark" class="size-5" />
@@ -192,35 +173,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
-import { House, Info, Newspaper, Phone, ShoppingBag, Sun, Moon, Menu, Search, X, ChevronDown } from 'lucide-vue-next'
+import { ref, onMounted } from 'vue'
+import { House, Info, Newspaper, Phone, ShoppingBag, Sun, Moon, Menu, ChevronDown } from 'lucide-vue-next'
 import LogoWide from '~/assets/Logo-wide.png'
+import Search from '../shared/Search.vue'
 
 defineEmits(['open-drawer'])
 
 const isDark = ref(false)
-const isSearchOpen = ref(false)
-const searchQuery = ref('')
-const searchContainer = ref<HTMLElement | null>(null)
-const searchInput = ref<HTMLInputElement | null>(null)
-
-watch(isSearchOpen, async (isOpen) => {
-  if (isOpen) {
-    await nextTick()
-    searchInput.value?.focus()
-  } else {
-    searchQuery.value = ''
-  }
-})
-
-const handleClickOutside = (event: MouseEvent) => {
-  if (searchContainer.value && !searchContainer.value.contains(event.target as Node)) {
-    isSearchOpen.value = false
-  }
-}
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
   const savedTheme = localStorage.getItem('theme')
   if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
     isDark.value = true
@@ -230,20 +192,10 @@ onMounted(() => {
   }
 })
 
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
-
 const toggleTheme = () => {
   isDark.value = !isDark.value
   const themeName = isDark.value ? 'dark' : 'light'
   document.documentElement.setAttribute('data-theme', themeName)
   localStorage.setItem('theme', themeName)
-}
-
-const handleSearch = () => {
-  if (searchQuery.value.trim()) {
-    console.log('Searching for:', searchQuery.value)
-  }
 }
 </script>

@@ -40,7 +40,7 @@
           class="text-xs text-primary"
         >کپی شد!</span>
         <NuxtLink
-          :to="`/products/${item.slug}`"
+          :to="`/product/${item.slug}`"
           class="font-bold text-xl text-base-content hover:text-primary transition-colors leading-snug"
         >
           {{ item.short_description?.name_fa ?? item.name }} | 

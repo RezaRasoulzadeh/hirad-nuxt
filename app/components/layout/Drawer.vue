@@ -80,7 +80,7 @@
               
               <NuxtLink 
                 v-else 
-                :to="`/products/${cat?.slug}`" 
+                :to="`/product/${cat?.slug}`" 
                 @click="$emit('close')" 
                 active-class="neutral-link"
                 exact-class="neutral-link"

@@ -7,7 +7,11 @@
           تماس با ما
         </h1>
         <p class="text-base-content/60 text-sm md:text-base">
-         اینجا هستیم که کمک کنیم! سوالی درباره محصولات، خدمات، یا سفارش‌ها دارید؟ یا دنبال مشاوره تخصصی هستید؟ با بخش مشاوره، فروش، یا حتی مدیریت می‌تونید راحت در تماس باشید. منتظر شنیدن از شما هستیم!
+          اینجا هستیم که کمک کنیم! سوالی درباره محصولات، خدمات، یا سفارش‌ها دارید؟ یا دنبال مشاوره تخصصی هستید؟
+        </p>
+        <p class="text-base-content/60 text-sm md:text-base">
+          با بخش
+          مشاوره، فروش، یا حتی مدیریت می‌تونید راحت در تماس باشید.
         </p>
       </div>
 
@@ -19,22 +23,15 @@
           <div class="relative flex flex-col gap-7">
             <div class="absolute right-4.75 top-3 bottom-3 w-px bg-base-300" aria-hidden="true"></div>
 
-            <div
-              v-for="(item, idx) in contactInfo"
-              :key="item.label"
-              class="relative flex items-start gap-4"
-            >
-              <div class="relative z-10 flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary shrink-0">
+            <div v-for="(item, idx) in contactInfo" :key="item.label" class="relative flex items-start gap-4">
+              <div
+                class="relative z-10 flex items-center justify-center w-10 h-10 rounded-full bg-base-300 text-primary shrink-0">
                 <component :is="item.icon" class="size-5" />
               </div>
               <div class="flex flex-col gap-0.5 pt-1.5">
                 <span class="text-xs text-base-content/50 font-bold">{{ item.label }}</span>
-                <component
-                  :is="item.href ? 'a' : 'span'"
-                  :href="item.href"
-                  class="text-sm text-base-content font-medium"
-                  :class="item.href ? 'hover:text-primary transition-colors' : ''"
-                >
+                <component :is="item.href ? 'a' : 'span'" :href="item.href" class="text-base-content font-medium"
+                  :class="item.href ? 'hover:text-primary transition-colors' : ''">
                   {{ item.value }}
                 </component>
               </div>
@@ -46,15 +43,9 @@
           <div class="flex flex-col gap-3">
             <span class="text-xs text-base-content/50 font-bold">شبکه‌های اجتماعی</span>
             <div class="flex items-center gap-3">
-              <a
-                v-for="icon in socialIcons"
-                :key="icon.label"
-                :href="icon.href"
-                target="_blank"
-                rel="noopener noreferrer"
-                :aria-label="icon.label"
-                class="flex items-center justify-center w-10 h-10 rounded-full bg-base-200 text-base-content/60 hover:bg-primary/10 hover:text-primary transition-colors"
-              >
+              <a v-for="icon in socialIcons" :key="icon.label" :href="icon.href" target="_blank"
+                rel="noopener noreferrer" :aria-label="icon.label"
+                class="flex items-center justify-center w-10 h-10 rounded-full bg-base-200 text-base-content/60 hover:bg-primary/10 hover:text-primary transition-colors">
                 <component :is="icon.svg" class="size-5" />
               </a>
             </div>
@@ -66,90 +57,60 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div class="form-control w-full">
-                <label for="name" class="label">
+                <!-- Added pb-2 here -->
+                <label for="name" class="label pb-2">
                   <span class="label-text font-medium text-base-content/80">نام و نام خانوادگی</span>
                 </label>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  v-model="form.name"
-                  autocomplete="name"
-                  placeholder="نام خود را وارد کنید"
-                  required
-                  class="input input-bordered w-full rounded-btn focus:input-primary"
-                />
+                <input id="name" name="name" type="text" v-model="form.name" autocomplete="name"
+                  placeholder="نام خود را وارد کنید" required
+                  class="input input-bordered w-full rounded-btn focus:input-primary" />
               </div>
 
               <div class="form-control w-full">
-                <label for="department" class="label">
+                <!-- Added pb-2 here -->
+                <label for="department" class="label pb-2">
                   <span class="label-text font-medium text-base-content/80">بخش مربوطه</span>
                 </label>
-                <select
-                  id="department"
-                  name="department"
-                  v-model="form.department"
-                  required
-                  class="select select-bordered w-full rounded-btn focus:select-primary"
-                >
+                <select id="department" name="department" v-model="form.department" required
+                  class="select select-bordered w-full rounded-btn focus:select-primary">
                   <option value="" disabled selected>انتخاب دپارتمان</option>
                   <option v-for="dep in departments" :key="dep" :value="dep">{{ dep }}</option>
                 </select>
               </div>
 
               <div class="form-control w-full">
-                <label for="email" class="label">
+                <!-- Added pb-2 here -->
+                <label for="email" class="label pb-2">
                   <span class="label-text font-medium text-base-content/80">آدرس ایمیل</span>
                 </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  v-model="form.email"
-                  autocomplete="email"
-                  placeholder="Email@Example.com"
-                  required
-                  class="input input-bordered w-full rounded-btn focus:input-primary text-left"
-                />
+                <input id="email" name="email" type="email" v-model="form.email" autocomplete="email"
+                  placeholder="Email@Example.com" required
+                  class="input input-bordered w-full rounded-btn focus:input-primary text-left" />
               </div>
 
               <div class="form-control w-full">
-                <label for="phone" class="label">
+                <!-- Added pb-2 here -->
+                <label for="phone" class="label pb-2">
                   <span class="label-text font-medium text-base-content/80">شماره تماس</span>
                 </label>
-                <input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  v-model="form.phone"
-                  autocomplete="tel"
+                <input id="phone" name="phone" type="tel" v-model="form.phone" autocomplete="tel"
                   placeholder="۰۹۱۲۳۴۵۶۷۸۹"
-                  class="input input-bordered w-full rounded-btn focus:input-primary text-left"
-                />
+                  class="input input-bordered w-full rounded-btn focus:input-primary text-left" />
               </div>
             </div>
 
             <div class="form-control w-full">
-              <label for="message" class="label">
+              <!-- Added pb-2 here -->
+              <label for="message" class="label pb-2">
                 <span class="label-text font-medium text-base-content/80">متن پیام</span>
               </label>
-              <textarea
-                id="message"
-                name="message"
-                v-model="form.message"
-                placeholder="پیام خود را در این قسمت بنویسید..."
-                required
-                rows="5"
-                class="textarea textarea-bordered w-full rounded-btn focus:textarea-primary resize-none"
-              ></textarea>
+              <textarea id="message" name="message" v-model="form.message"
+                placeholder="پیام خود را در این قسمت بنویسید..." required rows="5"
+                class="textarea textarea-bordered w-full rounded-btn focus:textarea-primary resize-none"></textarea>
             </div>
 
-            <button
-              id="send-contact-message"
-              type="submit"
-              class="btn btn-primary w-full rounded-btn no-animation mt-2"
-              :disabled="loading"
-            >
+            <button id="send-contact-message" type="submit" class="btn btn-primary w-full rounded-btn no-animation mt-2"
+              :disabled="loading">
               <span v-if="loading" class="loading loading-spinner loading-sm"></span>
               {{ loading ? 'در حال ارسال...' : 'ارسال پیام' }}
             </button>
@@ -172,9 +133,11 @@ const { form, loading, departments, submitForm } = useContact()
 const toast = useToast()
 
 const contactInfo = [
-  { label: 'تلفن تماس', value: '۰۲۱-۶۶۴۲۰۸۳۹', href: 'tel:+982166420839', icon: Phone },
-  { label: 'ایمیل', value: 'info@example.com', href: 'mailto:info@example.com', icon: Mail },
-  { label: 'آدرس', value: 'تهران، ایران', href: undefined, icon: MapPin },
+  { label: 'تلفن تماس ۱', value: '۰۲۱-۶۶۴۲۰۸۳۹', href: 'tel:+982166420839', icon: Phone },
+  { label: 'تلفن تماس ۲', value: '۰۲۱-۶۶۴۲۹۸۱۶', href: 'tel:+982166429816', icon: Phone },
+  { label: 'تلفن همراه', value: '۰۹۳۵-۲۵۵۷۱۶۳', href: 'tel:+989352557163', icon: Phone },
+  { label: 'ایمیل', value: 'info@hiradepc.ir', href: 'mailto:info@hiradepc.ir', icon: Mail },
+  { label: 'آدرس', value: 'تهران، خیابان ستارخان، خیابان نیایش، کوچه موثق نژاد، پلاک ۱، واحد یک', href: undefined, icon: MapPin },
 ]
 
 const socialIcons = [
