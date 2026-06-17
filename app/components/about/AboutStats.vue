@@ -1,5 +1,5 @@
 <template>
-  <section ref="sectionRef" class="bg-primary/5 border-y border-primary/10 py-12 md:py-16" dir="rtl">
+  <section ref="sectionRef" class="bg-base-200 border-y border-base-300 py-12 md:py-16" dir="rtl">
     <div class="container mx-auto px-4 lg:px-0">
       <div class="grid grid-cols-2 md:grid-cols-5 gap-8 md:gap-4 text-center">
         <div
