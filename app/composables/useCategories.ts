@@ -61,7 +61,6 @@ export const useCategories = () => {
     })
   }
 
-  // Recursive flat search to find a category by ID inside a nested tree structure
   const findCategoryById = (nodes: Category[], id: string): Category | null => {
     if (!nodes || !Array.isArray(nodes)) return null
     for (const node of nodes) {
@@ -73,7 +72,7 @@ export const useCategories = () => {
       }
     }
     return null
-  };
+  }
 
   const getCategoryLineage = (categoryId?: string | null) => {
     return computed(() => {

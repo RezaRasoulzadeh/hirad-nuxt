@@ -15,11 +15,11 @@
     </div>
 
     <div v-else class="bg-base-200/30 min-h-screen pb-16">
-      <ProductBreadcrumb 
-        :parentCategory="lineage.parentCategory" 
+      <ProductBreadcrumb
+        :parentCategory="lineage.parentCategory"
         :currentCategory="lineage.currentCategory"
-        :productName="product?.short_description?.name_fa || 'محصول'" 
-        :product-meta="product?.short_description?.name || 'محصول'" 
+        :productName="product?.short_description?.name_fa || 'محصول'"
+        :product-meta="product?.short_description?.name || 'محصول'"
       />
 
       <main class="mt-4 flex flex-col gap-10">
@@ -30,18 +30,18 @@
           </div>
 
           <div class="w-full flex flex-col gap-6">
-            <ProductInfo 
-              :sku="product?.sku || '---'" 
+            <ProductInfo
+              :sku="product?.sku || '---'"
               :name="product?.name || '---'"
               :nameFa="product?.short_description?.name_fa"
               :description="product?.short_description?.description || ''"
-              :descriptionFa="product?.short_description?.description_fa" 
+              :descriptionFa="product?.short_description?.description_fa"
               :copiedSku="copiedSku"
-              @copySku="copyToClipboard(product?.sku || '')" 
+              @copySku="copyToClipboard(product?.sku || '')"
             />
 
             <ProductFeatures
-              :features="product?.short_description?.features_fa || product?.short_description?.features || []" 
+              :features="product?.short_description?.features_fa || product?.short_description?.features || []"
             />
 
             <div class="card bg-base-100 border border-base-200 shadow-sm" dir="rtl">
@@ -53,11 +53,11 @@
                   </span>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full sm:w-auto">
-                  <a href="tel:+989352557163" class="btn btn-primary outline-1 outline-offset-3 outline-dashed outline-transparent hover:outline-primary text-base-content flex items-center gap-2 py-6 rounded-xl">
+                  <a href="tel:+989352557163" class="btn btn-primary outline-1 outline-offset-3 outline-dashed outline-transparent hover:outline-primary flex items-center gap-2 py-6 rounded-xl">
                     <Phone class="size-5"/>
                     استعلام قیمت و موجودی
                   </a>
-                  <a href="tel:+982166420839" class="btn btn-dash btn-primary text-base-content flex items-center gap-2 py-6 rounded-xl">
+                  <a href="tel:+982166420839" class="btn btn-dash btn-primary flex items-center gap-2 py-6 rounded-xl">
                     تماس با کارشناس فنی
                   </a>
                 </div>
@@ -68,23 +68,23 @@
         </div>
 
         <div class="container mx-auto px-4 lg:px-0 mt-4">
-          <ProductTabs 
+          <ProductTabs
             v-model:activeTab="activeTab"
             :specifications="product?.long_description?.specifications || []"
-            :explanations="product?.long_description?.explanation || []" 
+            :explanations="product?.long_description?.explanation || []"
           />
         </div>
 
-        <SharedApplications 
-          :items="product?.long_description?.applications || []" 
+        <SharedApplications
+          :items="product?.long_description?.applications || []"
           :resolveUrl="resolveUrl"
-          variant="list" 
-          :showHeading="true" 
+          variant="list"
+          :showHeading="true"
         />
         <div class="w-full">
-        <SharedFaq 
-          v-if="product?.long_description?.faq?.length" :items="product?.long_description?.faq || []" 
-        />
+          <SharedFaq
+            v-if="product?.long_description?.faq?.length" :items="product?.long_description?.faq || []"
+          />
         </div>
       </main>
     </div>
@@ -92,17 +92,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import { Phone, WifiOff } from 'lucide-vue-next'
-import { useProduct } from '~/composables/useProduct'
-import { useRuntimeConfig, useAsyncData } from '#app'
-import { useCategories } from '~/composables/useCategories'
 import placeholderImg from '~/assets/placeholder.png'
-
+import type { ApplicationItem } from '~/types/product'
 const config = useRuntimeConfig()
 const apiBase = (config.public.apiBase as string) || ''
-
-const { fetchCategories, getCategoryLineage } = useCategories()
 
 const {
   product,
@@ -117,7 +111,9 @@ const {
   formatPrice
 } = useProduct()
 
-await useAsyncData('init-categories', () => fetchCategories())
+const { fetchCategories, getCategoryLineage } = useCategories()
+
+await fetchCategories()
 
 const lineage = computed(() => {
   const categoryId = product.value?.category_id

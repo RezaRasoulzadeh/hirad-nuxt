@@ -1,5 +1,6 @@
 import { ref, computed, watch } from 'vue'
 import { useRoute, useRuntimeConfig, useFetch } from '#app'
+import type { ProductImage } from '~/composables/useProductList'
 
 export interface FeatureItem {
   [key: string]: string
@@ -40,9 +41,9 @@ export interface ProductData {
     specifications?: SpecificationItem[]
   }
   price: number
-  discount_price: number
-  stock_quantity: number
-  is_active: boolean
+  discount_price?: number
+  stock_quantity?: number
+  is_active?: boolean
 }
 
 export interface ApiResponse {
@@ -55,18 +56,21 @@ export interface ApiResponse {
 export const useProduct = () => {
   const route = useRoute()
   const config = useRuntimeConfig()
-  const slug = (route?.params?.slug as string) || ''
-  
+
+  // Reactive slug — refetches on client-side route change
+  const slug = computed(() => (route.params.slug as string) || '')
+
   const activeImage = ref<string | null>(null)
   const copiedSku = ref(false)
   const activeTab = ref<'specifications' | 'explanation'>('specifications')
 
   const { data: productResponse, pending, error, refresh } = useFetch<ApiResponse>(
-    `/products/${slug}`,
+    () => `/products/${slug.value}`,
     {
       baseURL: config?.public?.apiBase || '',
-      key: `product-${slug}`,
-      immediate: !!slug
+      key: () => `product-${slug.value}`,
+      watch: [slug],
+      immediate: !!slug.value
     }
   )
 
@@ -75,13 +79,18 @@ export const useProduct = () => {
   const sortedImages = computed(() => {
     const targetImages = product.value?.short_description?.images
     if (!targetImages || !Array.isArray(targetImages)) return []
-    
+
     return [...targetImages].sort((a, b) => {
       if (!a || !b) return 0
       if (a.is_primary && !b.is_primary) return -1
       if (!a.is_primary && b.is_primary) return 1
       return (a.sort_order || 0) - (b.sort_order || 0)
     })
+  })
+
+  // Reset on slug change, then re-select primary image once new data lands
+  watch(slug, () => {
+    activeImage.value = null
   })
 
   watch(sortedImages, (newImages) => {

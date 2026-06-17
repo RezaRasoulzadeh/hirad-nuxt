@@ -14,12 +14,15 @@
     </div>
 
     <LayoutDrawer @close="isDrawerOpen = false" :loading="loading" :categories="categories" />
+
+    <GlobalToast />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import type { Category } from '~/composables/useCategories'
+import GlobalToast from '~/components/shared/GlobalToast.vue'
 
 interface ApiResponse {
   code: number
