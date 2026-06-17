@@ -1,5 +1,5 @@
 <template>
-  <section class="container mx-auto px-4 lg:px-0 py-6 mb-8" dir="rtl">
+  <section v-if="items && items.length > 0" class="container mx-auto px-4 lg:px-0 py-6 mb-8" dir="rtl">
     <div class="flex flex-col items-center text-center mb-8">
       <span class="text-xs font-bold tracking-[0.2em] text-primary uppercase mb-3">Applications</span>
       <h2 class="text-2xl md:text-3xl font-black text-base-content tracking-tight">کاربردها</h2>
@@ -25,7 +25,7 @@
             loading="lazy"
             @error="handleImageError"
           />
-          <Cog v-else class="size-12 text-base-content/40" />
+          <Cog v-else class="size-12 text-base-content" />
         </div>
         <h3 class="text-sm font-bold text-base-content group-hover:text-primary transition-colors">
           {{ app?.title_fa || '---' }}

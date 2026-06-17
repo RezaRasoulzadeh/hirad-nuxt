@@ -86,6 +86,7 @@
             v-if="product?.long_description?.faq?.length" :items="product?.long_description?.faq || []"
           />
         </div>
+        <WhyChooseUs/>
       </main>
     </div>
   </div>
@@ -94,6 +95,7 @@
 <script setup lang="ts">
 import { Phone, WifiOff } from 'lucide-vue-next'
 import placeholderImg from '~/assets/placeholder.png'
+import WhyChooseUs from '~/components/category/WhyChooseUs.vue'
 import type { ApplicationItem } from '~/types/product'
 const config = useRuntimeConfig()
 const apiBase = (config.public.apiBase as string) || ''

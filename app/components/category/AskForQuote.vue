@@ -19,7 +19,7 @@ import { Headset } from 'lucide-vue-next';
             درخواست قیمت
           </h2>
           <div class="bg-primary h-1 w-12 mt-4 rounded-full opacity-80" />
-          <p class="text-base-content/70 mx-auto text-sm leading-relaxed mt-4 max-w-xl">
+          <p class="text-base-content/70 mx-auto text-sm leading-relaxed mt-4">
             اگر نیازهای خاصی دارید یا به راه‌حل سفارشی نیازمندید، لطفاً برای دریافت قیمت با ما تماس بگیرید.
             تیم ما با خوشحالی آماده پاسخگویی به نیازهای شماست.
           </p>
