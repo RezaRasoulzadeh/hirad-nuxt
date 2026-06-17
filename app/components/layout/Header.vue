@@ -1,6 +1,6 @@
 <template>
   <header
-    class="sticky top-0 z-40 border-b border-neutral-200 dark:border-neutral-800 bg-base-100/80 backdrop-blur-md border-t-4 border-t-primary transition-colors duration-300">
+    class="sticky top-0 z-40 bg-base-100/80 backdrop-blur-md border-t-4 border-t-primary transition-colors duration-300">
     <div class="mx-auto max-w-[1920px] px-4 lg:px-16 navbar h-18 justify-between gap-4">
 
       <div class="navbar-start w-auto shrink-0">
@@ -52,7 +52,7 @@
                 <ul
                   class="menu bg-base-100 rounded-xl w-56 p-2 shadow-lg border border-neutral-200 dark:border-neutral-800 gap-0.5">
                   <li>
-                    <NuxtLink to="/about/company" active-class="!text-primary bg-primary/5"
+                    <NuxtLink to="/about" active-class="!text-primary bg-primary/5"
                       class="py-2.5 focus:bg-transparent text-right">
                       <div class="flex flex-col">
                         <span class="text-sm font-medium">معرفی شرکت</span>
@@ -142,7 +142,7 @@
                 </summary>
                 <ul class="mr-4 ml-0 pr-3 pl-0 border-r border-neutral-200 dark:border-neutral-800 gap-1 my-1">
                   <li>
-                    <NuxtLink to="/about/company" active-class="!text-primary bg-primary/5"
+                    <NuxtLink to="/about" active-class="!text-primary bg-primary/5"
                       class="flex flex-col items-start gap-0"><span>معرفی شرکت</span></NuxtLink>
                   </li>
                   <li>

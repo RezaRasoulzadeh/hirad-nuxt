@@ -36,7 +36,6 @@ const { data } = await useAsyncData('home-and-certificates', async () => {
   }
 })
 
-// Fallback safety layer to ensure data remains populated under all hydration scenarios
 if (data.value) {
   page.value = data.value.homePage
   certificatePage.value = data.value.certificates

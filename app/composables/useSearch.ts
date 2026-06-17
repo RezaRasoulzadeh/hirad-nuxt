@@ -1,16 +1,6 @@
 import { ref, computed, type Ref } from 'vue'
 import { useRuntimeConfig } from '#app'
 
-export interface ProductImage {
-  image_url: string
-  is_primary: boolean
-  sort_order: number
-  media_asset_id?: string
-}
-
-export interface ProductFeature {
-  [key: string]: string
-}
 
 export interface ParsedProductTitle {
   name?: string
