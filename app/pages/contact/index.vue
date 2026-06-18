@@ -123,7 +123,7 @@
 </template>
 
 <script setup lang="ts">
-import { Phone, Mail, MapPin, Instagram, Send } from 'lucide-vue-next'
+import { Phone, Mail, MapPin, Instagram, Send, MessageCircleMore, MessageCircleCheck } from 'lucide-vue-next'
 
 useHead({
   title: 'تماس با ما',
@@ -141,8 +141,11 @@ const contactInfo = [
 ]
 
 const socialIcons = [
-  { label: 'اینستاگرام', href: '#', svg: Instagram },
-  { label: 'تلگرام', href: '#', svg: Send },
+  { label: 'WhatsApp', href: '#', svg: MessageCircleMore },
+  { label: 'Telegram', href: '#', svg: Send },
+  { label: 'Instagram', href: '#', svg: Instagram },
+  { label: 'Bale', href: '#', svg: MessageCircleCheck },
+  { label: 'Email', href: '#', svg: Mail }
 ]
 
 const handleSubmit = async () => {
