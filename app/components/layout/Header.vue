@@ -31,7 +31,7 @@
           </li>
 
           <li class="h-full flex items-center">
-            <NuxtLink to="/news"
+            <NuxtLink to="/blog"
               class="h-full px-4 pt-2.5 rounded-none text-base-content hover:bg-primary/5 hover:text-primary hover:border-primary border-b-2 border-transparent transition-all duration-300 ease-in-out gap-2 group"
               active-class="!text-primary">
               <Newspaper class="size-4 transition-transform duration-300 group-hover:scale-110" />
@@ -124,7 +124,7 @@
               </button>
             </li>
             <li>
-              <NuxtLink to="/news"
+              <NuxtLink to="/blog"
                 class="p-3 text-base text-base-content hover:bg-primary/5 transition-all duration-300"
                 active-class="!text-primary border-s-2 bg-primary/5">
                 <Newspaper class="size-5" />

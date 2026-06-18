@@ -118,7 +118,7 @@ interface SocialItem {
 const items: FooterItem[] = [
   { label: 'صفحه اصلی', to: '/', icon: House },
   { label: 'محصولات', emit: 'open-drawer', icon: ShoppingBag },
-  { label: 'اخبار و مقالات', to: '/news', icon: Newspaper },
+  { label: 'اخبار و مقالات', to: '/blog', icon: Newspaper },
   { label: 'درباره ما', to: '/about', icon: Info },
   { label: 'تماس با ما', to: '/contact', icon: Phone }
 ]
