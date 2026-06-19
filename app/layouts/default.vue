@@ -16,6 +16,7 @@
     <LayoutDrawer @close="isDrawerOpen = false" :loading="loading" :categories="categories" />
 
     <GlobalToast />
+    <FloatingContact />
   </div>
 </template>
 
@@ -23,6 +24,7 @@
 import { ref } from 'vue'
 import type { Category } from '~/composables/useCategories'
 import GlobalToast from '~/components/shared/GlobalToast.vue'
+import FloatingContact from '~/components/shared/FloatingContact.vue'
 
 interface ApiResponse {
   code: number
