@@ -9,6 +9,9 @@ export default defineNuxtConfig({
       apiBase: process.env.API_BASE_URL || 'http://localhost:3000/api'
     }
   },
+  routeRules: {
+    '/flipHTML/**': { ssr: false, static: true }
+  },
   app: {
     head: {
       htmlAttrs: { dir: 'rtl', lang: 'fa', 'data-theme': 'light' },
