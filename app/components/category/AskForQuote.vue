@@ -27,7 +27,7 @@ import { Headset } from 'lucide-vue-next';
 
         <div class="relative z-10 text-center">
           <NuxtLink
-            to="/contact-us"
+            to="/contact"
             class="btn btn-primary outline-1 outline-offset-3 outline-dashed outline-transparent hover:outline-primary border-0 rounded-xl font-bold px-12 py-6 transition-all"
           >
             <Headset class="size-5"/>

@@ -96,7 +96,9 @@
 import { Phone, WifiOff } from 'lucide-vue-next'
 import placeholderImg from '~/assets/placeholder.png'
 import WhyChooseUs from '~/components/category/WhyChooseUs.vue'
-import type { ApplicationItem } from '~/types/product'
+import { computed } from 'vue'
+import { useRuntimeConfig, useSeoMeta } from '#app'
+
 const config = useRuntimeConfig()
 const apiBase = (config.public.apiBase as string) || ''
 
@@ -123,6 +125,27 @@ const lineage = computed(() => {
   return getCategoryLineage(categoryId).value
 })
 
+useSeoMeta({
+  title: () => {
+    const name = product.value?.short_description?.name_fa || product.value?.short_description?.name || product.value?.name
+    return name ? `${name} | هیراد` : 'مشخصات محصول'
+  },
+  ogTitle: () => product.value?.short_description?.name_fa || product.value?.short_description?.name || product.value?.name,
+  
+  description: () => product.value?.short_description?.description_fa || product.value?.short_description?.description,
+  ogDescription: () => product.value?.short_description?.description_fa || product.value?.short_description?.description,
+  
+ogImage: () => {
+    const primaryImg = activeImage.value || (sortedImages.value && sortedImages.value[0])
+    
+    const imgUrlString = primaryImg && typeof primaryImg === 'object'
+      ? primaryImg.image_url
+      : primaryImg
+
+    return imgUrlString ? resolveUrl(imgUrlString) : placeholderImg
+  },
+  twitterCard: 'summary_large_image'
+})
 function resolveUrl(path?: string | null): string {
   if (!path) return placeholderImg
   if (path.startsWith('http')) return path

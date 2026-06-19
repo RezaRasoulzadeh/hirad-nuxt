@@ -57,7 +57,6 @@ export const useProduct = () => {
   const route = useRoute()
   const config = useRuntimeConfig()
 
-  // Reactive slug — refetches on client-side route change
   const slug = computed(() => (route.params.slug as string) || '')
 
   const activeImage = ref<string | null>(null)
@@ -88,7 +87,6 @@ export const useProduct = () => {
     })
   })
 
-  // Reset on slug change, then re-select primary image once new data lands
   watch(slug, () => {
     activeImage.value = null
   })

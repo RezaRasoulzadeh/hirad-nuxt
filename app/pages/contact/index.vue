@@ -125,10 +125,16 @@
 <script setup lang="ts">
 import { Phone, Mail, MapPin, Instagram, Send, MessageCircleMore, MessageCircleCheck } from 'lucide-vue-next'
 
-useHead({
-  title: 'تماس با ما',
+useSeoMeta({
+  title: 'تماس با ما | هیراد',
+  ogTitle: 'تماس با ما | شرکت فنی مهندسی هیراد',
+  
+  description: 'با بخش مشاوره تخصصی، فروش، پشتیبانی یا مدیریت هیراد در ارتباط باشید. فرم تماس را پر کنید یا از طریق شماره‌های تماس و شبکه‌های اجتماعی با ما گفتگو کنید.',
+  ogDescription: 'با بخش مشاوره تخصصی، فروش، پشتیبانی یا مدیریت هیراد در ارتباط باشید. فرم تماس را پر کنید یا از طریق شماره‌های تماس و شبکه‌های اجتماعی با ما گفتگو کنید.',
+  
+  ogType: 'website',
+  twitterCard: 'summary_large_image'
 })
-
 const { form, loading, departments, submitForm } = useContact()
 const toast = useToast()
 
