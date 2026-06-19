@@ -33,6 +33,19 @@
         <slot />
       </main>
       <GlobalToast />
+
+      <div class="dock dock-md lg:hidden border-t border-base-300 bg-base-100 z-30">
+        <NuxtLink 
+          v-for="dockItem in dockNavigationItems" 
+          :key="dockItem.path"
+          :to="dockItem.path"
+          active-class="dock-active text-primary"
+          class="text-base-content/70"
+        >
+          <component :is="dockItem.icon" class="size-5" />
+          <span class="dock-label text-xs font-medium">{{ dockItem.name }}</span>
+        </NuxtLink>
+      </div>
     </div>
 
     <div class="drawer-side z-40">
@@ -62,22 +75,9 @@
         </div>
 
         <div class="p-4 border-t border-base-200 bg-base-200/30 text-xs text-base-content/50 text-center w-full">
-          نسخه سیستم مدیریت نسخه ۵.۰
+           سیستم مدیریت نسخه ۱.۰
         </div>
       </aside>
-    </div>
-
-    <div class="dock dock-md lg:hidden border-t border-base-300 bg-base-100 z-30">
-      <NuxtLink 
-        v-for="dockItem in dockNavigationItems" 
-        :key="dockItem.path"
-        :to="dockItem.path"
-        active-class="dock-active text-primary"
-        class="text-base-content/70"
-      >
-        <component :is="dockItem.icon" class="size-5" />
-        <span class="dock-label text-xs font-medium">{{ dockItem.name }}</span>
-      </NuxtLink>
     </div>
   </div>
 </template>
