@@ -1,6 +1,6 @@
 <template>
   <section
-    class="relative w-full min-h-[60vh] flex items-end overflow-hidden rounded-b-box"
+    class="relative w-full min-h-[60vh] flex items-end overflow-hidden"
     dir="rtl"
   >
     <img
