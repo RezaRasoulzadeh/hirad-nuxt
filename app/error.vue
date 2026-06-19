@@ -15,11 +15,11 @@
         </p>
 
         <div class="flex flex-wrap justify-center gap-3">
-          <button type="button" class="btn btn-primary min-w-36" @click="goHome">
+          <button type="button" class="btn btn-primary outline-1 outline-offset-2 outline-dashed outline-transparent hover:outline-primary min-w-36" @click="goHome">
             صفحه اصلی
           </button>
 
-          <button type="button" class="btn btn-outline min-w-36" @click="goBack">
+          <button type="button" class="btn btn-dash btn-primary min-w-36" @click="goBack">
             بازگشت
           </button>
         </div>
