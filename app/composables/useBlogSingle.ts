@@ -6,7 +6,7 @@ export interface BlogBlock {
   author?: string
 }
 
-export interface BlogPost {
+export interface BlogPostSingle {
   id: string
   category_id: string
   title: string
@@ -28,10 +28,10 @@ interface ApiResponse {
   code: number
   success: boolean
   message: string
-  data: BlogPost
+  data: BlogPostSingle
 }
 
-export const useBlog = () => {
+export const useBlogSingle = () => {
   const config = useRuntimeConfig()
   const apiBase = config.public.apiBase || 'http://localhost:3000/api'
 

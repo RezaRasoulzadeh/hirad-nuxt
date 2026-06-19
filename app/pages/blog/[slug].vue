@@ -76,12 +76,12 @@
 import { useRoute, useAsyncData } from '#app'
 import { computed } from 'vue'
 import { WifiOff, SearchX } from 'lucide-vue-next'
-import { useBlog } from '~/composables/useBlogSingle'
+import { useBlogSingle } from '~/composables/useBlogSingle'
 import { resolveAssetUrl } from '~/utils/resolveAssetUrl'
 import BlogBlockRenderer from '~/components/blog/BlockRenderer.vue'
 
 const route = useRoute()
-const { fetchPostByRawSlug } = useBlog()
+const { fetchPostByRawSlug } = useBlogSingle()
 
 const rawSlugSegment = computed(() => {
   const pathParts = route.path.split('/')

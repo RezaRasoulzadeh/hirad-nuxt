@@ -30,7 +30,7 @@
               تجهیز فرآیند هیراد را دریافت نمایید.
             </p>
 
-            <NuxtLink to="/catalogue" class="btn btn-primary gap-2 px-8 group">
+            <NuxtLink to="/about/catalogue" class="btn btn-primary gap-2 px-8 group">
               <span class="pt-1">مشاهده و دریافت کاتالوگ</span>
 
               <ArrowLeft class="size-4 transition-transform duration-200 group-hover:-translate-x-1" />
