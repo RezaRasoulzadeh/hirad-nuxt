@@ -1,30 +1,59 @@
 // server/api/auth/refresh.post.ts
+import { defineEventHandler, getRequestHeader, setCookie, deleteCookie, appendHeader, createError } from 'h3'
+
+interface RefreshResponse {
+  success: boolean
+  data?: {
+    user_id: string
+    access_token: string
+  }
+}
+
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig();
-  const cookies = parseCookies(event);
+  const config = useRuntimeConfig()
+
+  const cookieHeader = getRequestHeader(event, 'cookie') || ''
 
   try {
-    // Proxy request downstream to backend engine running on port :3000
     const response = await $fetch.raw(`${config.public.apiBase}/refresh`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // Pass the cookie header exactly as received from the browser
-        Cookie: event.node.req.headers.cookie || '',
-      }
-    });
+      headers: { Cookie: cookieHeader },
+      credentials: 'include',
+      ignoreResponseError: true,
+    })
 
-    // Capture any updated tokens/set-cookie instructions issued by your real backend
-    const setCookieHeader = response.headers.get('set-cookie');
-    if (setCookieHeader) {
-      appendHeader(event, 'set-cookie', setCookieHeader);
+    const body = response._data as RefreshResponse
+
+    if (body?.success && body?.data?.access_token) {
+
+      setCookie(event, 'hirad_at', body.data.access_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 15,
+      })
+
+      setCookie(event, 'hirad_session', '1', {
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 15,
+      })
+
+      const setCookies = response.headers.getSetCookie?.() || []
+      for (const c of setCookies) {
+        appendHeader(event, 'set-cookie', c)
+      }
+
+      return body
     }
 
-    return { success: true };
+    throw createError({ statusCode: 401, message: 'Refresh failed' })
   } catch (error: any) {
-    throw createError({
-      statusCode: 401,
-      message: 'جلسه کاری شما منقضی شده است. لطفا مجددا وارد شوید.',
-    });
+    console.error('[Refresh Proxy] ERROR:', error?.message || error)
+    deleteCookie(event, 'hirad_session', { path: '/' })
+    deleteCookie(event, 'hirad_at', { path: '/' })
+    throw createError({ statusCode: 401, message: 'Refresh failed' })
   }
-});
+})

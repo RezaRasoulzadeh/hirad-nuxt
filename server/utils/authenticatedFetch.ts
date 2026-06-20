@@ -1,55 +1,75 @@
 // server/utils/authenticatedFetch.ts
 import type { H3Event } from 'h3'
-import { refreshUpstream } from './backendAuth'
-import { AUTH_COOKIE, REFRESH_COOKIE } from './cookies'
+import { getCookie, setCookie, deleteCookie } from 'h3'
+import { useRuntimeConfig } from '#imports'
 
-export async function authenticatedFetch(event: H3Event, path: string, options: RequestInit = {}) {
+const AUTH_COOKIE = 'hirad_at'
+const REFRESH_COOKIE = 'hirad_rt'       
+const SESSION_COOKIE = 'hirad_session'
+
+function clearAuthCookies(event: H3Event) {
+  deleteCookie(event, AUTH_COOKIE, { path: '/' })
+  deleteCookie(event, SESSION_COOKIE, { path: '/' })
+}
+
+export async function authenticatedFetch(
+  event: H3Event,
+  path: string,
+  options: RequestInit = {}
+) {
   const config = useRuntimeConfig()
-  const accessToken = getCookie(event, AUTH_COOKIE)
+  let accessToken = getCookie(event, AUTH_COOKIE)
 
-  // Clone or safely inspect body to support safe body stream cloning if necessary
-  const doFetch = (token: string | undefined) => {
-    // If the body is a stream and has already been read, clone would be required here.
-    // For stringified payloads, standard spread works perfectly.
+  const doFetch = async (token?: string) => {
+    const headers: Record<string, string> = { ...(options.headers as any) || {} }
+    if (token) headers.Authorization = `Bearer ${token}`
+
     return fetch(`${config.public.apiBase}${path}`, {
       ...options,
-      headers: {
-        ...((options.headers as Record<string, string>) || {}),
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...(options.body && typeof options.body === 'string' ? { 'Content-Type': 'application/json' } : {})
-      },
-      // Ensures cookies are included if backend needs domain verification
-      credentials: 'include' 
+      headers,
+      credentials: 'include',
     })
   }
 
   let res = await doFetch(accessToken)
 
-  if (res.status === 401) {
-    const refreshToken = getCookie(event, REFRESH_COOKIE)
-    if (refreshToken) {
-      try {
-        const newToken = await refreshUpstream(refreshToken)
-        if (newToken) {
-          setCookie(event, AUTH_COOKIE, newToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            path: '/',
-            maxAge: 60 * 15 // 15 Minutes
-          })
-          
-          // Execute retry with fresh authorization token
-          res = await doFetch(newToken)
-        } else {
-          // Explicit token rejection from upstream API
-          deleteCookie(event, AUTH_COOKIE, { path: '/' })
-          deleteCookie(event, REFRESH_COOKIE, { path: '/' })
+  if (res.status === 401 || res.status === 500) {
+    const text = await res.clone().text()
+
+    if (res.status === 401 || text.includes('Authorization header missing')) {
+      const refreshToken = getCookie(event, REFRESH_COOKIE)
+
+      if (refreshToken) {
+        try {
+          const refreshResponse = await $fetch('/api/auth/refresh', {
+            method: 'POST',
+            credentials: 'include',
+          }) as any
+
+          if (refreshResponse?.success && refreshResponse.data?.access_token) {
+            const newToken = refreshResponse.data.access_token
+
+            setCookie(event, AUTH_COOKIE, newToken, {
+              httpOnly: true,
+              secure: process.env.NODE_ENV === 'production',
+              sameSite: 'lax',
+              path: '/',
+              maxAge: 60 * 15,
+            })
+
+            setCookie(event, SESSION_COOKIE, '1', {
+              secure: process.env.NODE_ENV === 'production',
+              sameSite: 'lax',
+              path: '/',
+              maxAge: 60 * 15,
+            })
+
+            res = await doFetch(newToken)
+          }
+        } catch (e) {
+          console.error('[AuthFetch] Refresh failed:', e)
+          clearAuthCookies(event)
         }
-      } catch (refreshError) {
-        // Fail-safe cleanup for catastrophic backend rotation drops
-        deleteCookie(event, AUTH_COOKIE, { path: '/' })
-        deleteCookie(event, REFRESH_COOKIE, { path: '/' })
       }
     }
   }
