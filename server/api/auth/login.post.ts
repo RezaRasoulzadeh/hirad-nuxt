@@ -1,5 +1,18 @@
 // server/api/auth/login.post.ts
-import { defineEventHandler, setCookie, appendHeader, createError } from 'h3'
+import { defineEventHandler, setCookie, createError, readBody } from 'h3'
+
+interface LoginResponse {
+  success: boolean
+  data?: {
+    user_id: string
+    full_name: string | null
+    phone: string | null
+    email: string | null
+    user_type: string | null
+    access_token: string
+    refresh_token?: string
+  }
+}
 
 export default defineEventHandler(async (event) => {
   const { identifier, password } = await readBody(event)
@@ -13,12 +26,10 @@ export default defineEventHandler(async (event) => {
   const backendRes = await $fetch.raw(`${config.public.apiBase}/login`, {
     method: 'POST',
     body: { identifier, password },
-    credentials: 'include',
     ignoreResponseError: true,
   })
 
-  const body = backendRes._data as any
-
+  const body = backendRes._data as LoginResponse
 
   if (!body?.success || !body?.data?.access_token) {
     throw createError({ statusCode: 401, message: 'ورود ناموفق بود.' })
@@ -33,9 +44,12 @@ export default defineEventHandler(async (event) => {
     maxAge: 60 * 15,
   })
 
-  const setCookies = backendRes.headers.getSetCookie?.() || []
-  for (const cookie of setCookies) {
-    appendHeader(event, 'set-cookie', cookie)
+  if (body.data.refresh_token) {
+    setCookie(event, 'refresh_token', body.data.refresh_token, {
+      ...secureBase,
+      httpOnly: true,
+      maxAge: 60 * 60 * 24 * 30,
+    })
   }
 
   setCookie(event, 'hirad_session', '1', {
@@ -44,5 +58,14 @@ export default defineEventHandler(async (event) => {
     maxAge: 60 * 60 * 24 * 30,
   })
 
-  return { success: true, user: body.data.user }
+  return {
+    success: true,
+    user: {
+      user_id: body.data.user_id,
+      full_name: body.data.full_name,
+      phone: body.data.phone,
+      email: body.data.email,
+      user_type: body.data.user_type,
+    },
+  }
 })

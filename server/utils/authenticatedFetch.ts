@@ -2,9 +2,11 @@
 import type { H3Event } from 'h3'
 import { getCookie, setCookie, deleteCookie } from 'h3'
 import { useRuntimeConfig } from '#imports'
+import { performRefresh } from './refreshAuth'
+
 
 const AUTH_COOKIE = 'hirad_at'
-const REFRESH_COOKIE = 'hirad_rt'       
+const REFRESH_COOKIE = 'refresh_token'
 const SESSION_COOKIE = 'hirad_session'
 
 function clearAuthCookies(event: H3Event) {
@@ -40,37 +42,18 @@ export async function authenticatedFetch(
       const refreshToken = getCookie(event, REFRESH_COOKIE)
 
       if (refreshToken) {
-        try {
-          const refreshResponse = await $fetch('/api/auth/refresh', {
-            method: 'POST',
-            credentials: 'include',
-          }) as any
-
-          if (refreshResponse?.success && refreshResponse.data?.access_token) {
-            const newToken = refreshResponse.data.access_token
-
-            setCookie(event, AUTH_COOKIE, newToken, {
-              httpOnly: true,
-              secure: process.env.NODE_ENV === 'production',
-              sameSite: 'lax',
-              path: '/',
-              maxAge: 60 * 15,
-            })
-
-            setCookie(event, SESSION_COOKIE, '1', {
-              secure: process.env.NODE_ENV === 'production',
-              sameSite: 'lax',
-              path: '/',
-              maxAge: 60 * 15,
-            })
-
-            res = await doFetch(newToken)
-          }
-        } catch (e) {
-          console.error('[AuthFetch] Refresh failed:', e)
-          clearAuthCookies(event)
-        }
-      }
+  try {
+    const newToken = await performRefresh(event) // sets cookies DIRECTLY on the real event now
+    if (newToken) {
+      res = await doFetch(newToken)
+    } else {
+      clearAuthCookies(event)
+    }
+  } catch (e) {
+    console.error('[AuthFetch] Refresh failed:', e)
+    clearAuthCookies(event)
+  }
+}
     }
   }
 
