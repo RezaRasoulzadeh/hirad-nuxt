@@ -2,11 +2,11 @@
   <div class="w-full space-y-6">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-base-100 p-6 rounded-2xl border border-base-200 shadow-sm">
       <div>
-        <h1 class="text-2xl font-bold text-base-content">دسته‌ب بندی محصولات</h1>
+        <h1 class="text-2xl font-bold text-base-content">دسته‌بندی محصولات</h1>
         <p class="text-xs sm:text-sm text-base-content/60 mt-1">مدیریت، ساختاردهی درختی و چیدمان صفحات دسته‌بندی محصولات.</p>
       </div>
       <button
-        @click="isCreateModalOpen = true"
+        @click="openCreateModal"
         class="btn btn-primary font-bold px-6 h-12 rounded-xl text-sm"
       >
         افزودن دسته‌بندی جدید
@@ -28,7 +28,7 @@
     <div v-else-if="parentCategories.length" class="space-y-4">
       <CategoryParentGroup 
         v-for="parentCategory in parentCategories" 
-        :key="parentCategory.id"
+        :key="`parent-${parentCategory.id}`" 
         :parent-category="parentCategory"
         @update-item="openEditModal"
         @remove-item="removeCategory"
@@ -40,35 +40,20 @@
       <p class="text-sm text-base-content/50">هیچ دسته‌بندی محصولی در سیستم یافت نشد.</p>
     </div>
 
-    <CategoryModal 
-      :is-open="isCreateModalOpen"
-      :categories="rawCategories"
-      @close="isCreateModalOpen = false"
-      @save="handleSaveNewCategory"
-    />
-
-    <EditCategoryModal
-      v-if="isEditModalOpen"
-      :is-open="isEditModalOpen"
+    <CategoryWorkspaceModal
+      :is-open="isWorkspaceModalOpen"
       :category="selectedCategory"
       :all-categories="rawCategories"
-      @close="isEditModalOpen = false"
-      @update="handleUpdateCategory"
-    />
-
-    <PageEditorModal
-      v-if="isPageEditorOpen"
-      :category="pageCategory"
-      :is-open="isPageEditorOpen"
-      @close="isPageEditorOpen = false"
-      @save="handlePageSave"
+      @close="closeWorkspaceModal"
+      @saved="handleWorkspaceSaved"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick } from 'vue';
 import CategoryParentGroup from '~/components/dashboard/category/CategoryParentGroup.vue';
+import CategoryWorkspaceModal from '~/components/dashboard/category/CategoryWorkspaceModal.vue';
 import { useToast } from '~/composables/useToast';
 
 definePageMeta({
@@ -96,8 +81,7 @@ interface ApiResponse {
 }
 
 const toast = useToast();
-const isCreateModalOpen = ref(false);
-const isEditModalOpen = ref(false);
+const isWorkspaceModalOpen = ref(false);
 const isPageEditorOpen = ref(false);
 
 const selectedCategory = ref<CategoryNode | null>(null);
@@ -109,8 +93,8 @@ const { data: categoriesResponse, status, error, refresh } = await useFetch<ApiR
 
 const rawCategories = computed<CategoryNode[]>(() => {
   if (!categoriesResponse.value?.data) return [];
-  return categoriesResponse.value.data
-    .filter(c => c.is_visible)
+  
+  return [...categoriesResponse.value.data]
     .sort((a, b) => a.name.localeCompare(b.name, 'fa'));
 });
 
@@ -119,49 +103,41 @@ const parentCategories = computed<ParentCategory[]>(() => {
   const items = categoriesResponse.value.data;
 
   return items
-    .filter(cat => !cat.parent_id && cat.is_visible)
+    .filter(cat => !cat.parent_id && cat.slug !== 'blog') 
     .map(parent => ({
       ...parent,
       expanded: false,
-      children: (parent.children || [])
-        .filter(child => child.is_visible)
+      children: [...(parent.children || [])]
+        .filter(child => child.slug !== 'blog') 
         .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
     }))
     .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
 });
 
-const handleSaveNewCategory = async (newCategory: any) => {
-  try {
-    await $fetch('/api/dashboard/categories', {
-      method: 'POST',
-      body: newCategory
-    });
-    isCreateModalOpen.value = false;
-    await refresh();
-    toast.success('دسته‌بندی جدید با موفقیت ایجاد شد.');
-  } catch (err: any) {
-    toast.error('خطا در ایجاد دسته‌بندی جدید.');
-  }
+const openCreateModal = () => {
+  selectedCategory.value = null;
+  isWorkspaceModalOpen.value = true;
 };
 
 const openEditModal = (category: CategoryNode) => {
   selectedCategory.value = category;
-  isEditModalOpen.value = true;
+  isWorkspaceModalOpen.value = true;
 };
 
-const handleUpdateCategory = async (updatedCategory: CategoryNode) => {
-  if (!updatedCategory.slug) return;
-  try {
-    await $fetch(`/api/dashboard/categories/${updatedCategory.slug}`, {
-      method: 'PUT',
-      body: updatedCategory
-    });
-    isEditModalOpen.value = false;
-    await refresh();
-    toast.success('دسته‌بندی با موفقیت بروزرسانی شد.');
-  } catch (err: any) {
-    toast.error('خطا در بروزرسانی دسته‌بندی.');
-  }
+const closeWorkspaceModal = () => {
+  isWorkspaceModalOpen.value = false;
+  nextTick(() => {
+    selectedCategory.value = null;
+  });
+};
+
+const handleWorkspaceSaved = async () => {
+  isWorkspaceModalOpen.value = false;
+  selectedCategory.value = null;
+  
+  await nextTick();
+  await refresh();
+  toast.success('تنظیمات و ساختار با موفقیت بروزرسانی شد.');
 };
 
 const removeCategory = async (categoryId: number | string) => {

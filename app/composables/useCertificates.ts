@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-export interface PageData {
+export interface CertificatePageData {
   id: string
   title: string
   slug: string
@@ -23,13 +23,13 @@ export interface Certificate {
 
 export const useCertificates = () => {
   const config = useRuntimeConfig()
-  const certificatePage = ref<PageData | null>(null)
+  const certificatePage = ref<CertificatePageData | null>(null)
   const error = ref<any>(null)
 
   const fetchCertificates = async () => {
     try {
       const encodedSlug = encodeURIComponent('گواهی-ها')
-      const response = await $fetch<{ data: PageData }>(`${config.public.apiBase}/pages/${encodedSlug}`)
+      const response = await $fetch<{ data: CertificatePageData }>(`${config.public.apiBase}/pages/${encodedSlug}`)
       
       if (response?.data?.content?.Certificates) {
         response.data.content.Certificates.sort((a, b) => a.order - b.order)

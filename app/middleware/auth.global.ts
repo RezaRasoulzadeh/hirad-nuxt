@@ -7,17 +7,15 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return navigateTo('/login')
   }
 
+  const requestFetch = useRequestFetch()
+
   try {
-    await $fetch('/api/dashboard/stats', { credentials: 'include' })
+    await requestFetch('/api/dashboard/stats')
   } catch (error: any) {
     if ([401, 403].includes(error.statusCode)) {
       try {
-        await $fetch('/api/auth/refresh', {
-          method: 'POST',
-          credentials: 'include',
-        })
-        // Retry
-        await $fetch('/api/dashboard/stats', { credentials: 'include' })
+        await requestFetch('/api/auth/refresh', { method: 'POST' })
+        await requestFetch('/api/dashboard/stats')
       } catch {
         return navigateTo('/login')
       }

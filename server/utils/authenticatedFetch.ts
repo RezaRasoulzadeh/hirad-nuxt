@@ -43,7 +43,7 @@ export async function authenticatedFetch(
 
       if (refreshToken) {
   try {
-    const newToken = await performRefresh(event) // sets cookies DIRECTLY on the real event now
+    const newToken = await performRefresh(event)
     if (newToken) {
       res = await doFetch(newToken)
     } else {
