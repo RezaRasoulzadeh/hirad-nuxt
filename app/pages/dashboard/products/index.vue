@@ -6,7 +6,7 @@
         <p class="text-xs sm:text-sm text-base-content/60 mt-1">مشاهده، جستجو و تغییر ساختار محصولات بر اساس دسته‌بندی درختواره‌ای.</p>
       </div>
       <button
-        @click="navigateTo('/dashboard/product/create')"
+        @click="navigateTo('/dashboard/products/new')"
         class="btn btn-primary font-bold px-6 h-12 rounded-xl text-sm"
       >
         افزودن محصول جدید
@@ -94,11 +94,38 @@ const parentCategories = computed<UiParentCategory[]>(() => {
 })
 
 const handleEditProduct = (slug: string) => {
-  navigateTo(`/dashboard/product/edit/${encodeURIComponent(slug)}`)
+  navigateTo(`/dashboard/products/${encodeURIComponent(slug)}`)
 }
 
 const handleDuplicateProduct = async (slug: string) => {
-  console.log('Duplicate tracking active for:', slug)
+  const confirmed = window.confirm('آیا از کپی کردن این محصول اطمینان دارید؟')
+  if (!confirmed) return
+
+  try {
+    const response = await $fetch<{ success: boolean; data: any }>(
+      `/api/dashboard/products/duplicate/${encodeURIComponent(slug)}`,
+      { method: 'POST' }
+    )
+
+    if (response?.success && response.data) {
+      const newProduct = response.data
+
+      for (const parent of parentCategories.value) {
+        for (const child of parent.children) {
+          if (child.slug === newProduct.category_slug || child.id === newProduct.category_id) {
+            if (child.products) {
+              child.products.unshift(newProduct)
+            }
+            break
+          }
+        }
+      }
+      alert('محصول با موفقیت کپی شد.')
+    }
+  } catch (err) {
+    console.error('Duplication flow failed:', err)
+    alert('خطا در کپی برداری محصول.')
+  }
 }
 
 const handleProductRemoval = async (slug: string) => {
