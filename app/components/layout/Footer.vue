@@ -4,7 +4,7 @@
       class="mx-auto max-w-[1920px] px-6 py-12 xl:px-20 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-10 items-start">
 
       <aside class="space-y-5">
-        <img :src="LogoWide" alt="Hirad Logo" class="h-28 w-auto dark:brightness-110" />
+        <img :src="LogoWide" alt="Hirad Logo" class="h-28 w-auto object-contain object-right dark:brightness-110" />
         <p class="text-sm text-base-content/70 leading-relaxed text-justify">
           شرکت تجهیز فرآیند هیراد از سال ۱۳۹۴ با شماره ثبت ۵۲۵۴۷۰ در تهران تأسیس شده و در زمینه تأمین و تدارک تجهیزات
           فنی و صنعتی برای صنایع نفت، گاز، پتروشیمی، نیروگاه‌ها و صنایع دارویی و غذایی فعالیت می‌کند.
