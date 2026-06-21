@@ -9,7 +9,7 @@
     
     <div class="collapse-title flex items-center gap-3 px-6 py-4 bg-base-100 font-semibold text-base-content hover:bg-base-200/40 transition-colors">
       <h3 class="text-lg font-bold">{{ parentCategory.name }}</h3>
-      <div class="badge badge-soft badge-primary font-medium text-xs">
+      <div class="badge badge-soft badge-secondary font-medium text-xs">
         {{ localChildren.length }} زیرمجموعه
       </div>
     </div>
