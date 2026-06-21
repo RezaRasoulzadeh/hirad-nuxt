@@ -11,7 +11,9 @@
           v-if="childCategory.image_url" 
           :src="getImageUrl(childCategory.image_url)" 
           :alt="childCategory.name || ''"
-          class="w-6 h-6 object-contain rounded" 
+          class="size-6 object-contain transition-all 
+          [:is([data-theme=dark],.dark)_&]:not-data-error:filter-[brightness(0)_invert(80%)]"
+          loading="lazy"
         />
 
         <span class="font-semibold text-sm text-base-content">{{ childCategory.name }}</span>

@@ -13,13 +13,13 @@
       </button>
     </div>
 
-    <div v-if="status === 'pending'" class="space-y-4">
+    <div v-if="loading" class="space-y-4">
       <div v-for="n in 3" :key="n" class="h-20 rounded-xl bg-base-100 border border-base-200 animate-pulse"></div>
     </div>
 
-    <div v-else-if="error" class="alert alert-error rounded-xl text-sm font-medium shadow-sm flex items-center justify-between">
-      <span>{{ error.message || 'خطا در بارگذاری ساختار دسته‌بندی و محصولات.' }}</span>
-      <button class="btn btn-sm btn-ghost text-error-content" @click="() => refresh()">تلاش مجدد</button>
+    <div v-else-if="fetchError" class="alert alert-error rounded-xl text-sm font-medium shadow-sm flex items-center justify-between">
+      <span>خطا در بارگذاری ساختار دسته‌بندی و محصولات.</span>
+      <button class="btn btn-sm btn-ghost text-error-content" @click="loadDashboardData">تلاش مجدد</button>
     </div>
     
     <div v-else-if="parentCategories.length" class="space-y-4">
@@ -40,8 +40,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { navigateTo, useFetch } from '#imports'
+import { ref, computed, onMounted } from 'vue'
+import { navigateTo } from '#imports'
 import ParentCategoryGroup from '~/components/dashboard/product/ParentCategoryGroup.vue'
 import type { CategoryItem } from '~/types/categoryItem'
 
@@ -64,18 +64,34 @@ interface UiParentCategory extends CategoryNode {
   expanded?: boolean
 }
 
-interface ApiResponse {
-  success: boolean
-  data: CategoryNode[]
+const loading = ref(true)
+const fetchError = ref(false)
+const rawCategories = ref<CategoryNode[]>([])
+
+// Unified data loading sequence handles auth check first, then drops straight into the collection pipeline
+const loadDashboardData = async () => {
+  loading.value = true
+  fetchError.value = false
+  try {
+    // 1. Session verification check
+    await $fetch('/api/dashboard/stats', { method: 'GET' })
+    
+    // 2. Fetch structural tree data
+    const response = await $fetch<{ success: boolean; data: CategoryNode[] }>('/api/dashboard/categories', { method: 'GET' })
+    if (response?.success && response.data) {
+      rawCategories.value = response.data
+    }
+  } catch (err) {
+    console.error('[Dashboard Products Resource Load Failed]:', err)
+    fetchError.value = true
+  } finally {
+    loading.value = false
+  }
 }
 
-const { data: categoriesResponse, status, error, refresh } = await useFetch<ApiResponse>('/api/dashboard/categories', {
-  lazy: true
-})
-
 const parentCategories = computed<UiParentCategory[]>(() => {
-  if (!categoriesResponse.value?.data) return []
-  return [...categoriesResponse.value.data]
+  if (!rawCategories.value.length) return []
+  return [...rawCategories.value]
     .filter(cat => !cat.parent_id && cat.slug !== 'blog') 
     .map(parent => ({
       ...parent,
@@ -148,4 +164,8 @@ const handleProductRemoval = async (slug: string) => {
     console.error('Delete target execution failed:', err)
   }
 }
+
+onMounted(() => {
+  loadDashboardData()
+})
 </script>

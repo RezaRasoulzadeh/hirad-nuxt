@@ -1,5 +1,11 @@
 <template>
-  <div class="w-full bg-base-100 rounded-2xl border border-base-200 shadow-sm overflow-hidden flex flex-col">
+  <div class="w-full bg-base-100 rounded-2xl border border-base-200 shadow-sm overflow-hidden flex flex-col relative">
+    
+    <div v-if="loading || checkingAuth" class="absolute inset-0 bg-base-100/70 z-50 flex flex-col items-center justify-center gap-3">
+      <span class="loading loading-spinner loading-md text-primary"></span>
+      <span class="text-xs font-semibold text-base-content/50 font-mono">Verifying Access Permutations...</span>
+    </div>
+
     <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-base-200 p-6 gap-4">
       <div>
         <h2 class="text-xl font-bold text-base-content">
@@ -155,7 +161,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import { useRoute, useRouter, useFetch } from '#imports'
+import { useRoute, useRouter } from '#imports'
 import { useProductForm } from '~/composables/useProductForm'
 import MediaManagerModal from '~/components/dashboard/media/MediaSelector.vue'
 import ProductImageGalleryEditor from '~/components/dashboard/product/ProductImageGalleryEditor.vue'
@@ -168,6 +174,7 @@ const route = useRoute()
 const router = useRouter()
 const formEl = ref<HTMLFormElement | null>(null)
 const categories = ref<Array<{ id: string; name: string }>>([])
+const checkingAuth = ref(true)
 
 const {
   product, saving, loading, hasUnsavedChanges, isMediaManagerOpen, expandedItems, isEditMode,
@@ -278,8 +285,14 @@ const goBack = () => {
 }
 
 onMounted(async () => {
-  await fetchCategories()
-  await initializeForm()
+  try {
+    await $fetch('/api/dashboard/stats', { method: 'GET' })
+    checkingAuth.value = false
+    await fetchCategories()
+    await initializeForm()
+  } catch {
+    checkingAuth.value = false
+  }
 })
 
 watch(() => route.params.slug, initializeForm)
