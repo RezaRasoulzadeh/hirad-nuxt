@@ -3,12 +3,12 @@ import { ref, computed, watch } from 'vue';
 import { useToast } from '~/composables/useToast';
 
 export interface CategoryNode {
-  id: string | number; // Loosened to match component tree bindings
+  id: string | number;
   name: string;
   slug: string;
   description?: string | null;
   image_url?: string | null;
-  parent_id?: string | number | null; // Loosened to prevent component assignment errors
+  parent_id?: string | number | null;
   is_visible: boolean;
   sort_order?: number;
   meta_title?: string | null;
@@ -43,6 +43,8 @@ export function useCategoryWorkspace(props: { category: any; allCategories: any[
   const submitting = ref(false);
   const loadingPage = ref(false);
 
+  const sortOrderAutoManaged = ref(true);
+
   const formCategory = ref<Partial<CategoryNode>>({});
   const pageData = ref<PageData>(createEmptyPageData(null, ''));
 
@@ -65,19 +67,37 @@ export function useCategoryWorkspace(props: { category: any; allCategories: any[
     };
   }
 
+  function computeDefaultSortOrder(parentId: string | number | null | undefined): number {
+    const siblings = !parentId
+      ? props.allCategories
+      : (props.allCategories.find((c: any) => String(c.id) === String(parentId))?.children ?? []);
+
+    if (!siblings || !siblings.length) return 0;
+    const maxOrder = Math.max(...siblings.map((s: any) => Number(s.sort_order ?? 0)));
+    return maxOrder + 1;
+  }
+
   watch(() => props.category, (newVal) => {
     if (newVal) {
       formCategory.value = { ...newVal };
       pageData.value = createEmptyPageData(String(newVal.id), newVal.name);
       loadAdvancedPageContent(newVal.slug);
     } else {
+      sortOrderAutoManaged.value = true;
       formCategory.value = {
         name: '', description: null, parent_id: null,
-        sort_order: 0, is_visible: true, meta_title: null, meta_description: null, image_url: null
+        sort_order: computeDefaultSortOrder(null), is_visible: true,
+        meta_title: null, meta_description: null, image_url: null
       };
       pageData.value = createEmptyPageData(null, '');
     }
   }, { immediate: true });
+
+  watch(() => formCategory.value.parent_id, (newParentId) => {
+    if (!props.category && sortOrderAutoManaged.value) {
+      formCategory.value.sort_order = computeDefaultSortOrder(newParentId);
+    }
+  });
 
   async function loadAdvancedPageContent(slug: string) {
     if (!slug) return;
@@ -110,17 +130,16 @@ export function useCategoryWorkspace(props: { category: any; allCategories: any[
     submitting.value = true;
     try {
       const isNew = !props.category;
-      
+
       if (isNew && !formCategory.value.slug) {
         formCategory.value.slug = formCategory.value.name?.toLowerCase().trim().replace(/\s+/g, '-') || '';
       }
 
-      const categoryEndpoint = isNew 
-        ? '/api/dashboard/categories' 
+      const categoryEndpoint = isNew
+        ? '/api/dashboard/categories'
         : `/api/dashboard/categories/${encodeURIComponent(props.category?.slug || '')}`;
       const categoryMethod = isNew ? 'POST' : 'PUT';
 
-      // Explicit string coercion ensures runtime numbers pass the Uuid validation in Axum
       const cleanCategoryPayload = {
         parent_id: formCategory.value.parent_id ? String(formCategory.value.parent_id) : null,
         name: formCategory.value.name || '',
@@ -185,5 +204,8 @@ export function useCategoryWorkspace(props: { category: any; allCategories: any[
     }
   }
 
-  return { activeTab, submitting, loadingPage, formCategory, pageData, availableParents, submitWorkspace };
+  return {
+    activeTab, submitting, loadingPage, formCategory, pageData,
+    availableParents, submitWorkspace, sortOrderAutoManaged
+  };
 }

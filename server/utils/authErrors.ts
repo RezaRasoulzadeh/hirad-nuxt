@@ -10,7 +10,6 @@ export function mapLoginErrorMessage(status: number, backendMessage?: string): s
     case 404:
       return 'کاربری با این مشخصات یافت نشد.'
     case 406:
-      // backend's password-format rules — don't leak policy details on login
       return 'ایمیل یا رمز عبور اشتباه است.'
     case 422:
       return 'اطلاعات وارد شده معتبر نیست.'

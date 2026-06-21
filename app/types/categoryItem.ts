@@ -1,23 +1,21 @@
 // types/category.ts
 
 export interface CategoryItem {
-  id: string | number                 // APIs might use integers for autoincrement IDs
+  id: string | number                 
   slug: string
   parent_id: string | number | null
   name: string
   
-  // Null-guarded fields to prevent upstream API exceptions
   description?: string | null
   image_url?: string | null
-  is_visible?: boolean                // Made optional to safely assume fallback default true/false
-  sort_order?: number                 // Made optional to allow fallback default indexing systems
+  is_visible?: boolean                
+  sort_order?: number                 
   
   meta_title?: string | null
   meta_description?: string | null
   category_type?: string | null
   has_sidebar?: boolean
   
-  // Strongly type the structural nesting array to guarantee an asset array pattern
   children?: CategoryItem[]
   
   // Optional metadata layers

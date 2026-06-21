@@ -55,7 +55,7 @@
           <div class="p-6 border-b border-base-200 flex items-center justify-center w-full bg-base-100 sticky top-0 z-10">
             <NuxtLink to="/" class="flex justify-start w-full">
               <img src="/assets/Logo-wide.png" alt="Logo" class="w-46 max-w-full h-auto block dark:hidden" />
-              <img src="/assets/Logo-wide.png" alt="Logo" class="w-46 max-w-full h-auto hidden dark:block" />
+              <img src="/assets/Logo-wide-dark.png" alt="Logo" class="w-46 max-w-full h-auto hidden dark:block" />
             </NuxtLink>
           </div>
 

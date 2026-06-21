@@ -5,6 +5,9 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     return await authenticatedFetch(event, `/categories/${slug}`, {
       method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body,
     });
   } catch (error: any) {

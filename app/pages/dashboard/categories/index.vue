@@ -146,9 +146,9 @@ const removeCategory = async (categoryId: number | string) => {
 
   const findNode = (nodes: CategoryNode[]): boolean => {
     for (const n of nodes) {
-      if (n.id === categoryId) { 
-        target = n; 
-        return true; 
+      if (n.id === categoryId) {
+        target = n;
+        return true;
       }
       if (n.children && n.children.length && findNode(n.children)) {
         return true;
@@ -156,7 +156,7 @@ const removeCategory = async (categoryId: number | string) => {
     }
     return false;
   };
-  
+
   findNode(items);
 
   if (!target) {
@@ -166,15 +166,40 @@ const removeCategory = async (categoryId: number | string) => {
 
   const confirmed = window.confirm('آیا از حذف این دسته‌بندی و تمام زیرمجموعه‌های آن اطمینان دارید؟');
   if (!confirmed) return;
+  const flattenDeepestFirst = (node: CategoryNode): CategoryNode[] => {
+    const result: CategoryNode[] = [];
+    for (const child of node.children || []) {
+      result.push(...flattenDeepestFirst(child));
+    }
+    result.push(node);
+    return result;
+  };
+
+  const deletionOrder = flattenDeepestFirst(target as CategoryNode);
 
   try {
-    await $fetch(`/api/dashboard/categories/${(target as CategoryNode).slug}`, {
-      method: 'DELETE'
-    });
+    for (const node of deletionOrder) {
+      const slug = encodeURIComponent(node.slug);
+      try {
+        await $fetch(`/api/dashboard/pages/${slug}`, {
+          method: 'DELETE'
+        });
+      } catch (pageErr: any) {
+        if (pageErr?.statusCode !== 404) {
+          throw pageErr;
+        }
+      }
+
+      await $fetch(`/api/dashboard/categories/${slug}`, {
+        method: 'DELETE'
+      });
+    }
+
     await refresh();
-    toast.success('دسته‌بندی با موفقیت حذف شد.');
+    toast.success('دسته‌بندی و زیرمجموعه‌های آن به همراه صفحات مرتبط با موفقیت حذف شدند.');
   } catch (err: any) {
     toast.error('خطا در حذف دسته‌بندی.');
+    await refresh();
   }
 };
 

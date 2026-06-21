@@ -6,7 +6,9 @@
       <div class="navbar-start w-auto shrink-0">
         <NuxtLink to="/"
           class="flex items-center gap-2 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-primary">
-          <img :src="LogoWide" alt="Hirad Logo" class="h-12 w-auto select-none object-contain dark:brightness-110"
+          <img :src="LogoWide" alt="Hirad Logo" class="h-12 w-auto select-none object-contain block dark:hidden"
+            loading="eager" />
+            <img :src="LogoWideDark" alt="Hirad Logo" class="h-12 w-auto select-none object-contain hidden dark:block"
             loading="eager" />
         </NuxtLink>
       </div>
@@ -176,6 +178,7 @@
 import { ref, onMounted } from 'vue'
 import { House, Info, Newspaper, Phone, ShoppingBag, Sun, Moon, Menu, ChevronDown } from 'lucide-vue-next'
 import LogoWide from '~/assets/Logo-wide.png'
+import LogoWideDark from '~/assets/Logo-wide-dark.png'
 import Search from '../shared/Search.vue'
 
 defineEmits(['open-drawer'])
