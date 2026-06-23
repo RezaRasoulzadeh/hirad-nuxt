@@ -111,7 +111,7 @@ const dockNavigationItems = [
   { name: 'داشبورد', path: '/dashboard', icon: LayoutDashboard },
   { name: 'دسته‌بندی', path: '/dashboard/categories', icon: FolderTree },
   { name: 'محصولات', path: '/dashboard/products', icon: Package },
-  { name: 'پیام‌ها', path: '/dashboard/inbox', icon: Mail },
+  { name: 'پیام‌ها', path: '/dashboard/forms', icon: Mail },
 ];
 
 onMounted(() => {
