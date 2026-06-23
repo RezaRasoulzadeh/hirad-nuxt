@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { useState } from '#app'
 
 export interface CertificatePageData {
   id: string
@@ -11,6 +11,7 @@ export interface CertificatePageData {
   meta_title: string
   meta_description: string
 }
+
 export interface Certificate {
   title: string
   description: string
@@ -22,21 +23,24 @@ export interface Certificate {
 }
 
 export const useCertificates = () => {
-  const config = useRuntimeConfig()
-  const certificatePage = ref<CertificatePageData | null>(null)
-  const error = ref<any>(null)
+  const certificatePage = useState<CertificatePageData | null>('certificate-page', () => null)
+  const error = useState<any>('certificate-page-error', () => null)
 
   const fetchCertificates = async () => {
     try {
-      const encodedSlug = encodeURIComponent('گواهی-ها')
-      const response = await $fetch<{ data: CertificatePageData }>(`${config.public.apiBase}/pages/${encodedSlug}`)
+      error.value = null
       
-      if (response?.data?.content?.Certificates) {
-        response.data.content.Certificates.sort((a, b) => a.order - b.order)
-        certificatePage.value = response.data
+      const response = await $fetch<any>('/api/dashboard/pages/گواهی-ها')
+      
+      const pageData = response?.data || response
+
+      if (pageData?.content?.Certificates) {
+        pageData.content.Certificates.sort((a: Certificate, b: Certificate) => (a.order || 0) - (b.order || 0))
+        certificatePage.value = pageData
       }
-    } catch (err) {
+    } catch (err: any) {
       error.value = err
+      console.error('Failed to fetch certificates:', err)
     }
   }
 

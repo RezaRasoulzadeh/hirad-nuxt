@@ -1,3 +1,5 @@
+// composable/useHomePage.ts
+
 export interface ItemSection {
   title: string
   sub_title: string

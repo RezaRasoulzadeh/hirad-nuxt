@@ -1,3 +1,4 @@
+// components/shared/GlobalToast.vue
 <template>
   <div v-if="active" class="toast toast-start toast-bottom z-50">
     <div

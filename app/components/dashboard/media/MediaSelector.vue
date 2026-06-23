@@ -1,3 +1,4 @@
+// components/dashboard/media/MediaSelector.vue
 <template>
   <div v-if="isOpen" class="modal modal-open bg-black/60 z-60 transition-all duration-200">
     <div class="modal-box max-w-4xl w-full h-[80vh] p-0 flex flex-col overflow-hidden bg-base-100 rounded-2xl border border-base-200 shadow-xl">
