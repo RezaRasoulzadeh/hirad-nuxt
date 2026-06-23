@@ -102,7 +102,7 @@ const navigationItems = [
   { name: 'محصولات', path: '/dashboard/products', icon: Package },
   { name: 'مدیریت رسانه', path: '/dashboard/media', icon: Image },
   { name: 'بلاگ', path: '/dashboard/blog', icon: FileText },
-  { name: 'پیام‌ها', path: '/dashboard/inbox', icon: Mail },
+  { name: 'پیام‌ها', path: '/dashboard/forms', icon: Mail },
   { name: 'خبرنامه', path: '/dashboard/subscribers', icon: Bell },
   { name: 'تنظیمات', path: '/dashboard/settings', icon: Settings },
 ];

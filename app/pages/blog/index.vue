@@ -27,7 +27,7 @@
             <SearchX class="size-8" />
           </div>
           <h3 class="text-lg font-bold text-base-content">مقاله‌ای یافت نشد</h3>
-          <p class="text-sm text-base-content/50 mt-1">عبارت دیگری را برای جستجو امتحان کنید</p>
+          <p class="text-sm text-base-content/50 mt-1">به زودی مقالات جدید اضافه خواهد شد</p>
         </div>
       </template>
 

@@ -30,10 +30,11 @@
     <template v-else-if="block.type === 'image'">
       <figure class="my-6 flex flex-col items-center gap-2 bg-base-200/30 p-2 rounded-2xl border border-base-content/5">
         <img 
-          :src="resolveAssetUrl(block.text)" 
+          :src="imageUrl" 
+          @error="handleImageError"
           alt="محتوای مقاله"
           loading="lazy"
-          class="rounded-xl max-h-[50vh] object-contain w-full"
+          class="rounded-xl max-h-[50vh] object-contain w-full bg-base-100"
         />
         <figcaption v-if="block.text_fa" class="text-xs text-base-content/50 italic px-2 text-center">
           {{ block.text_fa }}
@@ -88,8 +89,10 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { ExternalLink } from 'lucide-vue-next'
 import { resolveAssetUrl } from '~/utils/resolveAssetUrl'
+import placeholderImg from '~/assets/placeholder.png'
 
 interface BlogBlock {
   type: 'heading' | 'paragraph' | 'quote' | 'image' | 'list' | 'code' | 'link' | 'video'
@@ -97,17 +100,30 @@ interface BlogBlock {
   text: string
   text_fa?: string
   author?: string
+  src?: string 
 }
 
-defineProps<{
+const props = defineProps<{
   block: BlogBlock
 }>()
+
+const imageUrl = computed(() => {
+  const path = props.block.text || props.block.src
+  return path ? resolveAssetUrl(path) : placeholderImg
+})
+
+const handleImageError = (event: Event) => {
+  const target = event.target as HTMLImageElement
+  if (target && target.src !== placeholderImg) {
+    target.src = placeholderImg
+  }
+}
 
 function splitListItems(rawText: string): string[] {
   if (!rawText) return []
   return rawText
     .split('\n')
-    .map(item => item.replace(/^[*\-\s\d.]+/g, '').trim()) // Clear markdown artifact items cleanly
+    .map(item => item.replace(/^[*\-\s\d.]+/g, '').trim()) 
     .filter(Boolean)
 }
 </script>
