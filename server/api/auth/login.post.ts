@@ -1,5 +1,6 @@
 // server/api/auth/login.post.ts
 import { defineEventHandler, setCookie, createError, readBody } from 'h3'
+import { shouldUseSecureCookies } from '../../utils/cookieOptions'
 
 interface LoginResponse {
   success: boolean
@@ -35,8 +36,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, message: 'ورود ناموفق بود.' })
   }
 
-  const isProd = process.env.NODE_ENV === 'production'
-  const secureBase = { secure: isProd, sameSite: 'lax' as const, path: '/' }
+  const secureBase = { secure: shouldUseSecureCookies(event), sameSite: 'lax' as const, path: '/' }
 
   setCookie(event, 'hirad_at', body.data.access_token, {
     ...secureBase,

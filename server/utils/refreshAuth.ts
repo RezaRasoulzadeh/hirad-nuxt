@@ -2,6 +2,7 @@
 import type { H3Event } from 'h3'
 import { getCookie, setCookie } from 'h3'
 import { useRuntimeConfig } from '#imports'
+import { shouldUseSecureCookies } from './cookieOptions'
 
 interface RefreshResponse {
   success: boolean
@@ -25,8 +26,7 @@ export async function performRefresh(event: H3Event): Promise<string | null> {
   const body = response._data as RefreshResponse
   if (!body?.success || !body?.data?.access_token) return null
 
-  const isProd = process.env.NODE_ENV === 'production'
-  const secureBase = { secure: isProd, sameSite: 'lax' as const, path: '/' }
+  const secureBase = { secure: shouldUseSecureCookies(event), sameSite: 'lax' as const, path: '/' }
 
   setCookie(event, 'hirad_at', body.data.access_token, {
     ...secureBase, httpOnly: true, maxAge: 60 * 15,
