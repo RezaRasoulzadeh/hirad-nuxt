@@ -80,7 +80,7 @@ const handleFile = (url: string) => {
 
 const savePage = async (slug: string, payload: any) => {
   try {
-    const res = await $fetch<any>(`/api/dashboard/pages/${encodeURIComponent(slug)}`, {
+    const res = await $fetch<any>(`/api/pages/${encodeURIComponent(slug)}`, {
       method: 'PUT',
       body: payload
     })

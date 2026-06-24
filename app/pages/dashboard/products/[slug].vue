@@ -184,7 +184,7 @@ const {
 
 const fetchCategories = async () => {
   try {
-    const response = await $fetch<any>('/api/dashboard/categories')
+    const response = await $fetch<any>('/api/categories')
     if (response?.data) {
       categories.value = response.data
         .filter((cat: any) => cat.category_type === 'product' && !cat.parent_id && cat.is_visible)
@@ -207,7 +207,7 @@ const initializeForm = async () => {
   if (slug && slug !== 'new') {
     loading.value = true
     try {
-      const response = await $fetch<any>(`/api/dashboard/products/${encodeURIComponent(slug)}`)
+      const response = await $fetch<any>(`/api/products/${encodeURIComponent(slug)}`)
       if (response?.data) {
         product.value = normalizeProductData(response.data)
       }
@@ -262,7 +262,7 @@ const onSubmit = async () => {
 
   saving.value = true
   try {
-    const url = isEditMode.value ? `/api/dashboard/products/${product.value.slug}` : '/api/dashboard/products'
+    const url = isEditMode.value ? `/api/products/${product.value.slug}` : '/api/products'
     const method = isEditMode.value ? 'PUT' : 'POST'
     
     await $fetch(url, {

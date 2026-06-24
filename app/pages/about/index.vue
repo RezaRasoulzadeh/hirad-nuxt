@@ -52,7 +52,6 @@ import { WifiOff } from 'lucide-vue-next'
 import CertificateCarousel from '~/components/home/CertificateCarousel.vue'
 import WhyChooseUs from '~/components/category/WhyChooseUs.vue'
 
-// 1. Capture Nuxt instance context immediately at top-level
 const requestUrl = useRequestURL()
 const siteOrigin = requestUrl.origin
 
@@ -82,7 +81,6 @@ const handleRefresh = () => {
   certRefresh()
 }
 
-// 2. Safe reactive metadata configurations
 const seoTitle = computed(() => `درباره ما | ${hero.value?.titleFa || 'تجهیز فرآیند هیراد'}`)
 const seoDesc = computed(() => hero.value?.summaryFa || 'تأمین کننده تخصصی شیرآلات صنعتی، اتصالات، فلنج، ابزار دقیق و گسکت برای صنایع نفت، گاز و پتروشیمی.')
 
@@ -96,7 +94,6 @@ useSeoMeta({
   twitterCard: 'summary_large_image',
 })
 
-// 3. Structured data schema injection utilizing invariant parent variable state
 useHead({
   htmlAttrs: {
     lang: 'fa',

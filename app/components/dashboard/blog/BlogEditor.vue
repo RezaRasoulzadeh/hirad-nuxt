@@ -377,7 +377,7 @@ const getFileExtension = (url: string): string => {
 const fetchAssets = async () => {
   mediaLoading.value = true
   try {
-    const res: any = await $fetch('/api/dashboard/media', { method: 'GET' })
+    const res: any = await $fetch('/api/media', { method: 'GET' })
     if (res?.success && res?.data) {
       assets.value = res.data
     } else if (Array.isArray(res)) {

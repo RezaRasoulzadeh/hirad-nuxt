@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
 
   if (refreshToken) {
     try {
-      await fetch(`${config.public.apiBase}/logout`, {
+      await fetch(`${config.internalApiBase}/logout`, {
         method: 'POST',
         headers: { Cookie: `refresh_token=${refreshToken}` }
       })

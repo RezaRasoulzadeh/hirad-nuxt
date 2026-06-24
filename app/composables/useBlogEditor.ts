@@ -69,7 +69,7 @@ export async function useBlogEditor() {
   const formData = ref<BlogFormData>({ ...initialFormData })
 
   const { data: apiResponse, status, error, refresh } = await useFetch<any>(
-    () => `/api/dashboard/pages/${encodeURIComponent(route.params.slug as string)}`,
+    () => `/api/pages/${encodeURIComponent(route.params.slug as string)}`,
     {
       lazy: true,
       immediate: isEditMode.value,
@@ -134,8 +134,8 @@ export async function useBlogEditor() {
     saving.value = true
     try {
       const url = isEditMode.value 
-        ? `/api/dashboard/pages/${encodeURIComponent(route.params.slug as string)}` 
-        : '/api/dashboard/pages'
+        ? `/api/pages/${encodeURIComponent(route.params.slug as string)}` 
+        : '/api/pages'
       
       const method = isEditMode.value ? 'PUT' : 'POST'
 

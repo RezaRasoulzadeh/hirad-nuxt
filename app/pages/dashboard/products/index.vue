@@ -77,7 +77,7 @@ const loadDashboardData = async () => {
     await $fetch('/api/dashboard/stats', { method: 'GET' })
     
     // 2. Fetch structural tree data
-    const response = await $fetch<{ success: boolean; data: CategoryNode[] }>('/api/dashboard/categories', { method: 'GET' })
+    const response = await $fetch<{ success: boolean; data: CategoryNode[] }>('/api/categories', { method: 'GET' })
     if (response?.success && response.data) {
       rawCategories.value = response.data
     }
@@ -119,7 +119,7 @@ const handleDuplicateProduct = async (slug: string) => {
 
   try {
     const response = await $fetch<{ success: boolean; data: any }>(
-      `/api/dashboard/products/duplicate/${encodeURIComponent(slug)}`,
+      `/api/products/duplicate/${encodeURIComponent(slug)}`,
       { method: 'POST' }
     )
 
@@ -149,7 +149,7 @@ const handleProductRemoval = async (slug: string) => {
   if (!confirmed) return
 
   try {
-    await $fetch(`/api/dashboard/products/${encodeURIComponent(slug)}`, {
+    await $fetch(`/api/products/${encodeURIComponent(slug)}`, {
       method: 'DELETE'
     })
     

@@ -103,7 +103,7 @@ export function useCategoryWorkspace(props: { category: any; allCategories: any[
     if (!slug) return;
     loadingPage.value = true;
     try {
-      const res: any = await $fetch(`/api/dashboard/pages/${encodeURIComponent(slug)}`, { method: 'GET' });
+      const res: any = await $fetch(`/api/pages/${encodeURIComponent(slug)}`, { method: 'GET' });
       if (res?.success && res?.data) {
         const d = res.data;
         pageData.value = {
@@ -136,8 +136,8 @@ export function useCategoryWorkspace(props: { category: any; allCategories: any[
       }
 
       const categoryEndpoint = isNew
-        ? '/api/dashboard/categories'
-        : `/api/dashboard/categories/${encodeURIComponent(props.category?.slug || '')}`;
+        ? '/api/categories'
+        : `/api/categories/${encodeURIComponent(props.category?.slug || '')}`;
       const categoryMethod = isNew ? 'POST' : 'PUT';
 
       const cleanCategoryPayload = {
@@ -166,8 +166,8 @@ export function useCategoryWorkspace(props: { category: any; allCategories: any[
 
       const pageMethod = (isNew || !pageData.value.id) ? 'POST' : 'PUT';
       const pageEndpoint = (isNew || !pageData.value.id)
-        ? '/api/dashboard/pages'
-        : `/api/dashboard/pages/${encodeURIComponent(resolvedSlug || '')}`;
+        ? '/api/pages'
+        : `/api/pages/${encodeURIComponent(resolvedSlug || '')}`;
 
       const targetPagePayload: Record<string, any> = {
         category_id: resolvedCategoryId,

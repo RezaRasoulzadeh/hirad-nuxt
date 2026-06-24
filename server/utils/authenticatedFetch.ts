@@ -50,7 +50,7 @@ export async function authenticatedFetch(
     const headers: Record<string, string> = { ...baseHeaders }
     if (token) headers.Authorization = `Bearer ${token}`
 
-    return fetch(`${config.public.apiBase}${path}`, {
+    return fetch(`${config.internalApiBase}${path}`, {
       ...options,
       body,
       headers,

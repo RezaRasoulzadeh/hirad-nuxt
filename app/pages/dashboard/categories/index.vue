@@ -87,7 +87,7 @@ const isPageEditorOpen = ref(false);
 const selectedCategory = ref<CategoryNode | null>(null);
 const pageCategory = ref<CategoryNode | null>(null);
 
-const { data: categoriesResponse, status, error, refresh } = await useFetch<ApiResponse>('/api/dashboard/categories', {
+const { data: categoriesResponse, status, error, refresh } = await useFetch<ApiResponse>('/api/categories', {
   lazy: true
 });
 
@@ -181,7 +181,7 @@ const removeCategory = async (categoryId: number | string) => {
     for (const node of deletionOrder) {
       const slug = encodeURIComponent(node.slug);
       try {
-        await $fetch(`/api/dashboard/pages/${slug}`, {
+        await $fetch(`/api/pages/${slug}`, {
           method: 'DELETE'
         });
       } catch (pageErr: any) {
@@ -190,7 +190,7 @@ const removeCategory = async (categoryId: number | string) => {
         }
       }
 
-      await $fetch(`/api/dashboard/categories/${slug}`, {
+      await $fetch(`/api/categories/${slug}`, {
         method: 'DELETE'
       });
     }

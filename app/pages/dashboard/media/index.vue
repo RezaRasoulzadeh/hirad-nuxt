@@ -90,7 +90,7 @@ const getFileExtension = (url: string): string => {
 const fetchAssets = async () => {
   loading.value = true;
   try {
-    const res: any = await $fetch('/api/dashboard/media', { method: 'GET' });
+    const res: any = await $fetch('/api/media', { method: 'GET' });
     if (res?.success && res?.data) {
       assets.value = res.data;
     } else if (Array.isArray(res)) {
@@ -136,7 +136,7 @@ const closePreviewModal = () => {
 const removeAsset = async (assetId: string) => {
   if (!window.confirm('آیا از حذف دائمی این رسانه اطمینان دارید؟')) return;
   try {
-    await $fetch(`/api/dashboard/media/${assetId}`, { method: 'DELETE' });
+    await $fetch(`/api/media/${assetId}`, { method: 'DELETE' });
     toast.success('رسانه مورد نظر با موفقیت حذف شد.');
     await fetchAssets();
   } catch (error) {

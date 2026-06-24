@@ -126,7 +126,7 @@ interface BlogListResponse {
 const config = useRuntimeConfig()
 const { success: toastSuccess, error: toastError } = useToast()
 
-const { data: blogResponse, status, error, refresh } = await useFetch<BlogListResponse>('/api/dashboard/blog', {
+const { data: blogResponse, status, error, refresh } = await useFetch<BlogListResponse>('/api/blog', {
   lazy: true
 })
 
@@ -151,7 +151,7 @@ async function removeBlogPost(slug: string): Promise<void> {
 
   deletingSlug.value = slug
   try {
-    await $fetch(`/api/dashboard/pages/${encodeURIComponent(slug)}`, {
+    await $fetch(`/api/pages/${encodeURIComponent(slug)}`, {
       method: 'DELETE'
     })
     toastSuccess('مقاله با موفقیت حذف شد.')
@@ -166,7 +166,7 @@ async function removeBlogPost(slug: string): Promise<void> {
 async function duplicateBlogPost(slug: string): Promise<void> {
   duplicatingSlug.value = slug
   try {
-    const response = await $fetch<any>(`/api/dashboard/pages/${encodeURIComponent(slug)}`)
+    const response = await $fetch<any>(`/api/pages/${encodeURIComponent(slug)}`)
     if (!response?.success || !response.data) throw new Error()
 
     const item = response.data
@@ -184,7 +184,7 @@ async function duplicateBlogPost(slug: string): Promise<void> {
       meta_description: item.meta_description || ''
     }
 
-    await $fetch('/api/dashboard/pages', {
+    await $fetch('/api/pages', {
       method: 'POST',
       body: newPayload
     })

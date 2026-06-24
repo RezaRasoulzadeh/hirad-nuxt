@@ -12,7 +12,7 @@ interface ApiResponse {
 
 export function useSubscribers() {
   const { data: subscribersData, status, error, refresh } = useFetch<ApiResponse>(
-    '/api/dashboard/subscribers',
+    '/api/subscribers',
     { lazy: true }
   );
 

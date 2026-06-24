@@ -16,7 +16,7 @@ export async function performRefresh(event: H3Event): Promise<string | null> {
   const refreshToken = getCookie(event, 'refresh_token')
   if (!refreshToken) return null
 
-  const response = await $fetch.raw(`${config.public.apiBase}/refresh`, {
+  const response = await $fetch.raw(`${config.internalApiBase}/refresh`, {
     method: 'POST',
     headers: { Cookie: `refresh_token=${refreshToken}` },
     ignoreResponseError: true,

@@ -20,7 +20,7 @@ interface ApiResponse {
 export function useForms() {
   const toast = useToast();
 
-  const { data: formsData, status, error, refresh } = useFetch<ApiResponse>('/api/dashboard/forms', {
+  const { data: formsData, status, error, refresh } = useFetch<ApiResponse>('/api/forms', {
     lazy: true,
   });
 
@@ -39,7 +39,7 @@ export function useForms() {
     const newStatus = !item.is_processed;
 
     try {
-      await $fetch('/api/dashboard/forms/submit-form', {
+      await $fetch('/api/forms/submit-form', {
         method: 'PUT',
         body: { id, is_processed: newStatus },
       });
@@ -47,9 +47,6 @@ export function useForms() {
       const updatedList = list.map((item, i) =>
         i === index ? { ...item, is_processed: newStatus } : item
       );
-
-      // Reassign the whole ref value (not just a nested prop) so the
-      // shallowRef from useFetch actually triggers reactivity.
       formsData.value = formsData.value
         ? { ...formsData.value, data: updatedList }
         : formsData.value;
@@ -65,7 +62,7 @@ export function useForms() {
     if (!list) return;
 
     try {
-      await $fetch('/api/dashboard/forms/submit-form', {
+      await $fetch('/api/forms/submit-form', {
         method: 'DELETE',
         query: { id },
       });

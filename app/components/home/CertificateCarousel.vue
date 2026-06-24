@@ -104,7 +104,6 @@
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import { ref, computed, onBeforeUnmount, onMounted } from 'vue'
 import type { StyleValue } from 'vue'
-import type { PageData } from '~/composables/useCertificates'
 
 const props = defineProps<{
   data: PageData | null
@@ -137,8 +136,17 @@ onBeforeUnmount(() => {
   if (swipeResetTimer) clearTimeout(swipeResetTimer)
 })
 
-const certificates = computed(() => {
-  const list = props.data?.content?.Certificates || []
+type CertificateItem = {
+  order: number
+  image: string
+  title?: string
+  title_fa?: string
+  description_fa?: string
+}
+
+const certificates = computed<CertificateItem[]>(() => {
+  const content = props.data?.content as { Certificates?: CertificateItem[] } | undefined
+  const list = content?.Certificates || []
   return [...list].sort((a, b) => a.order - b.order)
 })
 

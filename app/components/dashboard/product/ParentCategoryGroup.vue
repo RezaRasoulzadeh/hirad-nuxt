@@ -83,7 +83,7 @@ const fetchProducts = async (categorySlug: string) => {
   if (!childCategory || childCategory.productsLoaded) return
 
   try {
-    const response = await $fetch<any>('/api/dashboard/products', {
+    const response = await $fetch<any>('/api/products', {
       query: { category: categorySlug }
     })
     

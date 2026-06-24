@@ -81,7 +81,7 @@ const submitUpdate = async () => {
   formData.append('uploader_id', getUploaderId());
 
   try {
-    await $fetch(`/api/dashboard/media/${props.asset.id}`, {
+    await $fetch(`/api/media/${props.asset.id}`, {
       method: 'PUT',
       body: formData
     });

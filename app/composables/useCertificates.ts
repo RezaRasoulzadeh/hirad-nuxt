@@ -30,7 +30,7 @@ export const useCertificates = () => {
     try {
       error.value = null
       
-      const response = await $fetch<any>('/api/dashboard/pages/گواهی-ها')
+      const response = await $fetch<any>('/api/pages/گواهی-ها')
       
       const pageData = response?.data || response
 

@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
 
   const config = useRuntimeConfig()
 
-  const backendRes = await $fetch.raw(`${config.public.apiBase}/login`, {
+  const backendRes = await $fetch.raw(`${config.internalApiBase}/login`, {
     method: 'POST',
     body: { identifier, password },
     ignoreResponseError: true,

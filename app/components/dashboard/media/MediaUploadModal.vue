@@ -88,7 +88,7 @@ const submitUpload = async () => {
   formData.append('uploader_id', getUploaderId());
 
   try {
-    await $fetch('/api/dashboard/media', {
+    await $fetch('/api/media', {
       method: 'POST',
       body: formData
     });

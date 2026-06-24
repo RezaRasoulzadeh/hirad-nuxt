@@ -2,7 +2,7 @@
 export async function loginUpstream(identifier: string, password: string): Promise<LoginResult> {
   const config = useRuntimeConfig()
 
-  const res = await fetch(`${config.public.apiBase}/login`, {
+  const res = await fetch(`${config.internalApiBase}/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ identifier, password }),
