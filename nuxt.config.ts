@@ -4,21 +4,13 @@ export default defineNuxtConfig({
   compatibilityDate: "2026-06-13",
   future: { compatibilityVersion: 4 },
   css: ["~/assets/css/main.css"],
-runtimeConfig: {
+  runtimeConfig: {
+    internalApiBase: `${process.env.BACKEND_URL || "http://localhost:3000"}/api`,
     public: {
-      apiBase: '/api',
+      apiBase: "/api",
     },
-    backendUrl: process.env.BACKEND_URL || 'http://localhost:3000',
   },
 
-  nitro: {
-    devProxy: {
-      '/api/': {
-        target: 'http://localhost:3000',
-        changeOrigin: true,
-      }
-    }
-  },
   routeRules: {
     "/flipHTML/**": { ssr: false, static: true },
   },

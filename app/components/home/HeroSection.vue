@@ -59,7 +59,7 @@ import HeroHotspotImage from './HeroHotspotImage.vue'
 
 const props = defineProps<{ page: HomePage | null }>()
 const config = useRuntimeConfig()
-const baseUrl = config?.public?.apiBase ?? 'http://localhost:3000/api'
+const baseUrl = config?.public?.apiBase ?? '/api'
 
 const { fetchCategories, productCategories } = useCategories()
 

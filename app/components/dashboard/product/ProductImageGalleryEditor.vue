@@ -74,7 +74,7 @@ const emit = defineEmits<{
 
 const config = useRuntimeConfig()
 const getThumbnailUrl = (img: ProductImage) => {
-  const base = config.public.apiBase || 'http://localhost:3000/api'
+  const base = config.public.apiBase || '/api'
   return `${base}${img.image_url}`
 }
 

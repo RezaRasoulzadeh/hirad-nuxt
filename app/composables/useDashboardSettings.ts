@@ -50,11 +50,12 @@ export interface CompanyPage {
 export const useCompanyPage = () => {
   const companyPage = useState<CompanyPage | null>('company-page', () => null)
   const loading = useState<boolean>('company-page-loading', () => false)
-  const error = useState<any>('company-page-error', () => null)
+  const error = useState<string | null>('company-page-error', () => null)
 
   const fetchCompanyPage = async () => {
     const config = useRuntimeConfig()
     loading.value = true
+    error.value = null
     try {
       const response = await $fetch<{ success: boolean; data: CompanyPage }>(`${config.public.apiBase}/pages/about-company`)
       if (response?.success && response.data) {
@@ -67,8 +68,8 @@ export const useCompanyPage = () => {
         if (!d.content.team) d.content.team = []
         companyPage.value = d
       }
-    } catch (err) {
-      error.value = err
+    } catch (err: any) {
+      error.value = err?.data?.message || err?.message || 'خطا در دریافت اطلاعات شرکت'
     } finally {
       loading.value = false
     }

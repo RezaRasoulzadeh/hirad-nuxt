@@ -36,7 +36,7 @@ interface ApiResponse {
 const isDrawerOpen = ref(false)
 
 const config = useRuntimeConfig()
-const baseUrl = config?.public?.apiBase || 'http://localhost:3000/api'
+const baseUrl = config?.public?.apiBase || '/api'
 
 const categories = useState<Category[]>('categories', () => [])
 const loading = useState<boolean>('categories-loading', () => false)

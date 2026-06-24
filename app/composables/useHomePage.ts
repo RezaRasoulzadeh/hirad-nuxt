@@ -1,3 +1,4 @@
+// app/composables/useHomePage.ts
 export interface ItemSection {
   title: string
   sub_title: string
@@ -37,17 +38,24 @@ interface ApiResponse {
   data: HomePage
 }
 
+const HOME_SLUG = 'صفحه-اصلی'
+
 export const useHomePage = () => {
   const page = useState<HomePage | null>('home-page', () => null)
   const loading = useState<boolean>('home-page-loading', () => false)
-  const error = useState<string | null>('home-page-error', () => null)  
+  const error = useState<string | null>('home-page-error', () => null)
 
   const fetchHomePage = async () => {
     loading.value = true
     error.value = null
 
     try {
-      const response = await $fetch<ApiResponse>('/api/pages/صفحه-اصلی')
+      const config = useRuntimeConfig()
+      const apiBase = config.public.apiBase || '/api'
+
+      const response = await $fetch<ApiResponse>(
+        `${apiBase}/pages/${encodeURIComponent(HOME_SLUG)}`
+      )
 
       if (response?.success && response.data) {
         page.value = response.data
@@ -63,4 +71,4 @@ export const useHomePage = () => {
   }
 
   return { page, loading, error, fetchHomePage }
-}
+}                                                   

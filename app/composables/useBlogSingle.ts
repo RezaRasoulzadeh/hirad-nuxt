@@ -33,7 +33,7 @@ interface ApiResponse {
 
 export const useBlogSingle = () => {
   const config = useRuntimeConfig()
-  const apiBase = config.public.apiBase || 'http://localhost:3000/api'
+  const apiBase = config.public.apiBase || '/api'
 
   const fetchPostByRawSlug = async (rawSlug: string) => {
     return await $fetch<ApiResponse>(`/pages/${rawSlug}`, {

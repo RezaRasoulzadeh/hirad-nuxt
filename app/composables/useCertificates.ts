@@ -24,7 +24,7 @@ export interface Certificate {
 
 export const useCertificates = () => {
   const certificatePage = useState<CertificatePageData | null>('certificate-page', () => null)
-  const error = useState<any>('certificate-page-error', () => null)
+  const error = useState<string | null>('certificate-page-error', () => null)
 
   const fetchCertificates = async () => {
     try {
@@ -39,7 +39,7 @@ export const useCertificates = () => {
         certificatePage.value = pageData
       }
     } catch (err: any) {
-      error.value = err
+      error.value = err?.data?.message || err?.message || 'خطا در دریافت گواهی‌ها'
       console.error('Failed to fetch certificates:', err)
     }
   }

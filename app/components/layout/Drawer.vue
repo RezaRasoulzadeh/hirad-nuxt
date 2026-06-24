@@ -128,7 +128,7 @@ const props = defineProps<{
 defineEmits(['close'])
 
 const config = useRuntimeConfig()
-const baseUrl = config?.public?.apiBase || 'http://localhost:3000/api'
+const baseUrl = config?.public?.apiBase || '/api'
 
 const getIconUrl = (url: string) => {
   if (!url) return ''

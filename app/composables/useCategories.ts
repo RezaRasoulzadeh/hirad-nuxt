@@ -1,5 +1,4 @@
-import { computed } from 'vue'
-
+// app/composables/useCategories.ts
 export interface Category {
   id: string
   parent_id: string | null
@@ -25,9 +24,9 @@ interface ApiResponse {
 export const useCategories = () => {
   const categories = useState<Category[]>('categories', () => [])
   const loading = useState<boolean>('categories-loading', () => false)
-  const error = useState<Error | null>('categories-error', () => null)
+  const error = useState<string | null>('categories-error', () => null)
 
-  const fetchCategories = async () => {
+   const fetchCategories = async () => {
     if (categories.value && categories.value.length > 0) return
 
     loading.value = true
@@ -35,16 +34,16 @@ export const useCategories = () => {
 
     try {
       const config = useRuntimeConfig()
-      const baseUrl = config?.public?.apiBase || 'http://localhost:3000/api'
+      const apiBase = config.public.apiBase || '/api'
 
-      const response = await $fetch<ApiResponse>(`${baseUrl}/categories`)
+      const response = await $fetch<ApiResponse>(`${apiBase}/categories`)
       if (response?.success && Array.isArray(response.data)) {
         categories.value = response.data
       } else {
         categories.value = []
       }
-    } catch (err) {
-      error.value = err as Error
+    } catch (err: any) {
+      error.value = err?.message || 'خطا در دریافت دسته‌بندی‌ها'
       categories.value = []
       console.error('Failed to fetch categories:', err)
     } finally {

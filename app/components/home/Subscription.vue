@@ -33,7 +33,7 @@ const isLoading = ref(false)
 const config = useRuntimeConfig()
 const toast = useToast()
 
-const baseUrl = config?.public?.apiBase ?? 'http://localhost:3000/api'
+const baseUrl = config?.public?.apiBase ?? '/api'
 
 async function subscribe() {
   if (!email.value.trim()) return
