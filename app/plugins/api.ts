@@ -1,11 +1,12 @@
 // app/plugins/api.ts
-import { defineNuxtPlugin, navigateTo } from '#imports'
+import { defineNuxtPlugin, navigateTo, useRuntimeConfig, useNuxtApp } from '#imports'
 
 export default defineNuxtPlugin((nuxtApp) => {
-  const { logout } = useAuth()
+  const config = useRuntimeConfig()
   const originalFetch = globalThis.$fetch
 
   const triggerSmoothExit = async () => {
+    const { logout } = useAuth()
     await logout()
 
     if (process.client) {
@@ -25,24 +26,27 @@ export default defineNuxtPlugin((nuxtApp) => {
       document.body.appendChild(toastContainer)
 
       await new Promise((resolve) => setTimeout(resolve, 2000))
-      
       toastContainer.remove()
     }
-    await nuxtApp.runWithContext(() => navigateTo('/login', { replace: true }))
+    await navigateTo('/login', { replace: true })
   }
 
   globalThis.$fetch = originalFetch.create({
+    baseURL: config.public.apiBase,
     async onResponseError({ response, request }) {
       if (!response) return
 
       if ([401, 403].includes(response.status)) {
-        if (request === '/api/auth/refresh') {
+        if (request.toString().includes('/auth/refresh')) {
           await triggerSmoothExit()
           return
         }
 
         try {
-          await originalFetch('/api/auth/refresh', { method: 'POST' })
+          await originalFetch('/auth/refresh', { 
+            method: 'POST',
+            baseURL: config.public.apiBase 
+          })
         } catch {
           await triggerSmoothExit()
           return

@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    return await $fetch(`${config.internalApiBase}/pages/${encodeURIComponent(slug)}`);
+    return await $fetch(`${config.backendUrl}/pages/${encodeURIComponent(slug)}`);
   } catch (err: any) {
     throw createError({
       statusCode: err.statusCode || 500,

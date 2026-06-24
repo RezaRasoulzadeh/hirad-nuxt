@@ -6,9 +6,18 @@ export default defineNuxtConfig({
   css: ["~/assets/css/main.css"],
 runtimeConfig: {
     public: {
-      internalApiBase: 'http://localhost:3000',
-      apiBase: "/api",
+      apiBase: '/api',
     },
+    backendUrl: process.env.BACKEND_URL || 'http://localhost:3000',
+  },
+
+  nitro: {
+    devProxy: {
+      '/api/': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      }
+    }
   },
   routeRules: {
     "/flipHTML/**": { ssr: false, static: true },
