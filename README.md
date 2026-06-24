@@ -66,5 +66,64 @@ Compiles asynchronous operations for metadata construction (`useSeoMeta`), rende
 ---
 
 ## 4. Key Implementation Patterns
-- **Explicit API Proxying:** Client context maps to endpoints through `useRuntimeConfig().public.apiBase` (bound to `process.env.API_BASE_URL` with a fallback to `http://localhost:3000/api`).
+- **Explicit API Proxying:** Client context maps to local Nitro endpoints through `useRuntimeConfig().public.apiBase` (`/api`). Nitro uses server-only `BACKEND_URL` internally and appends `/api` when forwarding requests to the backend.
 - **SEO & Social Graphs:** Multi-tier fallback mapping (`ogTitle`, `twitterDescription`) driven by server-resolved content payloads.
+
+---
+
+## 5. VPS Build & Update Runbook
+
+Use this flow for future production updates. The Nuxt app listens on port `4000`, nginx proxies port `80` to it, and the backend API is expected on `http://127.0.0.1:3000/api`.
+
+### 5.1 Build and Upload from Local Machine
+```bash
+npm install
+npm run build
+zip -r hirad-build.zip .output
+scp -P 9011 hirad-build.zip root@87.107.146.141:/var/www/hirad-nuxt/
+```
+
+### 5.2 Deploy on VPS
+```bash
+ssh -p 9011 root@87.107.146.141
+cd /var/www/hirad-nuxt
+
+sudo fuser -k 4000/tcp
+unzip -o hirad-build.zip
+
+PORT=4000 HOST=0.0.0.0 BACKEND_URL=http://127.0.0.1:3000 COOKIE_SECURE=false nohup node .output/server/index.mjs > hirad.log 2>&1 &
+```
+
+`BACKEND_URL` must be the backend root without `/api`; Nuxt appends `/api` through `internalApiBase`.
+
+`COOKIE_SECURE=false` is required while serving the site over plain HTTP. If the VPS is later moved behind HTTPS, remove it or set `COOKIE_SECURE=true`.
+
+### 5.3 Verify App and Nginx
+```bash
+sudo ss -tulpn | grep :4000
+tail -f hirad.log
+
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+After deployment, clear browser cookies for `87.107.146.141`, log in again, and confirm DevTools shows:
+
+```text
+hirad_session=1
+```
+
+### 5.4 Optional PM2 Runner
+```bash
+sudo fuser -k 4000/tcp
+PORT=4000 HOST=0.0.0.0 BACKEND_URL=http://127.0.0.1:3000 COOKIE_SECURE=false pm2 start .output/server/index.mjs --name hirad-nuxt
+pm2 save
+```
+
+For later PM2 updates:
+
+```bash
+cd /var/www/hirad-nuxt
+unzip -o hirad-build.zip
+PORT=4000 HOST=0.0.0.0 BACKEND_URL=http://127.0.0.1:3000 COOKIE_SECURE=false pm2 restart hirad-nuxt --update-env
+```
