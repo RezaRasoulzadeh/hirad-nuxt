@@ -73,7 +73,9 @@ Compiles asynchronous operations for metadata construction (`useSeoMeta`), rende
 
 ## 5. VPS Build & Update Runbook
 
-Use this flow for future production updates. The Nuxt app listens on port `4000`, nginx proxies port `80` to it, and the backend API is expected on `http://127.0.0.1:3000/api`.
+Use this flow for future production updates. The Nuxt app listens on port `4000`, nginx proxies to it, and the backend API is expected on `http://127.0.0.1:3000/api`.
+
+The app runs as a **systemd service** (`hirad-nuxt.service`) rather than a bare `nohup` background process. `nohup` only blocks SIGHUP — it does not survive a host/container OOM kill, and on some systemd configs (`KillUserProcesses=yes` in `logind.conf`), the process can be reaped on SSH logout regardless of `nohup`/`&`. systemd avoids both problems: the process lives under PID 1, not the shell session, and `Restart=always` auto-recovers it if it ever does die.
 
 ### 5.1 Build and Upload from Local Machine
 ```bash
@@ -83,25 +85,60 @@ zip -r hirad-build.zip .output
 scp -P 9011 hirad-build.zip root@87.107.146.141:/var/www/hirad-nuxt/
 ```
 
-### 5.2 Deploy on VPS
+### 5.2 One-Time Service Setup (already done, kept here for reference)
+
+`/etc/systemd/system/hirad-nuxt.service`:
+```ini
+[Unit]
+Description=Hirad Nuxt SSR
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/var/www/hirad-nuxt
+Environment=PORT=4000
+Environment=HOST=0.0.0.0
+Environment=BACKEND_URL=http://127.0.0.1:3000
+Environment=COOKIE_SECURE=false
+Environment=NODE_OPTIONS=--max-old-space-size=512
+ExecStart=/usr/bin/node .output/server/index.mjs
+Restart=always
+RestartSec=3
+StandardOutput=append:/var/www/hirad-nuxt/hirad.log
+StandardError=append:/var/www/hirad-nuxt/hirad.log
+
+[Install]
+WantedBy=multi-user.target
+```
+
 ```bash
-ssh -p 9011 root@87.107.146.141
-cd /var/www/hirad-nuxt
-
-sudo fuser -k 4000/tcp
-unzip -o hirad-build.zip
-
-PORT=4000 HOST=0.0.0.0 BACKEND_URL=http://127.0.0.1:3000 COOKIE_SECURE=false nohup node .output/server/index.mjs > hirad.log 2>&1 &
+systemctl daemon-reload
+systemctl enable hirad-nuxt
 ```
 
 `BACKEND_URL` must be the backend root without `/api`; Nuxt appends `/api` through `internalApiBase`.
 
 `COOKIE_SECURE=false` is required while serving the site over plain HTTP. If the VPS is later moved behind HTTPS, remove it or set `COOKIE_SECURE=true`.
 
-### 5.3 Verify App and Nginx
+`NODE_OPTIONS=--max-old-space-size` caps the Node heap so the process fails predictably under memory pressure instead of risking an unpredictable host-level OOM kill; adjust the value to the VPS's available RAM.
+
+### 5.3 Deploy an Update on VPS
 ```bash
+ssh -p 9011 root@87.107.146.141
+cd /var/www/hirad-nuxt
+
+unzip -o hirad-build.zip
+systemctl restart hirad-nuxt
+```
+
+No `fuser -k` needed — `systemctl restart` stops and relaunches the service cleanly under the same managed process.
+
+### 5.4 Verify App and Nginx
+```bash
+systemctl status hirad-nuxt
+journalctl -u hirad-nuxt -f
+
 sudo ss -tulpn | grep :4000
-tail -f hirad.log
 
 sudo nginx -t
 sudo systemctl reload nginx
@@ -113,17 +150,10 @@ After deployment, clear browser cookies for `87.107.146.141`, log in again, and 
 hirad_session=1
 ```
 
-### 5.4 Optional PM2 Runner
+### 5.5 Useful systemd Commands
 ```bash
-sudo fuser -k 4000/tcp
-PORT=4000 HOST=0.0.0.0 BACKEND_URL=http://127.0.0.1:3000 COOKIE_SECURE=false pm2 start .output/server/index.mjs --name hirad-nuxt
-pm2 save
-```
-
-For later PM2 updates:
-
-```bash
-cd /var/www/hirad-nuxt
-unzip -o hirad-build.zip
-PORT=4000 HOST=0.0.0.0 BACKEND_URL=http://127.0.0.1:3000 COOKIE_SECURE=false pm2 restart hirad-nuxt --update-env
+systemctl status hirad-nuxt      
+systemctl restart hirad-nuxt    
+journalctl -u hirad-nuxt -f      
+journalctl -u hirad-nuxt --since "1 hour ago"   
 ```
