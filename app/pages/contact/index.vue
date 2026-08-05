@@ -6,6 +6,7 @@
         <h1 class="text-3xl md:text-4xl font-black text-base-content mb-3">
           تماس با ما
         </h1>
+        <span class="mx-auto mb-5 block h-0.5 w-16 rounded-full bg-primary"></span>
         <p class="text-base-content/60 text-sm md:text-base">
           اینجا هستیم که کمک کنیم! سوالی درباره محصولات، خدمات، یا سفارش‌ها دارید؟ یا دنبال مشاوره تخصصی هستید؟
         </p>
@@ -40,14 +41,50 @@
 
           <div class="divider my-6"></div>
 
-          <div class="flex flex-col gap-3">
+          <div class="flex flex-col items-center gap-4">
             <span class="text-xs text-base-content/50 font-bold">شبکه‌های اجتماعی</span>
-            <div class="flex items-center gap-3">
+
+            <div class="flex items-center justify-center gap-3">
               <a v-for="icon in socialIcons" :key="icon.label" :href="icon.href" target="_blank"
                 rel="noopener noreferrer" :aria-label="icon.label"
-                class="flex items-center justify-center w-10 h-10 rounded-full bg-base-200 text-base-content/60 hover:bg-primary/10 hover:text-primary transition-colors">
+                class="flex items-center justify-center w-11 h-11 rounded-full border border-base-300 bg-base-200/60 text-base-content/60 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-primary/10 hover:text-primary">
                 <component :is="icon.svg" class="size-5" />
               </a>
+            </div>
+
+            <div class="w-full rounded-2xl border border-primary/20 bg-primary/5 p-5 flex flex-col gap-4">
+              <div class="flex flex-col items-center gap-2 text-center">
+                <div class="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary">
+                  <WifiOff class="size-5" />
+                </div>
+                <p class="text-sm text-base-content/70 leading-relaxed">
+                  در هنگام قطعی اینترنت در پیام‌رسان‌های بله و روبیکا همراه شما هستیم.
+                </p>
+              </div>
+
+              <div class="flex flex-col sm:flex-row items-stretch justify-center gap-3">
+                <a href="https://ble.ir/09352557163" target="_blank" rel="noopener noreferrer"
+                  class="group flex flex-1 items-center justify-center gap-3 rounded-xl border border-base-300 bg-base-100 px-4 py-3 transition-colors duration-200 hover:border-primary/30 hover:bg-primary/5">
+                  <span class="flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 text-primary shrink-0">
+                    <MessageCircleCheck class="size-4" />
+                  </span>
+                  <span class="flex flex-col items-start">
+                    <span class="text-sm font-bold text-base-content transition-colors group-hover:text-primary">گفتگو در بله</span>
+                    <span class="text-xs text-base-content/50" dir="ltr">۰۹۳۵-۲۵۵۷۱۶۳</span>
+                  </span>
+                </a>
+
+                <a href="#" target="_blank" rel="noopener noreferrer"
+                  class="group flex flex-1 items-center justify-center gap-3 rounded-xl border border-base-300 bg-base-100 px-4 py-3 transition-colors duration-200 hover:border-primary/30 hover:bg-primary/5">
+                  <span class="flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 text-primary shrink-0">
+                    <MessageCircleMore class="size-4" />
+                  </span>
+                  <span class="flex flex-col items-start">
+                    <span class="text-sm font-bold text-base-content transition-colors group-hover:text-primary">گفتگو در روبیکا</span>
+                    <span class="text-xs text-base-content/50" dir="ltr">۰۹۳۵-۲۵۵۷۱۶۳</span>
+                  </span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -109,9 +146,10 @@
                 class="textarea textarea-bordered w-full rounded-btn focus:textarea-primary resize-none"></textarea>
             </div>
 
-            <button id="send-contact-message" type="submit" class="btn btn-primary w-full rounded-btn no-animation mt-2"
+            <button id="send-contact-message" type="submit" class="btn btn-primary w-full rounded-btn no-animation mt-2 gap-2"
               :disabled="loading">
               <span v-if="loading" class="loading loading-spinner loading-sm"></span>
+              <Send v-else class="size-4" />
               {{ loading ? 'در حال ارسال...' : 'ارسال پیام' }}
             </button>
           </form>
@@ -123,7 +161,7 @@
 </template>
 
 <script setup lang="ts">
-import { Phone, Mail, MapPin, Instagram, Send, MessageCircleMore, MessageCircleCheck } from 'lucide-vue-next'
+import { Phone, Mail, MapPin, Instagram, Send, MessageCircleMore, MessageCircleCheck, WifiOff } from 'lucide-vue-next'
 
 useSeoMeta({
   title: 'تماس با ما | هیراد',
@@ -142,7 +180,8 @@ const contactInfo = [
   { label: 'تلفن تماس ۱', value: '۰۲۱-۶۶۴۲۰۸۳۹', href: 'tel:+982166420839', icon: Phone },
   { label: 'تلفن تماس ۲', value: '۰۲۱-۶۶۴۲۹۸۱۶', href: 'tel:+982166429816', icon: Phone },
   { label: 'تلفن همراه', value: '۰۹۳۵-۲۵۵۷۱۶۳', href: 'tel:+989352557163', icon: Phone },
-  { label: 'ایمیل', value: 'info@hiradepc.ir', href: 'mailto:info@hiradepc.ir', icon: Mail },
+  { label: 'ایمیل ۱', value: 'info@hiradepc.ir', href: 'mailto:info@hiradepc.ir', icon: Mail },
+  { label: 'ایمیل ۲', value: 'hiradepc@gmail.com', href: 'mailto:hiradepc@gmail.com', icon: Mail },
   { label: 'آدرس', value: 'تهران، خیابان ستارخان، خیابان نیایش، کوچه موثق نژاد، پلاک ۱، واحد یک', href: undefined, icon: MapPin },
 ]
 
@@ -150,8 +189,8 @@ const socialIcons = [
   { label: 'WhatsApp', href: '#', svg: MessageCircleMore },
   { label: 'Telegram', href: '#', svg: Send },
   { label: 'Instagram', href: '#', svg: Instagram },
-  { label: 'Bale', href: '#', svg: MessageCircleCheck },
-  { label: 'Email', href: '#', svg: Mail }
+  { label: 'Bale', href: 'https://ble.ir/09352557163', svg: MessageCircleCheck },
+  { label: 'Email', href: 'mailto:info@hiradepc.ir', svg: Mail }
 ]
 
 const handleSubmit = async () => {
