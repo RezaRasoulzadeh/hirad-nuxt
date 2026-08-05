@@ -1,108 +1,319 @@
 <template>
-  <footer class="border-t border-neutral-200 dark:border-neutral-800 bg-base-200/50" dir="rtl">
+  <footer
+    class="relative overflow-hidden border-t border-base-300 bg-base-100 text-base-content"
+    dir="rtl"
+  >
+    <!-- Background image -->
+    <div class="pointer-events-none absolute inset-x-0 top-0 h-[430px] overflow-hidden">
+      <div
+        class="absolute inset-0 bg-cover bg-top bg-no-repeat opacity-10"
+        :style="{ backgroundImage: `url(${HeroImage})` }"
+      />
+
+      <!-- Fade background into current DaisyUI theme -->
+      <div
+        class="absolute inset-0 bg-gradient-to-b from-base-100/20 via-base-100/70 to-base-100"
+      />
+    </div>
+
+    <!-- Main cards -->
     <div
-      class="mx-auto max-w-[1920px] px-6 py-12 xl:px-20 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-10 items-start">
+      class="relative z-10 mx-auto grid max-w-[1540px] grid-cols-1 gap-5 px-5 pb-7 pt-14
+      md:grid-cols-2 lg:px-8 xl:grid-cols-4 xl:px-12"
+      dir="ltr"
+    >
+      <!-- Company -->
+      <aside class="card min-h-[355px] border border-base-300 bg-base-100/90 shadow-sm backdrop-blur-sm" dir="rtl">
+        <div class="card-body p-7">
+          <div class="flex min-h-[105px] items-center justify-start">
+            <img
+              :src="LogoWide"
+              alt="Hirad Logo"
+              class="block h-24 w-auto max-w-full object-contain object-right dark:hidden"
+            />
 
-      <aside class="space-y-5">
-        <img :src="LogoWide" alt="Hirad Logo" class="h-28 w-auto object-contain object-right block dark:hidden" />
-        <img :src="LogoWideDark" alt="Hirad Logo" class="h-28 w-auto object-contain object-right hidden dark:block" />
-        <p class="text-sm text-base-content/70 leading-relaxed text-justify">
-          شرکت تجهیز فرآیند هیراد از سال ۱۳۹۴ با شماره ثبت ۵۲۵۴۷۰ در تهران تأسیس شده و در زمینه تأمین و تدارک تجهیزات
-          فنی و صنعتی برای صنایع نفت، گاز، پتروشیمی، نیروگاه‌ها و صنایع دارویی و غذایی فعالیت می‌کند.
-        </p>
-      </aside>
-
-      <nav class="lg:ms-16">
-        <h2 class="footer-title opacity-100 font-bold mb-4 text-base text-base-content tracking-normal">دسترسی سریع</h2>
-        <div class="flex flex-col gap-3 text-base text-base-content/80">
-          <template v-for="item in items" :key="item.label">
-            <button v-if="item.emit" @click="$emit(item.emit)"
-              class="link link-hover hover:text-primary flex items-center gap-2 group transition-colors duration-200 w-full text-right bg-transparent border-none p-0 cursor-pointer font-normal">
-              <component :is="item.icon"
-                class="size-5 opacity-70 group-hover:scale-110 transition-transform duration-300" />
-              {{ item.label }}
-            </button>
-
-            <NuxtLink v-else :to="item.to!"
-              class="link link-hover hover:text-primary flex items-center gap-2 group transition-colors duration-200">
-              <component :is="item.icon"
-                class="size-5 opacity-70 group-hover:scale-110 transition-transform duration-300" />
-              {{ item.label }}
-            </NuxtLink>
-          </template>
-        </div>
-      </nav>
-
-      <nav>
-        <h2 class="footer-title opacity-100 font-bold mb-4 text-base text-base-content tracking-normal">ارتباط با ما
-        </h2>
-        <div class="flex flex-col gap-3.5 text-base text-base-content/80">
-          <a href="tel:+982166420839"
-            class="link link-hover hover:text-primary flex items-center gap-2 group transition-colors duration-200">
-            <Phone class="size-5 opacity-70 group-hover:scale-110 transition-transform duration-300" />
-            <span dir="ltr">۰۲۱-۶۶۴۲۰۸۳۹</span>
-          </a>
-          <a href="tel:+982166429816"
-            class="link link-hover hover:text-primary flex items-center gap-2 group transition-colors duration-200">
-            <Phone class="size-5 opacity-70 group-hover:scale-110 transition-transform duration-300" />
-            <span dir="ltr">۰۲۱-۶۶۴۲۹۸۱۶</span>
-          </a>
-          <a href="tel:+989352557163"
-            class="link link-hover hover:text-primary flex items-center gap-2 group transition-colors duration-200">
-            <Smartphone class="size-5 opacity-70 group-hover:scale-110 transition-transform duration-300" />
-            <span dir="ltr">۰۹۳۵-۲۵۵۷۱۶۳</span>
-          </a>
-          <div class="flex items-start gap-2 group">
-            <MapPin class="size-5 mt-1 opacity-70 group-hover:scale-110 transition-transform duration-300 shrink-0" />
-            <span class="leading-relaxed">تهران، خیابان ستارخان، خیابان نیایش، کوچه موثق نژاد، پلاک ۱، واحد یک</span>
+            <img
+              :src="LogoWideDark"
+              alt="Hirad Logo"
+              class="hidden h-24 w-auto max-w-full object-contain object-right dark:block"
+            />
           </div>
-        </div>
-      </nav>
 
-      <nav>
-        <h2 class="footer-title opacity-100 font-bold mb-4 text-base text-base-content tracking-normal">مجوزها و
-          گواهینامه‌ها
-        </h2>
-        <div
-          class="flex flex-wrap gap-4 bg-base-100 p-4 rounded-2xl border border-base-content/5 justify-center md:justify-start">
-          <a href="#" target="_blank" rel="noopener noreferrer"
-            class="w-20 h-20 bg-base-200 rounded-xl flex items-center justify-center hover:bg-base-300 transition-colors duration-200">
-          </a>
-          <a href="#" target="_blank" rel="noopener noreferrer"
-            class="w-20 h-20 bg-base-200 rounded-xl flex items-center justify-center hover:bg-base-300 transition-colors duration-200">
-          </a>
-        </div>
+          <div class="divider my-1 before:bg-base-300 after:bg-base-300">
+            <span class="h-0.5 w-16 rounded-full bg-primary" />
+          </div>
 
-        <div class="mt-6">
-          <h3 class="footer-title opacity-100 font-bold mb-3 text-sm text-base-content/40 tracking-normal text-center">
-           هیراد در شبکه‌های اجتماعی و پیام‌رسان‌ها
-          </h3>
+          <p class="text-justify text-sm leading-8 text-base-content/70">
+            تأمین‌کننده تخصصی تجهیزات ابزار دقیق، شیرآلات صنعتی، اتصالات و ملزومات پایپینگ
+            برای صنایع نفت، گاز، پتروشیمی، نیروگاهی و صنایع فرآیندی.
+          </p>
 
-          <div class="flex items-center gap-2.5 justify-center">
-            <a v-for="social in socials" :key="social.label" :href="social.href" target="_blank"
+          <div class="mt-auto flex items-center justify-center gap-2 pt-6">
+            <a
+              v-for="social in socials"
+              :key="social.label"
+              :href="social.href"
+              target="_blank"
               rel="noopener noreferrer"
-              class="p-2.5 rounded-xl bg-base-200 text-base-content/70 hover:text-primary hover:bg-primary/10 border border-transparent hover:border-primary/20 transition-all duration-200 group"
-              :aria-label="social.label">
-              <component :is="social.icon" class="size-5 group-hover:scale-110 transition-transform duration-300" />
+              class="btn btn-circle btn-ghost btn-sm border border-base-300
+              text-base-content/70 hover:border-primary/30 hover:bg-primary/10 hover:text-primary"
+              :aria-label="social.label"
+            >
+              <component :is="social.icon" class="size-[18px]" />
             </a>
           </div>
         </div>
+      </aside>
+
+      <!-- Quick access -->
+      <nav class="card min-h-[355px] border border-base-300 bg-base-100/90 shadow-sm backdrop-blur-sm" dir="rtl">
+        <div class="card-body p-7">
+          <FooterHeading title="دسترسی سریع" />
+
+          <div class="mt-3 flex flex-col">
+            <template v-for="(item, index) in items" :key="item.label">
+              <button
+                v-if="item.emit"
+                type="button"
+                class="group flex min-h-11 w-full items-center gap-3 rounded-lg px-2
+                text-right text-sm text-base-content/70 transition
+                hover:bg-base-200 hover:text-primary"
+                @click="$emit(item.emit)"
+              >
+                <component
+                  :is="item.icon"
+                  class="size-[18px] shrink-0 opacity-70 transition-transform group-hover:scale-110"
+                />
+                <span>{{ item.label }}</span>
+              </button>
+
+              <NuxtLink
+                v-else
+                :to="item.to!"
+                class="group flex min-h-11 items-center gap-3 rounded-lg px-2
+                text-sm text-base-content/70 transition
+                hover:bg-base-200 hover:text-primary"
+              >
+                <component
+                  :is="item.icon"
+                  class="size-[18px] shrink-0 opacity-70 transition-transform group-hover:scale-110"
+                />
+                <span>{{ item.label }}</span>
+              </NuxtLink>
+
+              <div
+                v-if="index !== items.length - 1"
+                class="mx-2 border-b border-base-200"
+              />
+            </template>
+          </div>
+        </div>
       </nav>
 
+      <!-- Contact -->
+      <nav class="card min-h-[355px] border border-base-300 bg-base-100/90 shadow-sm backdrop-blur-sm" dir="rtl">
+        <div class="card-body p-7">
+          <FooterHeading title="ارتباط با ما" />
+
+          <div class="mt-4 flex flex-col gap-5">
+            <a href="tel:+982166420839" class="group flex items-center gap-3">
+              <span
+                class="flex size-10 shrink-0 items-center justify-center rounded-full
+                border border-primary/15 bg-primary/5 text-primary
+                transition group-hover:bg-primary/10"
+              >
+                <Phone class="size-[18px]" />
+              </span>
+
+              <span>
+                <span class="block text-xs text-base-content/50">تلفن</span>
+                <span class="mt-1 block text-sm text-base-content/75 group-hover:text-primary" dir="ltr">
+                  ۰۲۱-۶۶۴۲۰۸۳۹
+                </span>
+              </span>
+            </a>
+
+            <a href="tel:+989352557163" class="group flex items-center gap-3">
+              <span
+                class="flex size-10 shrink-0 items-center justify-center rounded-full
+                border border-primary/15 bg-primary/5 text-primary
+                transition group-hover:bg-primary/10"
+              >
+                <Smartphone class="size-[18px]" />
+              </span>
+
+              <span>
+                <span class="block text-xs text-base-content/50">موبایل</span>
+                <span class="mt-1 block text-sm text-base-content/75 group-hover:text-primary" dir="ltr">
+                  ۰۹۳۵-۲۵۵۷۱۶۳
+                </span>
+              </span>
+            </a>
+
+            <div class="flex items-start gap-3">
+              <span
+                class="flex size-10 shrink-0 items-center justify-center rounded-full
+                border border-primary/15 bg-primary/5 text-primary"
+              >
+                <MapPin class="size-[18px]" />
+              </span>
+
+              <span>
+                <span class="block text-xs text-base-content/50">آدرس</span>
+                <span class="mt-1 block text-sm leading-7 text-base-content/75">
+                  تهران، خیابان ستارخان، خیابان نیایش، کوچه موثق‌نژاد، پلاک ۱، واحد یک
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Certificates -->
+      <nav class="card min-h-[355px] border border-base-300 bg-base-100/90 shadow-sm backdrop-blur-sm" dir="rtl">
+        <div class="card-body p-7">
+          <FooterHeading title="مجوزها و گواهینامه‌ها" />
+
+          <div class="mt-5 flex items-center justify-center gap-3">
+            <a
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex size-28 items-center justify-center rounded-box
+              border border-base-300 bg-base-100 shadow-sm
+              transition hover:-translate-y-1 hover:border-primary/30 hover:shadow-md"
+            >
+              <img
+                src="/images/enamad.png"
+                alt="نماد اعتماد الکترونیکی"
+                class="size-20 object-contain"
+              />
+            </a>
+
+            <a
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex size-28 items-center justify-center rounded-box
+              border border-base-300 bg-base-100 shadow-sm
+              transition hover:-translate-y-1 hover:border-primary/30 hover:shadow-md"
+            >
+              <img
+                src="/images/samandehi.png"
+                alt="نشان ساماندهی"
+                class="size-20 object-contain"
+              />
+            </a>
+          </div>
+
+          <div class="divider my-3 before:bg-base-300 after:bg-base-300" />
+
+          <div class="flex items-center gap-4 rounded-box bg-base-200/70 p-4">
+            <div class="flex size-12 shrink-0 items-center justify-center rounded-box bg-primary/10 text-primary">
+              <ShieldCheck class="size-7" />
+            </div>
+
+            <div>
+              <h3 class="text-sm font-bold text-base-content">
+                شرکت ثبت‌شده و معتبر
+              </h3>
+
+              <p class="mt-1 text-xs leading-6 text-base-content/60">
+                دارای مجوزهای لازم از مراجع ذی‌صلاح
+              </p>
+            </div>
+          </div>
+        </div>
+      </nav>
     </div>
 
-    <div class="border-t border-neutral-200 dark:border-neutral-800 py-6 text-center text-sm text-base-content/50">
-      <p>{{ new Date().getFullYear().toLocaleString('fa-IR', { useGrouping: false }) }} هیراد. تمامی حقوق محفوظ است.</p>
+    <!-- Features -->
+    <div class="relative z-10 border-y border-base-300 bg-base-100/90 backdrop-blur-sm">
+      <div
+        class="mx-auto grid max-w-[1540px] grid-cols-1 px-5
+        sm:grid-cols-2 lg:grid-cols-4 lg:px-8 xl:px-12"
+      >
+        <div
+          v-for="(feature, index) in features"
+          :key="feature.title"
+          class="relative flex min-h-[92px] items-center justify-center gap-4 px-5 py-5"
+        >
+          <div
+            v-if="index !== features.length - 1"
+            class="absolute left-0 top-1/2 hidden h-11 -translate-y-1/2 border-l border-base-300 lg:block"
+          />
+
+          <div class="flex size-12 shrink-0 items-center justify-center rounded-box bg-primary/10 text-primary">
+            <component :is="feature.icon" class="size-7" :stroke-width="1.7" />
+          </div>
+
+          <div>
+            <h3 class="text-sm font-bold text-base-content">
+              {{ feature.title }}
+            </h3>
+
+            <p class="mt-1 text-xs text-base-content/55">
+              {{ feature.description }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Copyright -->
+    <div class="relative z-10 bg-base-100">
+      <div
+        class="mx-auto grid max-w-[1540px] grid-cols-1 items-center gap-3
+        px-6 py-5 text-center text-xs text-base-content/50
+        md:grid-cols-3 md:text-right lg:px-12"
+      >
+        <p class="md:text-right" dir="ltr">
+          © {{ currentYear }} HIRAD Process Equipment Co.
+        </p>
+
+        <p class="text-center">
+          تمامی حقوق این وب‌سایت محفوظ است.
+        </p>
+
+        <p class="text-center md:text-left">
+          طراحی و توسعه با
+          <Heart class="mx-1 inline size-3.5 fill-primary text-primary" />
+          توسط تیم هیراد
+        </p>
+      </div>
     </div>
   </footer>
 </template>
 
 <script setup lang="ts">
-import { House, Info, Newspaper, Phone, Smartphone, ShoppingBag, MapPin, Send, Instagram, MessageCircleCheck, MessageCircleMore, Mail } from 'lucide-vue-next';
+import {
+  Award,
+  Headphones,
+  Heart,
+  House,
+  Info,
+  Instagram,
+  Mail,
+  MapPin,
+  MessageCircleCheck,
+  MessageCircleMore,
+  Newspaper,
+  PackageCheck,
+  Phone,
+  Send,
+  ShieldCheck,
+  ShoppingBag,
+  Smartphone,
+  Truck
+} from 'lucide-vue-next'
+
 import LogoWide from '~/assets/Logo-wide.png'
 import LogoWideDark from '~/assets/Logo-wide-dark.png'
+import HeroImage from '~/assets/hero.jpg'
 
-defineEmits(['open-drawer'])
+defineEmits<{
+  (event: 'open-drawer'): void
+}>()
 
 interface FooterItem {
   label: string
@@ -117,19 +328,110 @@ interface SocialItem {
   icon: any
 }
 
+interface FeatureItem {
+  title: string
+  description: string
+  icon: any
+}
+
+const currentYear = new Date()
+  .getFullYear()
+  .toLocaleString('en-US', { useGrouping: false })
+
 const items: FooterItem[] = [
   { label: 'صفحه اصلی', to: '/', icon: House },
   { label: 'محصولات', emit: 'open-drawer', icon: ShoppingBag },
-  { label: 'اخبار و مقالات', to: '/blog', icon: Newspaper },
+  { label: 'پروژه‌ها', to: '/projects', icon: PackageCheck },
+  { label: 'مقالات و اخبار', to: '/blog', icon: Newspaper },
   { label: 'درباره ما', to: '/about', icon: Info },
   { label: 'تماس با ما', to: '/contact', icon: Phone }
 ]
 
 const socials: SocialItem[] = [
-  { label: 'WhatsApp', href: '#', icon: MessageCircleMore },
-  { label: 'Telegram', href: '#', icon: Send },
-  { label: 'Instagram', href: '#', icon: Instagram },
-  { label: 'Bale', href: '#', icon: MessageCircleCheck },
-  { label: 'Email', href: '#', icon: Mail }
+  {
+    label: 'Email',
+    href: 'mailto:info@hiradprocess.com',
+    icon: Mail
+  },
+  {
+    label: 'WhatsApp',
+    href: '#',
+    icon: MessageCircleMore
+  },
+  {
+    label: 'Instagram',
+    href: '#',
+    icon: Instagram
+  },
+  {
+    label: 'Telegram',
+    href: '#',
+    icon: Send
+  },
+  {
+    label: 'Bale',
+    href: '#',
+    icon: MessageCircleCheck
+  }
 ]
+
+const features: FeatureItem[] = [
+  {
+    title: 'گارانتی معتبر',
+    description: 'گارانتی و خدمات پس از فروش',
+    icon: ShieldCheck
+  },
+  {
+    title: 'تحویل سریع',
+    description: 'ارسال به سراسر کشور',
+    icon: Truck
+  },
+  {
+    title: 'مهندسی و پشتیبانی',
+    description: 'مشاوره فنی و مهندسی',
+    icon: Headphones
+  },
+  {
+    title: 'کیفیت برتر',
+    description: 'تضمین کیفیت محصولات',
+    icon: Award
+  }
+]
+</script>
+
+<script lang="ts">
+import { defineComponent, h } from 'vue'
+
+const FooterHeading = defineComponent({
+  name: 'FooterHeading',
+
+  props: {
+    title: {
+      type: String,
+      required: true
+    }
+  },
+
+  setup(props) {
+    return () =>
+      h('div', {}, [
+        h(
+          'h2',
+          {
+            class: 'text-base font-bold tracking-normal text-base-content'
+          },
+          props.title
+        ),
+        h('span', {
+          class: 'mt-4 block h-0.5 w-16 rounded-full bg-primary'
+        })
+      ])
+  }
+})
+
+export default {
+  components: {
+    FooterHeading
+  }
+}
 </script>
