@@ -1,12 +1,15 @@
 <template>
-  <div ref="containerRef" class="relative flex items-center justify-end h-10 w-10 shrink-0">
+  <div ref="containerRef"
+    class="relative flex items-center justify-end h-10 shrink-0 transition-[width] duration-300 ease-in-out"
+    :class="isOpen ? 'w-44 sm:w-64' : 'w-10'">
     <div
-      class="flex items-center border border-neutral-200 dark:border-neutral-800 rounded-xl bg-base-100 overflow-hidden transition-[width,border-color] duration-300 ease-in-out absolute left-0 top-0"
-      :class="isOpen ? 'w-44 sm:w-64 border-primary/50' : 'w-10 border-transparent bg-transparent'"
+      class="flex items-center border border-neutral-200 dark:border-neutral-800 rounded-xl bg-base-100 overflow-hidden w-full h-full transition-colors duration-300 ease-in-out"
+      :class="isOpen ? 'border-primary/50' : 'border-transparent bg-transparent'"
     >
       <button
         type="button"
-        class="btn btn-ghost btn-circle btn-sm size-10 shrink-0"
+        class="btn btn-circle btn-sm size-9 shrink-0"
+        :class="isOpen ? 'btn-ghost' : 'btn-primary'"
         :aria-label="isOpen ? 'بستن جستجو' : 'باز کردن جستجو'"
         @click="isOpen ? null : openSearch()"
       >

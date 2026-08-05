@@ -21,7 +21,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import type { Category } from '~/composables/useCategories'
 import GlobalToast from '~/components/shared/GlobalToast.vue'
 import FloatingContact from '~/components/shared/FloatingContact.vue'
@@ -33,7 +32,7 @@ interface ApiResponse {
   data: Category[]
 }
 
-const isDrawerOpen = ref(false)
+const isDrawerOpen = useState<boolean>('productsDrawerOpen', () => false)
 
 const config = useRuntimeConfig()
 const baseUrl = config?.public?.apiBase || '/api'

@@ -28,7 +28,7 @@
 
     <div class="hidden xl:flex flex-col gap-1" v-if="items && items.length > 0">
       <NuxtLink
-        v-for="item in items"
+        v-for="item in visibleItems"
         :key="item.url ?? ''"
         :to="item.url ?? '/'"
         class="group flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] hover:bg-primary/8 border border-transparent hover:border-primary/20 hover:-translate-x-1"
@@ -42,20 +42,38 @@
         </div>
         <ChevronLeft class="size-5 text-base-content/40 group-hover:text-primary transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] mr-auto shrink-0 group-hover:translate-x-0" />
       </NuxtLink>
+
+      <button
+        v-if="items.length > 5"
+        type="button"
+        @click="isDrawerOpen = true"
+        class="group flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] hover:bg-primary/8 border border-transparent hover:border-primary/20 hover:-translate-x-1"
+      >
+        <div class="size-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center transition-colors duration-300 group-hover:bg-primary/20">
+          <LayoutGrid class="size-5 text-primary" />
+        </div>
+        <span class="text-base font-bold text-primary cursor-pointer">مشاهده همه محصولات</span>
+        <ChevronLeft class="size-5 text-primary/60 group-hover:text-primary transition-all duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] mr-auto shrink-0 group-hover:translate-x-0" />
+      </button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ChevronLeft } from 'lucide-vue-next'
+import { computed } from 'vue'
+import { ChevronLeft, LayoutGrid } from 'lucide-vue-next'
 
-defineProps<{
+const props = defineProps<{
   metaTitle: string
   gallery: any[]
   activeSlide: number
   items: any[]
   maskStyle: (url: string) => Record<string, string>
 }>()
+
+const visibleItems = computed(() => props.items.slice(0, 5))
+
+const isDrawerOpen = useState<boolean>('productsDrawerOpen', () => false)
 </script>
 
 <style scoped>

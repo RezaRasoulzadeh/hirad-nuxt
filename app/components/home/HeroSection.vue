@@ -31,7 +31,7 @@
 
     <div class="xl:hidden w-full px-4 border-t border-base-300">
       <NuxtLink
-        v-for="item in items"
+        v-for="item in visibleItems"
         :key="item.url ?? ''"
         :to="item.url ?? '/'"
         class="group flex items-center gap-4 px-6 py-4 border-b border-base-300 last:border-b-0 transition-colors duration-200 hover:bg-primary/5"
@@ -45,6 +45,16 @@
         </div>
         <ChevronLeft class="size-5 text-base-content/20 group-hover:text-primary transition-colors duration-200 mr-auto shrink-0" />
       </NuxtLink>
+
+      <button
+        v-if="items.length > 5"
+        type="button"
+        @click="isDrawerOpen = true"
+        class="group flex items-center justify-center gap-2 w-full px-6 py-4 text-primary font-bold text-sm transition-colors duration-200 hover:bg-primary/5 cursor-pointer"
+      >
+        مشاهده همه محصولات
+        <ChevronLeft class="size-4 transition-transform duration-200 group-hover:-translate-x-0.5" />
+      </button>
     </div>
   </section>
 </template>
@@ -78,6 +88,10 @@ const items = computed(() => {
       sub_title_fa: cat.description ?? ''
     }))
 })
+
+const visibleItems = computed(() => items.value.slice(0, 5))
+
+const isDrawerOpen = useState<boolean>('productsDrawerOpen', () => false)
 
 const gallery = computed(() => props.page?.content?.image_gallery ?? [])
 
