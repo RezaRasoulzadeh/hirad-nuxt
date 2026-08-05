@@ -1,47 +1,26 @@
 <template>
-  <footer
-    class="relative overflow-hidden border-t border-base-300 bg-base-100 text-base-content"
-    dir="rtl"
-  >
+  <footer class="relative overflow-hidden border-t border-base-300 bg-base-100 text-base-content" dir="rtl">
     <!-- Background image -->
-    <div class="pointer-events-none absolute inset-x-0 top-0 h-[430px] overflow-hidden">
-      <div
-        class="absolute inset-0 bg-cover bg-top bg-no-repeat opacity-10"
-        :style="{ backgroundImage: `url(${HeroImage})` }"
-      />
+    <div class="pointer-events-none absolute inset-x-0 top-0 h-107.5 overflow-hidden">
+      <div class="absolute inset-0 bg-cover bg-top bg-no-repeat opacity-20"
+        :style="{ backgroundImage: `url(${HeroImage})` }" />
 
       <!-- Fade background into current DaisyUI theme -->
-      <div
-        class="absolute inset-0 bg-gradient-to-b from-base-100/20 via-base-100/70 to-base-100"
-      />
+      <div class="absolute inset-0 bg-linear-to-b from-base-100/20 via-base-100/30 to-base-100" />
     </div>
 
     <!-- Main cards -->
-    <div
-      class="relative z-10 mx-auto grid max-w-[1540px] grid-cols-1 gap-5 px-5 pb-7 pt-14
-      md:grid-cols-2 lg:px-8 xl:grid-cols-4 xl:px-12"
-      dir="ltr"
-    >
+    <div class="container relative z-10 mx-auto grid grid-cols-1 gap-5 px-4 pb-7 pt-14 md:grid-cols-2 xl:grid-cols-4">
       <!-- Company -->
-      <aside class="card min-h-[355px] border border-base-300 bg-base-100/90 shadow-sm backdrop-blur-sm" dir="rtl">
-        <div class="card-body p-7">
-          <div class="flex min-h-[105px] items-center justify-start">
-            <img
-              :src="LogoWide"
-              alt="Hirad Logo"
-              class="block h-24 w-auto max-w-full object-contain object-right dark:hidden"
-            />
+      <aside class="card min-h-88.75 border border-base-300 bg-base-100/30 backdrop-blur-sm">
+        <div class="card-body items-center p-7 text-center">
+          <div class="flex min-h-26.25 items-center justify-center">
+            <img :src="LogoWide" alt="Hirad Logo" class="block h-24 w-auto max-w-full object-contain dark:hidden" />
 
-            <img
-              :src="LogoWideDark"
-              alt="Hirad Logo"
-              class="hidden h-24 w-auto max-w-full object-contain object-right dark:block"
-            />
+            <img :src="LogoWideDark" alt="Hirad Logo" class="hidden h-24 w-auto max-w-full object-contain dark:block" />
           </div>
 
-          <div class="divider my-1 before:bg-base-300 after:bg-base-300">
-            <span class="h-0.5 w-16 rounded-full bg-primary" />
-          </div>
+          <span class="mt-4 block h-0.5 w-16 rounded-full bg-primary" />
 
           <p class="text-justify text-sm leading-8 text-base-content/70">
             تأمین‌کننده تخصصی تجهیزات ابزار دقیق، شیرآلات صنعتی، اتصالات و ملزومات پایپینگ
@@ -49,80 +28,56 @@
           </p>
 
           <div class="mt-auto flex items-center justify-center gap-2 pt-6">
-            <a
-              v-for="social in socials"
-              :key="social.label"
-              :href="social.href"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="btn btn-circle btn-ghost btn-sm border border-base-300
+            <a v-for="social in socials" :key="social.label" :href="social.href" target="_blank"
+              rel="noopener noreferrer" class="btn btn-circle btn-ghost p-2 border border-base-300
               text-base-content/70 hover:border-primary/30 hover:bg-primary/10 hover:text-primary"
-              :aria-label="social.label"
-            >
-              <component :is="social.icon" class="size-[18px]" />
+              :aria-label="social.label">
+              <component :is="social.icon" class="size-5" />
             </a>
           </div>
         </div>
       </aside>
 
       <!-- Quick access -->
-      <nav class="card min-h-[355px] border border-base-300 bg-base-100/90 shadow-sm backdrop-blur-sm" dir="rtl">
+      <nav class="card min-h-88.75 border border-base-300 bg-base-100/30 backdrop-blur-sm">
         <div class="card-body p-7">
           <FooterHeading title="دسترسی سریع" />
 
           <div class="mt-3 flex flex-col">
             <template v-for="(item, index) in items" :key="item.label">
-              <button
-                v-if="item.emit"
-                type="button"
-                class="group flex min-h-11 w-full items-center gap-3 rounded-lg px-2
+              <button v-if="item.emit" type="button" class="group flex min-h-11 w-full items-center gap-3 rounded-lg px-2
                 text-right text-sm text-base-content/70 transition
-                hover:bg-base-200 hover:text-primary"
-                @click="$emit(item.emit)"
-              >
-                <component
-                  :is="item.icon"
-                  class="size-[18px] shrink-0 opacity-70 transition-transform group-hover:scale-110"
-                />
+                hover:bg-base-200 hover:text-primary" @click="$emit(item.emit)">
+                <component :is="item.icon"
+                  class="size-4.5 shrink-0 opacity-70 transition-transform group-hover:scale-110" />
                 <span>{{ item.label }}</span>
               </button>
 
-              <NuxtLink
-                v-else
-                :to="item.to!"
-                class="group flex min-h-11 items-center gap-3 rounded-lg px-2
+              <NuxtLink v-else :to="item.to!" class="group flex min-h-11 items-center gap-3 rounded-lg px-2
                 text-sm text-base-content/70 transition
-                hover:bg-base-200 hover:text-primary"
-              >
-                <component
-                  :is="item.icon"
-                  class="size-[18px] shrink-0 opacity-70 transition-transform group-hover:scale-110"
-                />
+                hover:bg-base-200 hover:text-primary">
+                <component :is="item.icon"
+                  class="size-4.5 shrink-0 opacity-70 transition-transform group-hover:scale-110" />
                 <span>{{ item.label }}</span>
               </NuxtLink>
 
-              <div
-                v-if="index !== items.length - 1"
-                class="mx-2 border-b border-base-200"
-              />
+              <div v-if="index !== items.length - 1" class="mx-2 border-b border-base-200" />
             </template>
           </div>
         </div>
       </nav>
 
       <!-- Contact -->
-      <nav class="card min-h-[355px] border border-base-300 bg-base-100/90 shadow-sm backdrop-blur-sm" dir="rtl">
+      <nav class="card min-h-88.75 border border-base-300 bg-base-100/30 backdrop-blur-sm">
         <div class="card-body p-7">
           <FooterHeading title="ارتباط با ما" />
 
           <div class="mt-4 flex flex-col gap-5">
             <a href="tel:+982166420839" class="group flex items-center gap-3">
-              <span
-                class="flex size-10 shrink-0 items-center justify-center rounded-full
+              <span class="flex size-10 shrink-0 items-center justify-center rounded-full
                 border border-primary/15 bg-primary/5 text-primary
-                transition group-hover:bg-primary/10"
-              >
-                <Phone class="size-[18px]" />
+                transition group-hover:bg-primary/10">
+                <Phone class="size-4.5" />
               </span>
 
               <span>
@@ -134,12 +89,10 @@
             </a>
 
             <a href="tel:+989352557163" class="group flex items-center gap-3">
-              <span
-                class="flex size-10 shrink-0 items-center justify-center rounded-full
+              <span class="flex size-10 shrink-0 items-center justify-center rounded-full
                 border border-primary/15 bg-primary/5 text-primary
-                transition group-hover:bg-primary/10"
-              >
-                <Smartphone class="size-[18px]" />
+                transition group-hover:bg-primary/10">
+                <Smartphone class="size-4.5" />
               </span>
 
               <span>
@@ -151,11 +104,9 @@
             </a>
 
             <div class="flex items-start gap-3">
-              <span
-                class="flex size-10 shrink-0 items-center justify-center rounded-full
-                border border-primary/15 bg-primary/5 text-primary"
-              >
-                <MapPin class="size-[18px]" />
+              <span class="flex size-10 shrink-0 items-center justify-center rounded-full
+                border border-primary/15 bg-primary/5 text-primary">
+                <MapPin class="size-4.5" />
               </span>
 
               <span>
@@ -170,39 +121,21 @@
       </nav>
 
       <!-- Certificates -->
-      <nav class="card min-h-[355px] border border-base-300 bg-base-100/90 shadow-sm backdrop-blur-sm" dir="rtl">
+      <nav class="card min-h-88.75 border border-base-300 bg-base-100/30 backdrop-blur-sm">
         <div class="card-body p-7">
           <FooterHeading title="مجوزها و گواهینامه‌ها" />
 
           <div class="mt-5 flex items-center justify-center gap-3">
-            <a
-              href="#"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="flex size-28 items-center justify-center rounded-box
-              border border-base-300 bg-base-100 shadow-sm
-              transition hover:-translate-y-1 hover:border-primary/30 hover:shadow-md"
-            >
-              <img
-                src="/images/enamad.png"
-                alt="نماد اعتماد الکترونیکی"
-                class="size-20 object-contain"
-              />
+            <a href="#" target="_blank" rel="noopener noreferrer" class="flex size-28 items-center justify-center rounded-box
+              border border-base-300 bg-base-100
+              transition hover:-translate-y-1 hover:border-primary/30">
+              <img :src="PlaceHolder" alt="نماد اعتماد الکترونیکی" class="size-24 rounded-xl object-cover" />
             </a>
 
-            <a
-              href="#"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="flex size-28 items-center justify-center rounded-box
-              border border-base-300 bg-base-100 shadow-sm
-              transition hover:-translate-y-1 hover:border-primary/30 hover:shadow-md"
-            >
-              <img
-                src="/images/samandehi.png"
-                alt="نشان ساماندهی"
-                class="size-20 object-contain"
-              />
+            <a href="#" target="_blank" rel="noopener noreferrer" class="flex size-28 items-center justify-center rounded-box
+              border border-base-300 bg-base-100
+              transition hover:-translate-y-1 hover:border-primary/30">
+              <img :src="PlaceHolder" alt="نشان ساماندهی" class="size-24 rounded-xl object-cover" />
             </a>
           </div>
 
@@ -229,19 +162,11 @@
 
     <!-- Features -->
     <div class="relative z-10 border-y border-base-300 bg-base-100/90 backdrop-blur-sm">
-      <div
-        class="mx-auto grid max-w-[1540px] grid-cols-1 px-5
-        sm:grid-cols-2 lg:grid-cols-4 lg:px-8 xl:px-12"
-      >
-        <div
-          v-for="(feature, index) in features"
-          :key="feature.title"
-          class="relative flex min-h-[92px] items-center justify-center gap-4 px-5 py-5"
-        >
-          <div
-            v-if="index !== features.length - 1"
-            class="absolute left-0 top-1/2 hidden h-11 -translate-y-1/2 border-l border-base-300 lg:block"
-          />
+      <div class="container mx-auto grid grid-cols-1 px-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div v-for="(feature, index) in features" :key="feature.title"
+          class="relative flex min-h-23 items-center justify-center gap-4 px-5 py-5">
+          <div v-if="index !== features.length - 1"
+            class="absolute left-0 top-1/2 hidden h-11 -translate-y-1/2 border-l border-base-300 lg:block" />
 
           <div class="flex size-12 shrink-0 items-center justify-center rounded-box bg-primary/10 text-primary">
             <component :is="feature.icon" class="size-7" :stroke-width="1.7" />
@@ -262,23 +187,21 @@
 
     <!-- Copyright -->
     <div class="relative z-10 bg-base-100">
-      <div
-        class="mx-auto grid max-w-[1540px] grid-cols-1 items-center gap-3
-        px-6 py-5 text-center text-xs text-base-content/50
-        md:grid-cols-3 md:text-right lg:px-12"
-      >
-        <p class="md:text-right" dir="ltr">
-          © {{ currentYear }} HIRAD Process Equipment Co.
-        </p>
+      <div class="container mx-auto grid grid-cols-1 items-center gap-3
+        px-4 py-5 text-center text-xs text-base-content/50
+        md:grid-cols-3 md:text-right">
 
+        <p class="text-center md:text-left">
+          طراحی و توسعه با
+          <Heart class="mx-1 inline size-3.5 fill-red-600 text-red-600" />
+          توسط تیم هیراد
+        </p>
         <p class="text-center">
           تمامی حقوق این وب‌سایت محفوظ است.
         </p>
 
-        <p class="text-center md:text-left">
-          طراحی و توسعه با
-          <Heart class="mx-1 inline size-3.5 fill-primary text-primary" />
-          توسط تیم هیراد
+        <p class="md:text-right" dir="ltr">
+          HIRAD Process Equipment Co. © {{ currentYear }}
         </p>
       </div>
     </div>
@@ -310,6 +233,7 @@ import {
 import LogoWide from '~/assets/Logo-wide.png'
 import LogoWideDark from '~/assets/Logo-wide-dark.png'
 import HeroImage from '~/assets/hero.jpg'
+import PlaceHolder from '~/assets/placeholder.png'
 
 defineEmits<{
   (event: 'open-drawer'): void
@@ -341,7 +265,6 @@ const currentYear = new Date()
 const items: FooterItem[] = [
   { label: 'صفحه اصلی', to: '/', icon: House },
   { label: 'محصولات', emit: 'open-drawer', icon: ShoppingBag },
-  { label: 'پروژه‌ها', to: '/projects', icon: PackageCheck },
   { label: 'مقالات و اخبار', to: '/blog', icon: Newspaper },
   { label: 'درباره ما', to: '/about', icon: Info },
   { label: 'تماس با ما', to: '/contact', icon: Phone }
@@ -414,7 +337,7 @@ const FooterHeading = defineComponent({
 
   setup(props) {
     return () =>
-      h('div', {}, [
+      h('div', { class: 'flex flex-col items-center text-center' }, [
         h(
           'h2',
           {
