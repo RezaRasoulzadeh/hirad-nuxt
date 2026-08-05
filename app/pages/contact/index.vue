@@ -189,7 +189,6 @@ const socialIcons = [
   { label: 'WhatsApp', href: '#', svg: MessageCircleMore },
   { label: 'Telegram', href: '#', svg: Send },
   { label: 'Instagram', href: '#', svg: Instagram },
-  { label: 'Bale', href: 'https://ble.ir/09352557163', svg: MessageCircleCheck },
   { label: 'Email', href: 'mailto:info@hiradepc.ir', svg: Mail }
 ]
 
