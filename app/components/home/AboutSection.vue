@@ -1,6 +1,6 @@
 <template>
   <section
-    class="w-full py-10 bg-base-100"
+    class="w-full py-10 bg-base-200"
     dir="rtl"
   >
     <div class="container mx-auto px-4">

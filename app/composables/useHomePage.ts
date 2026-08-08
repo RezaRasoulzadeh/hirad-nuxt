@@ -16,9 +16,17 @@ export interface ImageGallery {
   description_fa: string
 }
 
+export interface HomeBrand {
+  name: string
+  name_fa: string
+  logo_url: string
+  website_url: string
+}
+
 export interface HomePageContent {
   ItemSection: ItemSection[]
   image_gallery: ImageGallery[]
+  brands: HomeBrand[]
 }
 
 export interface HomePage {
@@ -58,6 +66,12 @@ export const useHomePage = () => {
       )
 
       if (response?.success && response.data) {
+        if (!response.data.content) {
+          response.data.content = { ItemSection: [], image_gallery: [], brands: [] }
+        }
+        response.data.content.ItemSection ??= []
+        response.data.content.image_gallery ??= []
+        response.data.content.brands ??= []
         page.value = response.data
       } else {
         error.value = response?.message || 'خطا در دریافت اطلاعات'
@@ -71,4 +85,4 @@ export const useHomePage = () => {
   }
 
   return { page, loading, error, fetchHomePage }
-}                                                   
+}

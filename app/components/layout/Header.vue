@@ -127,7 +127,7 @@
       <div class="grow"></div>
 
       <div class="navbar-end w-auto shrink-0 flex items-center gap-3 justify-end">
-        <button @click="toggleTheme" class="btn btn-ghost btn-circle swap swap-rotate" aria-label="Toggle Theme">
+        <button v-if="canUseDarkMode" @click="toggleTheme" class="btn btn-ghost btn-circle swap swap-rotate" aria-label="Toggle Theme">
           <Sun v-if="isDark" class="size-5" />
           <Moon v-else class="size-5" />
         </button>
@@ -216,8 +216,14 @@ import Search from '../shared/Search.vue'
 defineEmits(['open-drawer'])
 
 const isDark = ref(false)
+const canUseDarkMode = import.meta.dev
 
 onMounted(() => {
+  if (!canUseDarkMode) {
+    document.documentElement.setAttribute('data-theme', 'light')
+    return
+  }
+
   const savedTheme = localStorage.getItem('theme')
   if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
     isDark.value = true
@@ -228,6 +234,8 @@ onMounted(() => {
 })
 
 const toggleTheme = () => {
+  if (!canUseDarkMode) return
+
   isDark.value = !isDark.value
   const themeName = isDark.value ? 'dark' : 'light'
   document.documentElement.setAttribute('data-theme', themeName)

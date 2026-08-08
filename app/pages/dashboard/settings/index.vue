@@ -67,6 +67,9 @@ const handleFile = (url: string) => {
   if (mediaType.value === 'hero') {
     const item = mainPage.value?.content?.image_gallery?.[mediaIndex.value]
     if (item) item.url = url
+  } else if (mediaType.value === 'brand') {
+    const item = mainPage.value?.content?.brands?.[mediaIndex.value]
+    if (item) item.logo_url = url
   } else if (mediaType.value === 'cert') {
     const item = certPage.value?.content?.Certificates?.[mediaIndex.value]
     if (item) item.image = url

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 48" fill="none">
+  <defs>
+    <linearGradient id="pipeMetal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F9FAFB"/>
+      <stop offset="0.18" stop-color="#D5D9DD"/>
+      <stop offset="0.42" stop-color="#8C9399"/>
+      <stop offset="0.56" stop-color="#F4F5F6"/>
+      <stop offset="0.78" stop-color="#A6ADB2"/>
+      <stop offset="1" stop-color="#ECEEEF"/>
+    </linearGradient>
+  </defs>
+  <path d="M0 12h16c6.6 0 12 5.4 12 12s-5.4 12-12 12H0V12Z" fill="url(#pipeMetal)" stroke="#858B90" stroke-width="1.2"/>
+  <path d="M0 16h24" stroke="#fff" stroke-opacity="0.72" stroke-width="2"/>
+  <path d="M0 32h24" stroke="#636A70" stroke-opacity="0.42" stroke-width="1.4"/>
+</svg>

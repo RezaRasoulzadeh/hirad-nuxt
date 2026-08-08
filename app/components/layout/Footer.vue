@@ -157,7 +157,7 @@ const currentYear = new Date()
   .toLocaleString('en-US', { useGrouping: false })
 
 const primaryPhone = contactData.phones.find(item => item.primary) ?? null
-const mobilePhone = contactData.phones.find(item => item.label === 'تلفن همراه') ?? null
+const mobilePhone = contactData.phones.find(item => item.label.toString().includes('تلفن همراه')) ?? null
 const primaryEmail = contactData.emails.find(item => item.primary) ?? null
 
 const items: FooterItem[] = [

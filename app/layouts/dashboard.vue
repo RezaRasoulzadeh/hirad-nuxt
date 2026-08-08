@@ -15,7 +15,7 @@
         </div>
 
         <div class="flex items-center gap-2 sm:gap-4 justify-end">
-          <button @click="toggleTheme" class="btn btn-ghost btn-circle btn-sm sm:btn-md">
+          <button v-if="canUseDarkMode" @click="toggleTheme" class="btn btn-ghost btn-circle btn-sm sm:btn-md">
             <Sun v-if="currentTheme === 'dark'" class="size-5" />
             <Moon v-else class="size-5" />
           </button>
@@ -95,6 +95,7 @@ const auth = useAuth();
 const toast = useToast();
 const isDrawerOpen = ref(false);
 const currentTheme = ref('light');
+const canUseDarkMode = import.meta.dev;
 
 const navigationItems = [
   { name: 'داشبورد', path: '/dashboard', icon: LayoutDashboard },
@@ -115,12 +116,20 @@ const dockNavigationItems = [
 ];
 
 onMounted(() => {
+  if (!canUseDarkMode) {
+    currentTheme.value = 'light';
+    document.documentElement.setAttribute('data-theme', 'light');
+    return;
+  }
+
   const savedTheme = localStorage.getItem('theme') || 'light';
   currentTheme.value = savedTheme;
   document.documentElement.setAttribute('data-theme', savedTheme);
 });
 
 const toggleTheme = () => {
+  if (!canUseDarkMode) return;
+
   const targetTheme = currentTheme.value === 'light' ? 'dark' : 'light';
   currentTheme.value = targetTheme;
   localStorage.setItem('theme', targetTheme);

@@ -1,18 +1,20 @@
 <template>
   <div>
-    <HeroSection :page="page || null" />  
-    <OrderProcess />   
+    <HeroSection :page="page || null" />
     <AboutSection />
-    <Catalogue /> 
+    <OrderProcess />
+    <Catalogue />
     <CertificateCarousel :data="certificatePage" />
+    <BrandsSection :brands="page?.content?.brands || []" />
     <Subscription />
-    <BrandPromisses/>
+    <BrandPromisses />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 import HeroSection from '~/components/home/HeroSection.vue'
+import BrandsSection from '~/components/home/BrandsSection.vue'
 import AboutSection from '~/components/home/AboutSection.vue'
 import OrderProcess from '~/components/home/OrderProcess.vue'
 import Subscription from '~/components/home/Subscription.vue'

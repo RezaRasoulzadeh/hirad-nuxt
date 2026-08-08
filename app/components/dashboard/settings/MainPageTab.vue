@@ -53,6 +53,40 @@
         <PlusCircle class="w-4 h-4 ml-2" /> افزودن تصویر جدید
       </button>
 
+      <div class="divider text-base-content/50 font-medium text-xs">برندها</div>
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div v-for="(brand, idx) in modelValue.content?.brands || []" :key="'brand-' + idx"
+          class="relative rounded-xl border border-base-300 bg-base-200/50 p-4">
+          <button type="button" @click="modelValue.content.brands.splice(idx, 1)"
+            class="btn btn-ghost btn-sm btn-circle absolute top-2 left-2 text-error" aria-label="حذف برند">
+            <Trash2 class="size-4" />
+          </button>
+
+          <div class="mb-4 flex h-28 items-center justify-center rounded-lg border border-base-300 bg-base-100 p-3">
+            <img v-if="brand.logo_url" :src="resolveAssetUrl(brand.logo_url)" :alt="brand.name_fa || brand.name"
+              class="h-full w-full object-contain">
+            <span v-else class="text-xs text-base-content/40">لوگوی برند</span>
+          </div>
+
+          <div class="space-y-3">
+            <div class="join w-full">
+              <input v-model="brand.logo_url" type="text" placeholder="Logo URL"
+                class="input input-bordered join-item min-w-0 grow" />
+              <button type="button" @click="$emit('select-media', idx, 'brand')" class="btn join-item">انتخاب فایل</button>
+            </div>
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <input v-model="brand.name_fa" type="text" placeholder="نام فارسی" class="input input-bordered w-full" />
+              <input v-model="brand.name" type="text" placeholder="Name (EN)" class="input input-bordered w-full" dir="ltr" />
+            </div>
+            <input v-model="brand.website_url" type="url" placeholder="https://brand.com"
+              class="input input-bordered w-full" dir="ltr" />
+          </div>
+        </div>
+      </div>
+      <button type="button" @click="addBrand" class="btn btn-outline btn-dashed btn-primary btn-block">
+        <PlusCircle class="w-4 h-4 ml-2" /> افزودن برند
+      </button>
+
       <button type="submit" class="btn btn-primary btn-block mt-6">ذخیره تغییرات صفحه اصلی</button>
     </div>
   </form>
@@ -68,5 +102,11 @@ const addHeroImage = () => {
   if (!props.modelValue.content) props.modelValue.content = {}
   if (!props.modelValue.content.image_gallery) props.modelValue.content.image_gallery = []
   props.modelValue.content.image_gallery.push({ url: '', title: '', title_fa: '', description: '', description_fa: '' })
+}
+
+const addBrand = () => {
+  if (!props.modelValue.content) props.modelValue.content = {}
+  if (!props.modelValue.content.brands) props.modelValue.content.brands = []
+  props.modelValue.content.brands.push({ name: '', name_fa: '', logo_url: '', website_url: '' })
 }
 </script>

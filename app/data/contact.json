@@ -3,8 +3,8 @@
   "phones": [
     { "label": "تلفن تماس ۱", "value": "۰۲۱-۶۶۴۲۰۸۳۹", "href": "tel:+982166420839", "primary": true },
     { "label": "تلفن تماس ۲", "value": "۰۲۱-۶۶۴۲۹۸۱۶", "href": "tel:+982166429816", "primary": false },
-    { "label": "تلفن همراه ۲", "value": "۰۹۱۲-۹۳۳۳۶۰۸", "href": "tel:+989129333608", "primary": true },
-    { "label": "تلفن همراه", "value": "۰۹۳۵-۲۵۵۷۱۶۳", "href": "tel:+989352557163", "primary": false }
+    { "label": "تلفن همراه", "value": "۰۹۱۲-۹۳۳۳۶۰۸", "href": "tel:+989129333608", "primary": true },
+    { "label": "تلفن همراه ۲", "value": "۰۹۳۵-۲۵۵۷۱۶۳", "href": "tel:+989352557163", "primary": false }
   ],
   "emails": [
     { "label": "ایمیل ۱", "value": "info@hiradepc.ir", "href": "mailto:info@hiradepc.ir", "primary": true },
