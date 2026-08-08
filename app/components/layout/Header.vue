@@ -77,6 +77,15 @@
                       </NuxtLink>
                     </li>
                     <li>
+                      <NuxtLink to="/about/international-sourcing" active-class="!text-primary bg-primary/5"
+                        class="py-2.5 focus:bg-transparent text-right">
+                        <div class="flex flex-col">
+                          <span class="text-sm font-medium">بازرگانی خارجی و تأمین کالا</span>
+                          <span class="text-xs text-base-content/40 font-normal">International Sourcing</span>
+                        </div>
+                      </NuxtLink>
+                    </li>
+                    <li>
                       <NuxtLink to="/about/certificates" active-class="!text-primary bg-primary/5"
                         class="py-2.5 focus:bg-transparent text-right">
                         <div class="flex flex-col">
@@ -165,6 +174,10 @@
                   <li>
                     <NuxtLink to="/about" active-class="!text-primary bg-primary/5"
                       class="flex flex-col items-start gap-0"><span>معرفی شرکت</span></NuxtLink>
+                  </li>
+                  <li>
+                    <NuxtLink to="/about/international-sourcing" active-class="!text-primary bg-primary/5"
+                      class="flex flex-col items-start gap-0"><span>بازرگانی خارجی و تأمین کالا</span></NuxtLink>
                   </li>
                   <li>
                     <NuxtLink to="/about/certificates" active-class="!text-primary bg-primary/5"

@@ -1,0 +1,28 @@
+{
+  "company": "شرکت تجهیز فرآیند هیراد",
+  "phones": [
+    { "label": "تلفن تماس ۱", "value": "۰۲۱-۶۶۴۲۰۸۳۹", "href": "tel:+982166420839", "primary": true },
+    { "label": "تلفن تماس ۲", "value": "۰۲۱-۶۶۴۲۹۸۱۶", "href": "tel:+982166429816", "primary": false },
+    { "label": "تلفن همراه ۲", "value": "۰۹۱۲-۹۳۳۳۶۰۸", "href": "tel:+989129333608", "primary": true },
+    { "label": "تلفن همراه", "value": "۰۹۳۵-۲۵۵۷۱۶۳", "href": "tel:+989352557163", "primary": false }
+  ],
+  "emails": [
+    { "label": "ایمیل ۱", "value": "info@hiradepc.ir", "href": "mailto:info@hiradepc.ir", "primary": true },
+    { "label": "ایمیل ۲", "value": "hiradepc@gmail.com", "href": "mailto:hiradepc@gmail.com", "primary": false }
+  ],
+  "address": {
+    "label": "دفتر تهران",
+    "value": "تهران، تهران‌ویلا، خیابان امام منتظر، خیابان شهید محسن موثق‌نژاد، پلاک ۱، طبقه ۴"
+  },
+  "socials": [
+    { "platform": "whatsapp", "label": "واتساپ", "href": "#" },
+    { "platform": "telegram", "label": "تلگرام", "href": "#" },
+    { "platform": "instagram", "label": "اینستاگرام", "href": "#" },
+    { "platform": "bale", "label": "بله", "href": "https://ble.ir/09352557163" },
+    { "platform": "rubika", "label": "روبیکا", "href": "#" }
+  ],
+  "availability": {
+    "title": "پاسخ‌گویی تخصصی",
+    "description": "درخواست شما به واحد مرتبط ارجاع داده می‌شود و کارشناسان هیراد در اولین فرصت با شما تماس می‌گیرند."
+  }
+}

@@ -104,9 +104,10 @@
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import { ref, computed, onBeforeUnmount, onMounted } from 'vue'
 import type { StyleValue } from 'vue'
+import type { CertificatePageData } from '~/composables/useCertificates'
 
 const props = defineProps<{
-  data: PageData | null
+  data: CertificatePageData | null
 }>()
 
 const config = useRuntimeConfig()

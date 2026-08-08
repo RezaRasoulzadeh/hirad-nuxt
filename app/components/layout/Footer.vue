@@ -1,189 +1,83 @@
 <template>
   <footer class="relative overflow-hidden border-t border-base-300 bg-base-100 text-base-content" dir="rtl">
-    <!-- Background image -->
-    <div class="pointer-events-none absolute inset-x-0 top-0 h-107.5 overflow-hidden">
-      <div class="absolute inset-0 bg-cover bg-top bg-no-repeat opacity-20"
-        :style="{ backgroundImage: `url(${HeroImage})` }" />
+    <img :src="FooterBackground" alt="" aria-hidden="true"
+      class="pointer-events-none absolute left-0 top-0 h-auto w-full origin-center -scale-x-100 object-contain object-top-left opacity-90 mix-blend-multiply lg:w-[60vw] dark:invert dark:opacity-20 dark:mix-blend-screen" />
 
-      <!-- Fade background into current DaisyUI theme -->
-      <div class="absolute inset-0 bg-linear-to-b from-base-100/20 via-base-100/30 to-base-100" />
-    </div>
-
-    <!-- Main cards -->
-    <div class="container relative z-10 mx-auto grid grid-cols-1 gap-5 px-4 pb-7 pt-14 md:grid-cols-2 xl:grid-cols-4">
-      <!-- Company -->
-      <aside class="card min-h-88.75 border border-base-300 bg-base-100/30 backdrop-blur-sm">
-        <div class="card-body items-center p-7 text-center">
-          <div class="flex min-h-26.25 items-center justify-center">
-            <img :src="LogoWide" alt="Hirad Logo" class="block h-24 w-auto max-w-full object-contain dark:hidden" />
-
-            <img :src="LogoWideDark" alt="Hirad Logo" class="hidden h-24 w-auto max-w-full object-contain dark:block" />
-          </div>
-
-          <span class="mt-4 block h-0.5 w-16 rounded-full bg-primary" />
-
-          <p class="text-justify text-sm leading-8 text-base-content/70">
-            تأمین‌کننده تخصصی تجهیزات ابزار دقیق، شیرآلات صنعتی، اتصالات و ملزومات پایپینگ
-            برای صنایع نفت، گاز، پتروشیمی، نیروگاهی و صنایع فرآیندی.
+    <div class="relative z-10 mx-auto w-full max-w-[1720px] px-5 pb-10 pt-44 sm:pt-56 md:px-8 md:pt-64 lg:pt-72 xl:pt-80">
+      <div class="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.05fr_.7fr_.95fr_1.4fr] lg:gap-0">
+        <aside class="flex flex-col lg:pl-9">
+          <NuxtLink to="/" class="inline-flex w-fit rounded-lg focus-visible:outline-2 focus-visible:outline-primary">
+            <img :src="LogoWide" alt="تجهیز فرآیند هیراد" class="block h-auto w-64 max-w-full object-contain dark:hidden" />
+            <img :src="LogoWideDark" alt="تجهیز فرآیند هیراد" class="hidden h-auto w-64 max-w-full object-contain dark:block" />
+          </NuxtLink>
+          <span class="mt-7 h-0.5 w-11 rounded-full bg-primary" />
+          <p class="mt-5 max-w-sm text-justify text-sm leading-8 text-base-content/65">
+            تأمین‌کننده تخصصی تجهیزات ابزار دقیق، شیرآلات صنعتی، اتصالات و ملزومات پایپینگ برای صنایع نفت، گاز، پتروشیمی، نیروگاهی و صنایع فرآیندی.
           </p>
-
-          <div class="mt-auto flex items-center justify-center gap-2 pt-6">
-            <a v-for="social in socials" :key="social.label" :href="social.href" target="_blank"
-              rel="noopener noreferrer" class="btn btn-circle btn-ghost p-2 border border-base-300
-              text-base-content/70 hover:border-primary/30 hover:bg-primary/10 hover:text-primary"
+          <div class="mt-7 flex w-full max-w-sm flex-wrap items-center justify-between gap-3">
+            <a v-for="social in socials" :key="social.label" :href="social.href" target="_blank" rel="noopener noreferrer"
+              class="flex size-11 items-center justify-center rounded-full border border-base-300 bg-base-100/80 text-primary shadow-sm transition duration-300 hover:-translate-y-1 hover:border-primary/30 hover:bg-primary hover:text-primary-content hover:shadow-md"
               :aria-label="social.label">
               <component :is="social.icon" class="size-5" />
             </a>
           </div>
-        </div>
-      </aside>
+        </aside>
 
-      <!-- Quick access -->
-      <nav class="card min-h-88.75 border border-base-300 bg-base-100/30 backdrop-blur-sm">
-        <div class="card-body p-7">
+        <nav class="lg:border-r lg:border-base-300 lg:px-9">
           <FooterHeading title="دسترسی سریع" />
-
-          <div class="mt-3 flex flex-col">
-            <template v-for="(item, index) in items" :key="item.label">
-              <button v-if="item.emit" type="button" class="group flex min-h-11 w-full items-center gap-3 rounded-lg px-2
-                text-right text-sm text-base-content/70 transition
-                hover:bg-base-200 hover:text-primary" @click="$emit(item.emit)">
-                <component :is="item.icon"
-                  class="size-4.5 shrink-0 opacity-70 transition-transform group-hover:scale-110" />
+          <div class="mt-6 flex flex-col gap-1">
+            <template v-for="item in items" :key="item.label">
+              <button v-if="item.emit" type="button" class="group flex min-h-10 w-full items-center gap-3 rounded-lg px-2 text-right text-sm text-base-content/65 transition hover:bg-primary/5 hover:text-primary" @click="$emit(item.emit)">
+                <component :is="item.icon" class="size-4.5 shrink-0 transition-transform group-hover:scale-110" />
                 <span>{{ item.label }}</span>
               </button>
-
-              <NuxtLink v-else :to="item.to!" class="group flex min-h-11 items-center gap-3 rounded-lg px-2
-                text-sm text-base-content/70 transition
-                hover:bg-base-200 hover:text-primary">
-                <component :is="item.icon"
-                  class="size-4.5 shrink-0 opacity-70 transition-transform group-hover:scale-110" />
+              <NuxtLink v-else :to="item.to!" class="group flex min-h-10 items-center gap-3 rounded-lg px-2 text-sm text-base-content/65 transition hover:bg-primary/5 hover:text-primary">
+                <component :is="item.icon" class="size-4.5 shrink-0 transition-transform group-hover:scale-110" />
                 <span>{{ item.label }}</span>
               </NuxtLink>
-
-              <div v-if="index !== items.length - 1" class="mx-2 border-b border-base-200" />
             </template>
           </div>
-        </div>
-      </nav>
+        </nav>
 
-      <!-- Contact -->
-      <nav class="card min-h-88.75 border border-base-300 bg-base-100/30 backdrop-blur-sm">
-        <div class="card-body p-7">
+        <address class="not-italic lg:border-r lg:border-base-300 lg:px-9">
           <FooterHeading title="ارتباط با ما" />
-
-          <div class="mt-4 flex flex-col gap-5">
-            <a href="tel:+982166420839" class="group flex items-center gap-3">
-              <span class="flex size-10 shrink-0 items-center justify-center rounded-full
-                border border-primary/15 bg-primary/5 text-primary
-                transition group-hover:bg-primary/10">
-                <Phone class="size-4.5" />
-              </span>
-
-              <span>
-                <span class="block text-xs text-base-content/50">تلفن</span>
-                <span class="mt-1 block text-sm text-base-content/75 group-hover:text-primary" dir="ltr">
-                  ۰۲۱-۶۶۴۲۰۸۳۹
-                </span>
-              </span>
+          <div class="mt-6 flex flex-col gap-4">
+            <a v-if="primaryPhone" :href="primaryPhone.href" class="group flex items-center gap-3 text-sm text-base-content/70 hover:text-primary">
+              <span class="flex size-10 shrink-0 items-center justify-center rounded-full border border-base-300 bg-base-100/80 text-primary shadow-sm"><Phone class="size-4.5" /></span>
+              <span dir="ltr">{{ primaryPhone.value }}</span>
             </a>
-
-            <a href="tel:+989352557163" class="group flex items-center gap-3">
-              <span class="flex size-10 shrink-0 items-center justify-center rounded-full
-                border border-primary/15 bg-primary/5 text-primary
-                transition group-hover:bg-primary/10">
-                <Smartphone class="size-4.5" />
-              </span>
-
-              <span>
-                <span class="block text-xs text-base-content/50">موبایل</span>
-                <span class="mt-1 block text-sm text-base-content/75 group-hover:text-primary" dir="ltr">
-                  ۰۹۳۵-۲۵۵۷۱۶۳
-                </span>
-              </span>
+            <a v-if="mobilePhone" :href="mobilePhone.href" class="group flex items-center gap-3 text-sm text-base-content/70 hover:text-primary">
+              <span class="flex size-10 shrink-0 items-center justify-center rounded-full border border-base-300 bg-base-100/80 text-primary shadow-sm"><Smartphone class="size-4.5" /></span>
+              <span dir="ltr">{{ mobilePhone.value }}</span>
             </a>
-
-            <div class="flex items-start gap-3">
-              <span class="flex size-10 shrink-0 items-center justify-center rounded-full
-                border border-primary/15 bg-primary/5 text-primary">
-                <MapPin class="size-4.5" />
-              </span>
-
-              <span>
-                <span class="block text-xs text-base-content/50">آدرس</span>
-                <span class="mt-1 block text-sm leading-7 text-base-content/75">
-                  تهران، خیابان ستارخان، خیابان نیایش، کوچه موثق‌نژاد، پلاک ۱، واحد یک
-                </span>
-              </span>
+            <a v-if="primaryEmail" :href="primaryEmail.href" class="group flex items-center gap-3 text-sm text-base-content/70 hover:text-primary">
+              <span class="flex size-10 shrink-0 items-center justify-center rounded-full border border-base-300 bg-base-100/80 text-primary shadow-sm"><Mail class="size-4.5" /></span>
+              <span dir="ltr">{{ primaryEmail.value }}</span>
+            </a>
+            <div class="flex items-start gap-3 text-sm leading-7 text-base-content/70">
+              <span class="flex size-10 shrink-0 items-center justify-center rounded-full border border-base-300 bg-base-100/80 text-primary shadow-sm"><MapPin class="size-4.5" /></span>
+              <span>{{ contactData.address.value }}</span>
             </div>
           </div>
-        </div>
-      </nav>
+        </address>
 
-      <!-- Certificates -->
-      <nav class="card min-h-88.75 border border-base-300 bg-base-100/30 backdrop-blur-sm">
-        <div class="card-body p-7">
-          <FooterHeading title="مجوزها و گواهینامه‌ها" />
-
-          <div class="mt-5 flex items-center justify-center gap-3">
-            <a href="#" target="_blank" rel="noopener noreferrer" class="flex size-28 items-center justify-center rounded-box
-              border border-base-300 bg-base-100
-              transition hover:-translate-y-1 hover:border-primary/30">
-              <img :src="PlaceHolder" alt="نماد اعتماد الکترونیکی" class="size-24 rounded-xl object-cover" />
-            </a>
-
-            <a href="#" target="_blank" rel="noopener noreferrer" class="flex size-28 items-center justify-center rounded-box
-              border border-base-300 bg-base-100
-              transition hover:-translate-y-1 hover:border-primary/30">
-              <img :src="PlaceHolder" alt="نشان ساماندهی" class="size-24 rounded-xl object-cover" />
-            </a>
+        <div class="lg:border-r lg:border-base-300 lg:pr-9">
+          <div class="overflow-hidden rounded-2xl border border-base-300 bg-base-100/60 p-3 shadow-lg shadow-base-content/5 backdrop-blur-sm">
+            <img :src="FooterPainting" alt="نمای معماری ساختمان شرکت تجهیز فرآیند هیراد" class="aspect-[2.3/1] w-full rounded-xl object-cover" loading="lazy" />
           </div>
-
-          <div class="divider my-3 before:bg-base-300 after:bg-base-300" />
-
-          <div class="flex items-center gap-4 rounded-box bg-base-200/70 p-4">
-            <div class="flex size-12 shrink-0 items-center justify-center rounded-box bg-primary/10 text-primary">
-              <ShieldCheck class="size-7" />
+          <div class="mt-6 grid grid-cols-2 sm:grid-cols-4">
+            <div v-for="(feature, index) in features" :key="feature.title" class="relative flex flex-col items-center px-2 py-3 text-center">
+              <span v-if="index" class="absolute right-0 top-1/2 hidden h-14 -translate-y-1/2 border-r border-base-300 sm:block" />
+              <component :is="feature.icon" class="size-8 text-primary" :stroke-width="1.55" />
+              <h3 class="mt-3 text-xs font-bold leading-6 text-base-content">{{ feature.title }}</h3>
+              <p class="mt-1 text-[11px] leading-5 text-base-content/50">{{ feature.description }}</p>
             </div>
-
-            <div>
-              <h3 class="text-sm font-bold text-base-content">
-                شرکت ثبت‌شده و معتبر
-              </h3>
-
-              <p class="mt-1 text-xs leading-6 text-base-content/60">
-                دارای مجوزهای لازم از مراجع ذی‌صلاح
-              </p>
-            </div>
-          </div>
-        </div>
-      </nav>
-    </div>
-
-    <!-- Features -->
-    <div class="relative z-10 border-y border-base-300 bg-base-100/90 backdrop-blur-sm">
-      <div class="container mx-auto grid grid-cols-1 px-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div v-for="(feature, index) in features" :key="feature.title"
-          class="relative flex min-h-23 items-center justify-center gap-4 px-5 py-5">
-          <div v-if="index !== features.length - 1"
-            class="absolute left-0 top-1/2 hidden h-11 -translate-y-1/2 border-l border-base-300 lg:block" />
-
-          <div class="flex size-12 shrink-0 items-center justify-center rounded-box bg-primary/10 text-primary">
-            <component :is="feature.icon" class="size-7" :stroke-width="1.7" />
-          </div>
-
-          <div>
-            <h3 class="text-sm font-bold text-base-content">
-              {{ feature.title }}
-            </h3>
-
-            <p class="mt-1 text-xs text-base-content/55">
-              {{ feature.description }}
-            </p>
           </div>
         </div>
       </div>
     </div>
+
+    <div class="relative z-10 h-px bg-primary" />
 
     <!-- Copyright -->
     <div class="relative z-10 bg-base-100">
@@ -221,7 +115,6 @@ import {
   MessageCircleCheck,
   MessageCircleMore,
   Newspaper,
-  PackageCheck,
   Phone,
   Send,
   ShieldCheck,
@@ -232,8 +125,9 @@ import {
 
 import LogoWide from '~/assets/Logo-wide.png'
 import LogoWideDark from '~/assets/Logo-wide-dark.png'
-import HeroImage from '~/assets/hero.jpg'
-import PlaceHolder from '~/assets/placeholder.png'
+import FooterBackground from '~/assets/Footer-bg.png'
+import FooterPainting from '~/assets/footer-painting.png'
+import contactData from '~/data/contact.json'
 
 defineEmits<{
   (event: 'open-drawer'): void
@@ -262,6 +156,10 @@ const currentYear = new Date()
   .getFullYear()
   .toLocaleString('en-US', { useGrouping: false })
 
+const primaryPhone = contactData.phones.find(item => item.primary) ?? null
+const mobilePhone = contactData.phones.find(item => item.label === 'تلفن همراه') ?? null
+const primaryEmail = contactData.emails.find(item => item.primary) ?? null
+
 const items: FooterItem[] = [
   { label: 'صفحه اصلی', to: '/', icon: House },
   { label: 'محصولات', emit: 'open-drawer', icon: ShoppingBag },
@@ -270,32 +168,21 @@ const items: FooterItem[] = [
   { label: 'تماس با ما', to: '/contact', icon: Phone }
 ]
 
+const socialIconMap = {
+  whatsapp: MessageCircleMore,
+  telegram: Send,
+  instagram: Instagram,
+  bale: MessageCircleCheck,
+  rubika: MessageCircleMore
+}
+
 const socials: SocialItem[] = [
-  {
-    label: 'Email',
-    href: 'mailto:info@hiradprocess.com',
-    icon: Mail
-  },
-  {
-    label: 'WhatsApp',
-    href: '#',
-    icon: MessageCircleMore
-  },
-  {
-    label: 'Instagram',
-    href: '#',
-    icon: Instagram
-  },
-  {
-    label: 'Telegram',
-    href: '#',
-    icon: Send
-  },
-  {
-    label: 'Bale',
-    href: '#',
-    icon: MessageCircleCheck
-  }
+  ...(primaryEmail ? [{ label: 'ایمیل', href: primaryEmail.href, icon: Mail }] : []),
+  ...contactData.socials.slice(0, 4).map(item => ({
+    label: item.label,
+    href: item.href,
+    icon: socialIconMap[item.platform as keyof typeof socialIconMap]
+  }))
 ]
 
 const features: FeatureItem[] = [
@@ -337,7 +224,7 @@ const FooterHeading = defineComponent({
 
   setup(props) {
     return () =>
-      h('div', { class: 'flex flex-col items-center text-center' }, [
+      h('div', { class: 'flex flex-col items-start text-right' }, [
         h(
           'h2',
           {
@@ -346,7 +233,7 @@ const FooterHeading = defineComponent({
           props.title
         ),
         h('span', {
-          class: 'mt-4 block h-0.5 w-16 rounded-full bg-primary'
+          class: 'mt-4 block h-0.5 w-10 rounded-full bg-primary'
         })
       ])
   }
