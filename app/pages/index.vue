@@ -1,13 +1,12 @@
 <template>
   <div>
     <HeroSection :page="page || null" />
-    <AboutSection />
+    <AboutSection :page="page" />
     <OrderProcess />
     <Catalogue />
     <CertificateCarousel :data="certificatePage" />
-    <BrandsSection :brands="page?.content?.brands || []" />
-    <Subscription />
     <BrandPromisses />
+    <BrandsSection :brands="page?.content?.brands || []" />
   </div>
 </template>
 
@@ -17,7 +16,6 @@ import HeroSection from '~/components/home/HeroSection.vue'
 import BrandsSection from '~/components/home/BrandsSection.vue'
 import AboutSection from '~/components/home/AboutSection.vue'
 import OrderProcess from '~/components/home/OrderProcess.vue'
-import Subscription from '~/components/home/Subscription.vue'
 import Catalogue from '~/components/home/Catalogue.vue'
 import CertificateCarousel from '~/components/home/CertificateCarousel.vue'
 import { useHomePage } from '~/composables/useHomePage'

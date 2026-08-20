@@ -23,10 +23,26 @@ export interface HomeBrand {
   website_url: string
 }
 
+export interface HomeAboutFeature {
+  title: string
+  description: string
+  value?: string
+}
+
+export interface HomeAboutSection {
+  eyebrow: string
+  title: string
+  description: string
+  cta_label: string
+  cta_url: string
+  features: HomeAboutFeature[]
+}
+
 export interface HomePageContent {
   ItemSection: ItemSection[]
   image_gallery: ImageGallery[]
   brands: HomeBrand[]
+  about_section?: HomeAboutSection
 }
 
 export interface HomePage {

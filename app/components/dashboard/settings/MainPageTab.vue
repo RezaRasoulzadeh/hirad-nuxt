@@ -53,6 +53,64 @@
         <PlusCircle class="w-4 h-4 ml-2" /> افزودن تصویر جدید
       </button>
 
+      <div class="divider text-base-content/50 font-medium text-xs">محتوای صفحه اصلی</div>
+      <div class="collapse collapse-arrow rounded-xl border border-base-300 bg-base-200/50">
+        <input type="checkbox" />
+        <div class="collapse-title font-bold text-base-content/80">بخش درباره هیراد</div>
+        <div class="collapse-content space-y-4 bg-base-100 pt-4">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div class="form-control w-full">
+            <label class="label text-xs font-bold text-base-content/70">عنوان انگلیسی کوچک</label>
+            <input v-model="modelValue.content.about_section.eyebrow" type="text" dir="ltr"
+              class="input input-bordered w-full" />
+          </div>
+          <div class="form-control w-full">
+            <label class="label text-xs font-bold text-base-content/70">عنوان اصلی</label>
+            <input v-model="modelValue.content.about_section.title" type="text" class="input input-bordered w-full" />
+          </div>
+        </div>
+
+        <div class="form-control w-full">
+          <label class="label text-xs font-bold text-base-content/70">متن معرفی</label>
+          <textarea v-model="modelValue.content.about_section.description"
+            class="textarea textarea-bordered min-h-36 w-full resize-y" />
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div class="form-control w-full">
+            <label class="label text-xs font-bold text-base-content/70">متن دکمه</label>
+            <input v-model="modelValue.content.about_section.cta_label" type="text" class="input input-bordered w-full" />
+          </div>
+          <div class="form-control w-full">
+            <label class="label text-xs font-bold text-base-content/70">لینک دکمه</label>
+            <input v-model="modelValue.content.about_section.cta_url" type="text" dir="ltr"
+              class="input input-bordered w-full" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 xl:grid-cols-3">
+          <div v-for="(feature, idx) in modelValue.content.about_section.features" :key="`about-feature-${idx}`"
+            class="space-y-3 rounded-xl border border-base-300 bg-base-100 p-4">
+            <div class="flex items-center justify-between">
+              <strong class="text-sm">ویژگی {{ idx + 1 }}</strong>
+              <button type="button" class="btn btn-ghost btn-xs text-error"
+                aria-label="حذف ویژگی" @click="removeAboutFeature(idx)">
+                <Trash2 class="size-4" />
+              </button>
+            </div>
+            <input v-model="feature.title" type="text" placeholder="عنوان ویژگی"
+              class="input input-bordered w-full" />
+            <textarea v-model="feature.description" placeholder="توضیح ویژگی"
+              class="textarea textarea-bordered h-20 w-full resize-none" />
+          </div>
+        </div>
+          <button v-if="modelValue.content.about_section.features.length < 3" type="button"
+            class="btn btn-outline btn-dashed btn-primary btn-block" @click="addAboutFeature">
+            <PlusCircle class="size-4 ml-2" /> افزودن ویژگی
+          </button>
+        </div>
+      </div>
+
       <div class="divider text-base-content/50 font-medium text-xs">برندها</div>
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div v-for="(brand, idx) in modelValue.content?.brands || []" :key="'brand-' + idx"
@@ -98,6 +156,31 @@ import { Trash2, PlusCircle } from 'lucide-vue-next'
 const props = defineProps<{ modelValue: any }>()
 defineEmits(['save', 'select-media'])
 
+const defaultAboutSection = () => ({
+  eyebrow: 'About Hirad',
+  title: 'درباره تجهیز فرآیند هیراد',
+  description: 'شرکت تجهیز فرآیند هیراد در سال ۱۳۹۷ با شماره ثبت ۵۲۵۴۷۰ در تهران تأسیس شد و طی سال‌های اخیر فعالیت خود را بر ارائه خدمات تأمین، تدارکات، مهندسی، و بازرگانی تخصصی در حوزه نفت، گاز، پالایش، پتروشیمی، نیروگاه، صنایع تولیدی، غذایی و دارویی متمرکز کرده است. این شرکت با بهره‌گیری از شبکه گسترده تأمین‌کنندگان داخلی و بین‌المللی، یکی از عرضه‌کنندگان فعال لوله، اتصالات، شیرآلات صنعتی، فلنج، ابزار دقیق، مواد شیمیایی و تجهیزات خاص طرح‌ها و پروژه‌های صنعتی در کشور به شمار می‌رود. در راستای ارتقای کیفیت و مدیریت یکپارچه، شرکت موفق به پیاده‌سازی و اخذ گواهی‌های ISO 9001، ISO 14001، ISO 29001، ISO 45001 و IMS شده است. همچنین شرکت در فهرست بلند تأمین‌کنندگان مورد تأیید وزارت نفت (AVL) ثبت گردیده که بیانگر احراز صلاحیت‌های فنی و مدیریتی و امکان مشارکت در فرآیندهای مناقصات و تأمین در صنایع نفت و گاز است. پایبندی به استانداردهای بین‌المللی از جمله ASME، ANSI، API، EN، DIN، BS و ISO، تحویل کالا با نظارت نهادهای بازرسی و ارائه گواهی‌های معتبر فنی از اصول اساسی فعالیت شرکت تجهیز فرآیند هیراد محسوب می‌شود.',
+  cta_label: 'مشاهده کامل معرفی شرکت',
+  cta_url: '/about',
+  features: [
+    { title: 'تأمین و تدارک تجهیزات', description: 'برای پروژه‌های صنعتی در سراسر کشور' },
+    { title: 'استانداردهای بین‌المللی', description: '(ASME, ANSI, API, EN, DIN, BS)' },
+    { title: '+10 سال تجربه', description: 'در صنایع مختلف' },
+  ],
+})
+
+if (!props.modelValue.content) props.modelValue.content = {}
+if (!props.modelValue.content.about_section) props.modelValue.content.about_section = defaultAboutSection()
+props.modelValue.content.about_section.features ??= defaultAboutSection().features
+props.modelValue.content.about_section.features = props.modelValue.content.about_section.features.map((feature: any) => ({
+  title: feature.value ? `${feature.value} ${feature.title}` : feature.title,
+  description: feature.description,
+}))
+if (!props.modelValue.content.about_section.description
+  || props.modelValue.content.about_section.description.includes('در سال ۱۳۹۴ با هدف')) {
+  props.modelValue.content.about_section.description = defaultAboutSection().description
+}
+
 const addHeroImage = () => {
   if (!props.modelValue.content) props.modelValue.content = {}
   if (!props.modelValue.content.image_gallery) props.modelValue.content.image_gallery = []
@@ -108,5 +191,14 @@ const addBrand = () => {
   if (!props.modelValue.content) props.modelValue.content = {}
   if (!props.modelValue.content.brands) props.modelValue.content.brands = []
   props.modelValue.content.brands.push({ name: '', name_fa: '', logo_url: '', website_url: '' })
+}
+
+const addAboutFeature = () => {
+  if (props.modelValue.content.about_section.features.length >= 3) return
+  props.modelValue.content.about_section.features.push({ title: '', description: '' })
+}
+
+const removeAboutFeature = (index: number) => {
+  props.modelValue.content.about_section.features.splice(index, 1)
 }
 </script>

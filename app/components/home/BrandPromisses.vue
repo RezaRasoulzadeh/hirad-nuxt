@@ -1,5 +1,20 @@
 <template>
-  <section class="container w-full mx-auto px-6 py-8 md:py-16" dir="rtl">
+  <section class="relative w-full overflow-visible" dir="rtl">
+    <div ref="circuitFrameRef" class="relative mx-auto max-w-[1880px] overflow-visible px-5">
+      <div class="pointer-events-none absolute inset-0 z-10 hidden md:block" aria-hidden="true">
+        <svg class="absolute inset-0 size-full overflow-visible" viewBox="0 0 1000 700" fill="none"
+          preserveAspectRatio="none">
+          <path :d="`M500 30H${18 + topCornerOffset}L18 74V592L${18 + bottomCornerOffset} 650H215`"
+            class="promise-circuit-line" />
+        </svg>
+        <i class="absolute top-[calc(4.286%_-_0.3125rem)] left-[calc(50%_-_0.3125rem)] size-2.5 rounded-full bg-primary" />
+        <span class="absolute top-[68%] left-[calc(1.8%_-_0.3125rem)] flex flex-col gap-2">
+          <i v-for="dot in 3" :key="dot" class="size-2.5 rounded-full bg-primary" />
+        </span>
+        <i class="absolute top-[calc(92.857%_-_0.3125rem)] left-[calc(21.5%_-_0.3125rem)] size-2.5 rounded-full bg-primary" />
+      </div>
+
+      <div class="container relative z-20 mx-auto px-10 pt-16 pb-20 md:px-12 lg:px-16">
     <div class="flex flex-col items-center text-center mb-10 px-4">
       <span class="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">
         Brand Promise
@@ -39,10 +54,16 @@
         </p>
       </div>
     </div>
+      </div>
+    </div>
   </section>
 </template>
 
 <script setup lang="ts">
+import { useCircuitGeometry } from '~/composables/useCircuitGeometry'
+
+const { circuitFrameRef, topCornerOffset, bottomCornerOffset } = useCircuitGeometry()
+
 const glob = import.meta.glob('~/assets/icons/*.png', { 
   eager: true, 
   import: 'default' 
@@ -81,3 +102,11 @@ const resolveAsset = (filename: string): string => {
   return glob[`/assets/icons/${filename}`] || ''
 }
 </script>
+
+<style scoped>
+.promise-circuit-line {
+  stroke: var(--color-primary);
+  stroke-width: 1.25;
+  vector-effect: non-scaling-stroke;
+}
+</style>

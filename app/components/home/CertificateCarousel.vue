@@ -1,6 +1,21 @@
 <template>
-  <section v-if="certificates.length" class="bg-base-100 text-base-content pt-10 overflow-hidden select-none">
-    <div class="flex flex-col items-center text-center mb-6 px-4">
+  <section v-if="certificates.length" class="relative overflow-x-clip overflow-y-visible bg-base-100 text-base-content select-none">
+    <div ref="circuitFrameRef" class="relative mx-auto min-h-170 max-w-[1880px] overflow-visible px-5">
+      <div class="pointer-events-none absolute inset-0 z-10 hidden md:block" aria-hidden="true">
+        <svg class="absolute inset-0 size-full overflow-visible" viewBox="0 0 1000 700" fill="none"
+          preserveAspectRatio="none">
+          <path :d="`M500 30H${982 - topCornerOffset}L982 74V552L${982 - bottomCornerOffset} 610H785`"
+            class="certificate-circuit-line" />
+        </svg>
+        <i class="absolute top-[calc(4.286%_-_0.3125rem)] left-[calc(50%_-_0.3125rem)] size-2.5 rounded-full bg-primary" />
+        <span class="absolute top-[68%] right-[calc(1.8%_-_0.3125rem)] flex flex-col gap-2">
+          <i v-for="dot in 3" :key="dot" class="size-2.5 rounded-full bg-primary" />
+        </span>
+        <i class="absolute top-[calc(87.143%_-_0.3125rem)] left-[calc(78.5%_-_0.3125rem)] size-2.5 rounded-full bg-primary" />
+      </div>
+
+      <div class="relative z-20 pt-16 pb-12">
+    <div class="mb-12 flex flex-col items-center px-4 text-center md:mb-16">
       <span class="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">
         Certificates & Standards
       </span>
@@ -97,6 +112,8 @@
         :class="activeIndex === index ? 'w-6 bg-primary' : 'w-2 bg-base-content/30'"
       ></div>
     </div>
+      </div>
+    </div>
   </section>
 </template>
 
@@ -105,10 +122,13 @@ import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import { ref, computed, onBeforeUnmount, onMounted } from 'vue'
 import type { StyleValue } from 'vue'
 import type { CertificatePageData } from '~/composables/useCertificates'
+import { useCircuitGeometry } from '~/composables/useCircuitGeometry'
 
 const props = defineProps<{
   data: CertificatePageData | null
 }>()
+
+const { circuitFrameRef, topCornerOffset, bottomCornerOffset } = useCircuitGeometry()
 
 const config = useRuntimeConfig()
 const carouselStage = ref<HTMLElement | null>(null)
@@ -362,6 +382,14 @@ const getShortestDirection = (targetIndex: number): 'left' | 'right' => {
   return forwardSteps <= backwardSteps ? 'left' : 'right'
 }
 </script>
+
+<style scoped>
+.certificate-circuit-line {
+  stroke: var(--color-primary);
+  stroke-width: 1.25;
+  vector-effect: non-scaling-stroke;
+}
+</style>
 
 <style scoped>
 .perspective-container {

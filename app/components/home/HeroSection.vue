@@ -17,18 +17,22 @@
       </div>
     </div>
 
-    <div class="relative mx-4 flex min-h-[calc(100svh-72px)] max-w-[1920px] flex-col justify-center py-6 2xl:mx-12 lg:py-8">
-      <div class="flex w-full min-w-0 flex-col md:flex-row md:items-stretch" dir="rtl">
-        <div class="z-2 order-1 lg:mt-10 2xl:mt-16 flex w-full min-w-0 flex-col text-center md:basis-[40%] md:text-right">
-          <p class="mb-2 text-sm font-bold text-primary lg:text-base">شرکت تجهیز فرآیند هیراد</p>
-          <h1 id="home-hero-title"
-            class="m-0 w-full text-3xl leading-[1.4] font-black tracking-tight text-base-content md:text-[clamp(2rem,2.45vw,3rem)]">
-            {{ heroTitle }}
-          </h1>
-          <i class="mx-auto my-2 block h-0.75 w-8 rounded-full bg-primary md:mx-0" aria-hidden="true" />
-          <p class="m-0 w-full text-sm leading-8 text-base-content/65 md:text-justify">
-            {{ heroDescription }}
-          </p>
+    <div class="relative mx-4 flex min-h-[calc(100svh-72px)] max-w-[1920px] flex-col justify-center pt-6 2xl:mx-12 lg:pt-8">
+      <div class="flex w-full min-w-0 flex-col md:flex-row md:items-stretch md:gap-6 lg:gap-10 2xl:gap-48" dir="rtl">
+        <div class="z-2 order-1 lg:mt-8 flex w-full min-w-0 flex-col text-center md:basis-[40%] md:text-right">
+          <Transition name="hero-copy" mode="out-in">
+            <div :key="activeHeroIndex">
+              <p class="mb-2 text-sm font-bold text-primary lg:text-base">{{ heroEyebrow }}</p>
+              <h1 id="home-hero-title"
+                class="m-0 w-full text-3xl leading-[1.4] font-black tracking-tight text-base-content md:text-[clamp(2rem,2.45vw,3rem)]">
+                {{ heroTitle }}
+              </h1>
+              <i class="mx-auto my-2 block h-0.75 w-8 rounded-full bg-primary md:mx-0" aria-hidden="true" />
+              <p class="m-0 w-full text-sm leading-8 text-base-content/65 md:text-justify">
+                {{ heroDescription }}
+              </p>
+            </div>
+          </Transition>
 
           <div class="mt-4 flex flex-wrap justify-center gap-3 md:justify-start">
             <button type="button"
@@ -44,26 +48,37 @@
             </NuxtLink>
           </div>
 
-          <nav v-if="visibleItems.length" class="mt-4 flex w-full flex-col gap-2 md:grid md:grid-cols-5 lg:mt-10"
+          <nav v-if="visibleItems.length" class="mt-4 flex w-full flex-col gap-2 lg:mt-6"
             aria-label="دسته‌بندی محصولات">
             <NuxtLink v-for="item in visibleItems" :key="item.url" :to="item.url"
-              class="group relative flex min-h-20 min-w-0 flex-row items-center gap-3 overflow-hidden rounded-xl border border-base-300 bg-base-100/90 px-4 py-3 text-base-content shadow-sm transition hover:-translate-y-1 hover:shadow-lg md:min-h-42 md:flex-col md:gap-0 md:px-1 md:text-center">
-              <div class="grid size-12 shrink-0 place-items-center text-primary md:mb-1 md:size-14">
+              class="group relative flex min-h-20 min-w-0 flex-row items-center gap-3 overflow-hidden rounded-xl border border-base-300 bg-base-100/90 px-4 py-3 text-base-content shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg md:min-h-14 md:py-1.5">
+              <div class="grid size-12 shrink-0 place-items-center text-primary md:size-10">
                 <img v-if="item.icon" :src="resolveIcon(item.icon)" alt="" class="max-size-14 object-contain">
                 <PackageOpen v-else class="size-8" aria-hidden="true" />
               </div>
-              <div class="flex min-w-0 flex-1 flex-col text-right md:items-center md:text-center">
-                <strong class="max-w-full truncate text-sm leading-6 md:mt-2">{{ cleanTitle(item.title_fa) }}</strong>
-                <small class="max-w-full truncate text-[10px] leading-5 text-base-content/60">{{
-                  cleanTitle(item.meta_title) || item.sub_title_fa }}</small>
-              </div>
+              <strong class="min-w-0 flex-1 truncate text-right text-sm leading-6">
+                {{ cleanTitle(item.title_fa) }}<template v-if="cleanTitle(item.meta_title)"> | <span dir="ltr">{{
+                  cleanTitle(item.meta_title) }}</span></template>
+              </strong>
               <ArrowLeft
-                class="ms-auto size-4 shrink-0 text-primary transition-transform group-hover:-translate-x-1 md:mt-auto md:ms-0"
+                class="ms-auto size-4 shrink-0 text-primary transition-transform group-hover:-translate-x-1"
                 aria-hidden="true" />
               <span
-                class="absolute inset-y-3 right-0 w-1 rounded-l-full bg-primary md:inset-x-3 md:top-auto md:bottom-0 md:h-1 md:w-auto md:rounded-t-full md:rounded-b-none" />
+                class="absolute inset-y-3 right-0 w-1 rounded-l-full bg-primary" />
             </NuxtLink>
           </nav>
+
+          <div class="mt-4 grid w-full grid-cols-2 rounded-xl border border-base-300 bg-base-100/90 px-2 py-2 shadow-sm md:grid-cols-4"
+            aria-label="آمار شرکت">
+            <div v-for="stat in stats" :key="stat.label"
+              class="flex items-center justify-start gap-3 border-b border-base-300 px-3 py-3 odd:border-l nth-last-[-n+2]:border-b-0 md:justify-center md:border-b-0 md:border-l md:odd:border-l md:last:border-l-0">
+              <component :is="stat.icon" class="size-8 shrink-0 text-primary" :stroke-width="1.5" aria-hidden="true" />
+              <div class="flex min-w-0 flex-col">
+                <strong class="text-xl leading-none text-base-content" dir="ltr">{{ stat.value }}</strong>
+                <span class="mt-1 truncate text-xs text-base-content/70">{{ stat.label }}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div
@@ -71,16 +86,6 @@
           dir="ltr">
           <img src="~/assets/hero.jpg" alt="مجموعه تجهیزات و شیرآلات صنعتی هیراد" fetchpriority="high"
             class="block h-auto w-full object-contain mix-blend-multiply">
-        </div>
-      </div>
-
-      <div class="mx-auto mt-3 grid w-full max-w-6xl grid-cols-2 px-2 py-2 md:grid-cols-4 md:px-7"
-        aria-label="آمار شرکت">
-        <div v-for="stat in stats" :key="stat.label"
-          class="flex items-center justify-start gap-3 border-b border-base-300 px-4 py-3 odd:border-l nth-last-[-n+2]:border-b-0 md:justify-center md:border-b-0 md:border-l md:px-0 md:py-0 md:odd:border-l md:last:border-l-0">
-          <component :is="stat.icon" class="size-8 text-primary" :stroke-width="1.5" aria-hidden="true" />
-          <div class="flex flex-col"><strong class="text-xl leading-none text-base-content" dir="ltr">{{ stat.value
-              }}</strong><span class="mt-1 text-xs text-base-content/70">{{ stat.label }}</span></div>
         </div>
       </div>
 
@@ -97,7 +102,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import {
   ArrowLeft, ArrowDown, Download, PackageOpen, ShieldCheck, Globe2, Headphones,
   Award, Box, Factory, Building2,
@@ -111,8 +116,12 @@ const baseUrl = config.public.apiBase ?? '/api'
 const { fetchCategories, productCategories } = useCategories()
 const isDrawerOpen = useState<boolean>('productsDrawerOpen', () => false)
 const sectionRef = ref<HTMLElement | null>(null)
+const activeHeroIndex = ref(0)
+let heroTimer: ReturnType<typeof setInterval> | undefined
 
-const activeHero = computed(() => props.page?.content?.image_gallery?.[0])
+const heroSlides = computed(() => props.page?.content?.image_gallery ?? [])
+const activeHero = computed(() => heroSlides.value[activeHeroIndex.value])
+const heroEyebrow = computed(() => props.page?.title || 'شرکت تجهیز فرآیند هیراد')
 const heroTitle = computed(() =>
   activeHero.value?.title_fa || props.page?.title || props.page?.meta_title || 'تجهیزات صنعتی هیراد'
 )
@@ -128,7 +137,6 @@ const visibleItems = computed(() => [...productCategories.value]
     icon: cat.image_url ?? '',
     title_fa: cat.name,
     meta_title: cat.meta_title,
-    sub_title_fa: cat.description ?? '',
   })))
 
 const qualityPoints = [
@@ -151,5 +159,52 @@ const resolveIcon = (url: string) => url.startsWith('http')
 
 const scrollDown = () => sectionRef.value?.nextElementSibling?.scrollIntoView({ behavior: 'smooth' })
 
-onMounted(fetchCategories)
+const stopHeroRotation = () => {
+  if (heroTimer) clearInterval(heroTimer)
+  heroTimer = undefined
+}
+
+const startHeroRotation = () => {
+  stopHeroRotation()
+  if (heroSlides.value.length < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+  heroTimer = setInterval(() => {
+    activeHeroIndex.value = (activeHeroIndex.value + 1) % heroSlides.value.length
+  }, 8000)
+}
+
+watch(() => heroSlides.value.length, () => {
+  activeHeroIndex.value = 0
+  if (import.meta.client) startHeroRotation()
+})
+
+onMounted(() => {
+  fetchCategories()
+  startHeroRotation()
+})
+onBeforeUnmount(stopHeroRotation)
 </script>
+
+<style scoped>
+.hero-copy-enter-active,
+.hero-copy-leave-active {
+  transition: opacity 450ms ease, transform 450ms ease;
+}
+
+.hero-copy-enter-from {
+  opacity: 0;
+  transform: translateY(0.75rem);
+}
+
+.hero-copy-leave-to {
+  opacity: 0;
+  transform: translateY(-0.5rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-copy-enter-active,
+  .hero-copy-leave-active {
+    transition: none;
+  }
+}
+</style>
