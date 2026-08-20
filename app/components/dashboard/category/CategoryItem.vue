@@ -74,6 +74,8 @@
 import { ref, computed, watch } from 'vue';
 import { ArrowDown, ArrowUp, ChevronRight, ChevronDown, GripVertical, PenSquare, Trash } from 'lucide-vue-next';
 import CategoryItem from '~/components/dashboard/category/CategoryItem.vue';
+import { useToast } from '~/composables/useToast';
+import { getApiErrorMessage } from '~/utils/apiFeedback';
 
 interface CategoryNode {
   id: number | string;
@@ -101,6 +103,7 @@ defineEmits<{
 }>();
 
 const config = useRuntimeConfig();
+const toast = useToast();
 const showChildren = ref(false);
 const hasChildren = computed(() => !!props.category.children?.length);
 const localChildren = ref<CategoryNode[]>([]);
@@ -117,22 +120,28 @@ watch(() => props.category.children, (children) => {
   });
 }, { immediate: true, deep: true });
 
-const persistOrder = async () => {
+const persistOrder = async (previous: CategoryNode[]) => {
   localChildren.value.forEach((item, index) => { item.sort_order = index });
-  await $fetch('/api/categories/reorder', {
-    method: 'PUT',
-    body: { parent_id: props.category.id, ids: localChildren.value.map(item => item.id) },
-  });
+  try {
+    await $fetch('/api/categories/reorder', {
+      method: 'PUT',
+      body: { parent_id: props.category.id, ids: localChildren.value.map(item => item.id) },
+    });
+  } catch (error) {
+    localChildren.value = previous;
+    toast.error(getApiErrorMessage(error, 'ذخیره ترتیب زیردسته‌ها انجام نشد.'));
+  }
 };
 
 const moveChild = (index: number, offset: number) => {
+  const previous = [...localChildren.value];
   const target = index + offset;
   if (target < 0 || target >= localChildren.value.length) return;
   const [item] = localChildren.value.splice(index, 1);
   if (!item) return;
   localChildren.value.splice(target, 0, item);
   highlight(item.id);
-  persistOrder();
+  persistOrder(previous);
 };
 
 const setDropIndex = (event: DragEvent, index: number) => {
@@ -147,6 +156,7 @@ const clearDrag = () => {
 };
 
 const dropChild = () => {
+  const previous = [...localChildren.value];
   const sourceIndex = draggedIndex.value;
   let targetIndex = dropIndex.value;
   clearDrag();
@@ -157,7 +167,7 @@ const dropChild = () => {
   if (sourceIndex === targetIndex) return;
   localChildren.value.splice(targetIndex, 0, item);
   highlight(item.id);
-  persistOrder();
+  persistOrder(previous);
 };
 
 const highlight = (id: number | string) => {

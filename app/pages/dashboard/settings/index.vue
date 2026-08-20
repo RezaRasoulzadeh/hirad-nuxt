@@ -30,6 +30,7 @@ import { useHomePage } from '~/composables/useHomePage'
 import { useCertificates } from '~/composables/useCertificates'
 import { useCompanyPage } from '~/composables/useDashboardSettings'
 import { useToast } from '~/composables/useToast'
+import { getApiErrorMessage, getApiSuccessMessage } from '~/utils/apiFeedback'
 
 import MainPageTab from '~/components/dashboard/settings/MainPageTab.vue'
 import CertificatesTab from '~/components/dashboard/settings/CertificatesTab.vue'
@@ -95,13 +96,12 @@ const savePage = async (slug: string, payload: any) => {
     })
     const data = res?.data || res
     if (data) {
-      toast.success('تغییرات با موفقیت ذخیره شد!')
+      toast.success(getApiSuccessMessage(res, 'تغییرات با موفقیت ذخیره شد!'))
     } else {
       toast.error('خطا در ثبت اطلاعات')
     }
   } catch (err: any) {
-    const errorMsg = err.data?.message || err.message || 'خطای سرور'
-    toast.error(errorMsg)
+    toast.error(getApiErrorMessage(err, 'ذخیره تنظیمات انجام نشد.'))
   }
 }
 </script>

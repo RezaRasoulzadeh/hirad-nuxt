@@ -66,6 +66,7 @@ import { ref, computed, nextTick } from 'vue';
 import CategoryParentGroup from '~/components/dashboard/category/CategoryParentGroup.vue';
 import CategoryWorkspaceModal from '~/components/dashboard/category/CategoryWorkspaceModal.vue';
 import { useToast } from '~/composables/useToast';
+import { getApiErrorMessage } from '~/utils/apiFeedback';
 
 definePageMeta({
   layout: 'dashboard'
@@ -132,8 +133,8 @@ const persistParentOrder = async (ordered: ParentCategory[]) => {
       body: { parent_id: null, ids: ordered.map(item => item.id) },
     })
     await refresh()
-  } catch {
-    toast.error('ذخیره ترتیب دسته‌بندی‌ها انجام نشد.')
+  } catch (error) {
+    toast.error(getApiErrorMessage(error, 'ذخیره ترتیب دسته‌بندی‌ها انجام نشد.'))
     await refresh()
   }
 }

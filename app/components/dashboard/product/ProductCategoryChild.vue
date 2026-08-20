@@ -112,6 +112,8 @@ import { ArrowDown, ArrowUp, ChevronRight, ChevronDown, Copy, GripVertical, PenS
 import { useRuntimeConfig } from '#imports'
 import type { ProductItem } from '~/types/productItem'
 import type { CategoryItem } from '~/types/categoryItem'
+import { useToast } from '~/composables/useToast'
+import { getApiErrorMessage } from '~/utils/apiFeedback'
 
 const emit = defineEmits(['toggle', 'fetch-products', 'edit', 'remove-product', 'duplicate'])
 
@@ -126,6 +128,7 @@ const props = defineProps<{
 }>()
 
 const config = useRuntimeConfig()
+const toast = useToast()
 const localProducts = ref<ProductItem[]>([])
 const draggedIndex = ref<number | null>(null)
 const dropIndex = ref<number | null>(null)
@@ -140,22 +143,28 @@ watch(() => props.childCategory.products, (products) => {
   })
 }, { immediate: true, deep: true })
 
-const persistOrder = async () => {
+const persistOrder = async (previous: ProductItem[]) => {
   localProducts.value.forEach((item, index) => { item.sort_order = index })
-  await $fetch('/api/products/reorder', {
-    method: 'PUT',
-    body: { category_id: props.childCategory.id, ids: localProducts.value.map(item => item.id) },
-  })
+  try {
+    await $fetch('/api/products/reorder', {
+      method: 'PUT',
+      body: { category_id: props.childCategory.id, ids: localProducts.value.map(item => item.id) },
+    })
+  } catch (error) {
+    localProducts.value = previous
+    toast.error(getApiErrorMessage(error, 'ذخیره ترتیب محصولات انجام نشد.'))
+  }
 }
 
 const moveProduct = (index: number, offset: number) => {
+  const previous = [...localProducts.value]
   const target = index + offset
   if (target < 0 || target >= localProducts.value.length) return
   const [item] = localProducts.value.splice(index, 1)
   if (!item) return
   localProducts.value.splice(target, 0, item)
   highlight(item.id)
-  persistOrder()
+  persistOrder(previous)
 }
 
 const setDropIndex = (event: DragEvent, index: number) => {
@@ -170,6 +179,7 @@ const clearDrag = () => {
 }
 
 const dropProduct = () => {
+  const previous = [...localProducts.value]
   const sourceIndex = draggedIndex.value
   let targetIndex = dropIndex.value
   clearDrag()
@@ -180,7 +190,7 @@ const dropProduct = () => {
   if (sourceIndex === targetIndex) return
   localProducts.value.splice(targetIndex, 0, item)
   highlight(item.id)
-  persistOrder()
+  persistOrder(previous)
 }
 
 const highlight = (id: string) => {
