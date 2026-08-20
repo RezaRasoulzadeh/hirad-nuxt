@@ -60,9 +60,12 @@ const localChildren = ref<ChildCategory[]>([])
 watch(
   () => props.parentCategory.children,
   (newChildren) => {
-    localChildren.value = [...(newChildren || [])].sort(
-      (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)
-    )
+    localChildren.value = [...(newChildren || [])].sort((a, b) => {
+      if (a.sort_order == null && b.sort_order == null) return a.name.localeCompare(b.name, 'fa')
+      if (a.sort_order == null) return 1
+      if (b.sort_order == null) return -1
+      return a.sort_order - b.sort_order
+    })
   },
   { immediate: true, deep: true }
 )
@@ -87,7 +90,12 @@ const fetchProducts = async (categorySlug: string) => {
       query: { category: categorySlug }
     })
     
-    childCategory.products = response.data || []
+    childCategory.products = [...(response.data || [])].sort((a, b) => {
+      if (a.sort_order == null && b.sort_order == null) return (a.name || '').localeCompare(b.name || '', 'fa')
+      if (a.sort_order == null) return 1
+      if (b.sort_order == null) return -1
+      return a.sort_order - b.sort_order
+    })
     childCategory.productsLoaded = true
   } catch (err) {
     console.error(`Error loading products for ${categorySlug}:`, err)

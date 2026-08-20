@@ -157,18 +157,14 @@
               <span>{{ member.name_fa || member.name || 'عضو بدون نام' }}</span>
               <button type="button" @click.stop="modelValue.content.team.splice(idx, 1)" class="btn btn-ghost btn-xs text-error"><Trash2 class="w-4 h-4" /></button>
             </div>
-            <div class="collapse-content space-y-4 bg-base-100 pt-4">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input v-model="member.name" type="text" placeholder="Name" class="input input-bordered w-full" />
+            <div class="collapse-content flex flex-col gap-4 bg-base-100 pt-4 lg:flex-row lg:items-start">
+              <AssetPickerField v-model="member.photo_url" label="تصویر عضو تیم"
+                class="w-full lg:w-64 lg:shrink-0" @select="$emit('select-media', idx, 'team')" />
+              <div class="grid min-w-0 grow grid-cols-1 gap-4 md:grid-cols-2">
+                <input v-model="member.name" type="text" placeholder="Name" dir="ltr" class="input input-bordered w-full" />
                 <input v-model="member.name_fa" type="text" placeholder="نام" class="input input-bordered w-full" />
-                <input v-model="member.role" type="text" placeholder="Role" class="input input-bordered w-full" />
+                <input v-model="member.role" type="text" placeholder="Role" dir="ltr" class="input input-bordered w-full" />
                 <input v-model="member.role_fa" type="text" placeholder="نقش" class="input input-bordered w-full" />
-              </div>
-              <div class="form-control w-full">
-                <div class="join w-full">
-                  <input v-model="member.photo_url" type="text" placeholder="Photo URL" class="input input-bordered join-item grow w-full" />
-                  <button type="button" @click="$emit('select-media', idx, 'team')" class="btn join-item">انتخاب فایل</button>
-                </div>
               </div>
             </div>
           </div>
@@ -186,6 +182,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { Trash2, PlusCircle } from 'lucide-vue-next'
+import AssetPickerField from './AssetPickerField.vue'
 
 const props = defineProps<{ modelValue: any }>()
 const emit = defineEmits(['save', 'select-media'])

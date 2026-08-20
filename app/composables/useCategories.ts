@@ -7,7 +7,7 @@ export interface Category {
   description: string | null
   image_url: string | null
   is_visible: boolean
-  sort_order: number
+  sort_order: number | null
   meta_title: string | null
   meta_description: string | null
   category_type: 'product' | 'about' | 'blog'

@@ -14,6 +14,7 @@ export interface ProductFormData {
   price: number;
   discount_price: number;
   stock_quantity: number;
+  sort_order: number | null;
   is_active: boolean;
   short_description: {
     name: string;
@@ -40,6 +41,7 @@ const createEmptyProduct = (): ProductFormData => ({
   price: 0,
   discount_price: 0,
   stock_quantity: 0,
+  sort_order: null,
   is_active: false,
   short_description: {
     name: '',
@@ -95,6 +97,7 @@ export const useProductForm = () => {
       price: Number(data.price) || 0,
       discount_price: Number(data.discount_price) || 0,
       stock_quantity: Number(data.stock_quantity) || 0,
+      sort_order: Number.isFinite(data.sort_order) ? Number(data.sort_order) : null,
       is_active: Boolean(data.is_active),
       short_description: {
         name: data.short_description?.name || '',

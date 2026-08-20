@@ -68,6 +68,13 @@ const loading = ref(true)
 const fetchError = ref(false)
 const rawCategories = ref<CategoryNode[]>([])
 
+const compareOrder = (a: { sort_order?: number | null; name?: string | null }, b: { sort_order?: number | null; name?: string | null }) => {
+  if (a.sort_order == null && b.sort_order == null) return (a.name || '').localeCompare(b.name || '', 'fa')
+  if (a.sort_order == null) return 1
+  if (b.sort_order == null) return -1
+  return a.sort_order - b.sort_order
+}
+
 // Unified data loading sequence handles auth check first, then drops straight into the collection pipeline
 const loadDashboardData = async () => {
   loading.value = true
@@ -104,9 +111,9 @@ const parentCategories = computed<UiParentCategory[]>(() => {
           products: null,
           productsLoaded: false
         }))
-        .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+        .sort(compareOrder)
     }))
-    .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+    .sort(compareOrder)
 })
 
 const handleEditProduct = (slug: string) => {

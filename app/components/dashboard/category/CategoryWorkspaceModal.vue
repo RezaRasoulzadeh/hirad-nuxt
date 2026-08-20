@@ -38,10 +38,6 @@
                 <label class="label font-semibold text-xs text-base-content/70">نام دسته‌بندی <span class="text-error">*</span></label>
                 <input type="text" v-model="formCategory.name" required class="input input-bordered w-full rounded-xl" />
               </div>
-              <div class="form-control w-full">
-                <label class="label font-semibold text-xs text-base-content/70">ترتیب چیدمان</label>
-                <input type="number" v-model.number="formCategory.sort_order" @input="sortOrderAutoManaged = false" class="input input-bordered w-full rounded-xl" />
-              </div>
               <div class="form-control w-full md:col-span-2">
                 <label class="label font-semibold text-xs text-base-content/70">دسته‌بندی والد</label>
                 <select v-model="formCategory.parent_id" class="select select-bordered w-full rounded-xl">
@@ -203,8 +199,7 @@ const {
   formCategory,
   pageData,
   availableParents,
-  submitWorkspace,
-  sortOrderAutoManaged
+  submitWorkspace
 } = useCategoryWorkspace(props, emit);
 
 const isMediaSelectorOpen = ref(false);

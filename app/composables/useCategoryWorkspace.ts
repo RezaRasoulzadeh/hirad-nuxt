@@ -10,7 +10,7 @@ export interface CategoryNode {
   image_url?: string | null;
   parent_id?: string | number | null;
   is_visible: boolean;
-  sort_order?: number;
+  sort_order?: number | null;
   meta_title?: string | null;
   meta_description?: string | null;
   children: CategoryNode[];
@@ -43,8 +43,6 @@ export function useCategoryWorkspace(props: { category: any; allCategories: any[
   const submitting = ref(false);
   const loadingPage = ref(false);
 
-  const sortOrderAutoManaged = ref(true);
-
   const formCategory = ref<Partial<CategoryNode>>({});
   const pageData = ref<PageData>(createEmptyPageData(null, ''));
 
@@ -67,37 +65,20 @@ export function useCategoryWorkspace(props: { category: any; allCategories: any[
     };
   }
 
-  function computeDefaultSortOrder(parentId: string | number | null | undefined): number {
-    const siblings = !parentId
-      ? props.allCategories
-      : (props.allCategories.find((c: any) => String(c.id) === String(parentId))?.children ?? []);
-
-    if (!siblings || !siblings.length) return 0;
-    const maxOrder = Math.max(...siblings.map((s: any) => Number(s.sort_order ?? 0)));
-    return maxOrder + 1;
-  }
-
   watch(() => props.category, (newVal) => {
     if (newVal) {
       formCategory.value = { ...newVal };
       pageData.value = createEmptyPageData(String(newVal.id), newVal.name);
       loadAdvancedPageContent(newVal.slug);
     } else {
-      sortOrderAutoManaged.value = true;
       formCategory.value = {
         name: '', description: null, parent_id: null,
-        sort_order: computeDefaultSortOrder(null), is_visible: true,
+        sort_order: null, is_visible: true,
         meta_title: null, meta_description: null, image_url: null
       };
       pageData.value = createEmptyPageData(null, '');
     }
   }, { immediate: true });
-
-  watch(() => formCategory.value.parent_id, (newParentId) => {
-    if (!props.category && sortOrderAutoManaged.value) {
-      formCategory.value.sort_order = computeDefaultSortOrder(newParentId);
-    }
-  });
 
   async function loadAdvancedPageContent(slug: string) {
     if (!slug) return;
@@ -146,7 +127,7 @@ export function useCategoryWorkspace(props: { category: any; allCategories: any[
         description: formCategory.value.description?.trim() || null,
         image_url: formCategory.value.image_url || null,
         is_visible: formCategory.value.is_visible !== false,
-        sort_order: formCategory.value.sort_order !== undefined ? Number(formCategory.value.sort_order) : 0,
+        sort_order: Number.isFinite(formCategory.value.sort_order) ? Number(formCategory.value.sort_order) : null,
         meta_title: formCategory.value.meta_title?.trim() || null,
         meta_description: formCategory.value.meta_description?.trim() || null
       };
@@ -206,6 +187,6 @@ export function useCategoryWorkspace(props: { category: any; allCategories: any[
 
   return {
     activeTab, submitting, loadingPage, formCategory, pageData,
-    availableParents, submitWorkspace, sortOrderAutoManaged
+    availableParents, submitWorkspace
   };
 }

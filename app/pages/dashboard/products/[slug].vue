@@ -56,6 +56,7 @@
             <label class="label"><span class="label-text font-semibold text-base-content/80">موجودی انبار *</span></label>
             <input v-model.number="product.stock_quantity" type="number" min="0" required class="input input-bordered w-full rounded-xl focus:input-primary" />
           </div>
+
         </div>
 
         <div class="border border-base-200 bg-base-50/40 p-5 rounded-2xl space-y-2">

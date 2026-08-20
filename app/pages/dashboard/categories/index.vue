@@ -25,16 +25,27 @@
       <button class="btn btn-sm btn-ghost text-error-content" @click="() => refresh()">تلاش مجدد</button>
     </div>
     
-    <div v-else-if="parentCategories.length" class="space-y-4">
-      <CategoryParentGroup 
-        v-for="parentCategory in parentCategories" 
+    <TransitionGroup v-else-if="parentCategories.length" name="reorder" tag="div" class="space-y-4">
+      <div v-for="(parentCategory, index) in parentCategories" :key="`parent-wrap-${parentCategory.id}`"
+        class="group/order rounded-xl transition-all duration-200"
+        @dragover.prevent="setParentDropIndex($event, index)" @drop.prevent="dropParent">
+      <div v-if="parentDropIndex === index" class="mb-4 h-20 rounded-xl border-2 border-dashed border-primary/55 bg-primary/8 transition-all" />
+      <div draggable="true" :class="{ 'opacity-45 scale-[0.99]': draggedParentIndex === index, 'ring-2 ring-primary/35 bg-primary/5': highlightedParentId === parentCategory.id }"
+        @dragstart="draggedParentIndex = index" @dragend="clearParentDrag">
+      <CategoryParentGroup
         :key="`parent-${parentCategory.id}`" 
         :parent-category="parentCategory"
+        :can-move-up="index > 0" :can-move-down="index < parentCategories.length - 1"
+        @move-up="moveParent(index, -1)" @move-down="moveParent(index, 1)"
         @update-item="openEditModal"
         @remove-item="removeCategory"
         @edit-page="openPageEditorModal"
       />
-    </div>
+      </div>
+      <div v-if="index === parentCategories.length - 1 && parentDropIndex === parentCategories.length"
+        class="mt-4 h-20 rounded-xl border-2 border-dashed border-primary/55 bg-primary/8 transition-all" />
+      </div>
+    </TransitionGroup>
 
     <div v-else class="flex flex-col items-center justify-center py-16 text-center bg-base-100 rounded-2xl border border-base-200 shadow-sm">
       <p class="text-sm text-base-content/50">هیچ دسته‌بندی محصولی در سیستم یافت نشد.</p>
@@ -68,7 +79,7 @@ interface CategoryNode {
   image_url?: string | null;
   parent_id?: number | string | null;
   is_visible: boolean;
-  sort_order?: number;
+  sort_order?: number | null;
   children: CategoryNode[];
 }
 
@@ -86,6 +97,9 @@ const isPageEditorOpen = ref(false);
 
 const selectedCategory = ref<CategoryNode | null>(null);
 const pageCategory = ref<CategoryNode | null>(null);
+const draggedParentIndex = ref<number | null>(null);
+const parentDropIndex = ref<number | null>(null);
+const highlightedParentId = ref<number | string | null>(null);
 
 const { data: categoriesResponse, status, error, refresh } = await useFetch<ApiResponse>('/api/categories', {
   lazy: true
@@ -98,6 +112,74 @@ const rawCategories = computed<CategoryNode[]>(() => {
     .sort((a, b) => a.name.localeCompare(b.name, 'fa'));
 });
 
+const compareOrder = (a: CategoryNode, b: CategoryNode) => {
+  if (a.sort_order == null && b.sort_order == null) return a.name.localeCompare(b.name, 'fa')
+  if (a.sort_order == null) return 1
+  if (b.sort_order == null) return -1
+  return a.sort_order - b.sort_order
+}
+
+const persistParentOrder = async (ordered: ParentCategory[]) => {
+  ordered.forEach((item, index) => { item.sort_order = index })
+  const positions = new Map(ordered.map((item, index) => [String(item.id), index]))
+  categoriesResponse.value?.data?.forEach((item) => {
+    const position = positions.get(String(item.id))
+    if (position !== undefined) item.sort_order = position
+  })
+  try {
+    await $fetch('/api/categories/reorder', {
+      method: 'PUT',
+      body: { parent_id: null, ids: ordered.map(item => item.id) },
+    })
+    await refresh()
+  } catch {
+    toast.error('ذخیره ترتیب دسته‌بندی‌ها انجام نشد.')
+    await refresh()
+  }
+}
+
+const moveParent = (index: number, offset: number) => {
+  const ordered = [...parentCategories.value]
+  const target = index + offset
+  if (target < 0 || target >= ordered.length) return
+  const [item] = ordered.splice(index, 1)
+  if (!item) return
+  ordered.splice(target, 0, item)
+  highlightParent(item.id)
+  persistParentOrder(ordered)
+}
+
+const setParentDropIndex = (event: DragEvent, index: number) => {
+  if (draggedParentIndex.value == null) return
+  const bounds = (event.currentTarget as HTMLElement).getBoundingClientRect()
+  parentDropIndex.value = event.clientY < bounds.top + bounds.height / 2 ? index : index + 1
+}
+
+const clearParentDrag = () => {
+  draggedParentIndex.value = null
+  parentDropIndex.value = null
+}
+
+const dropParent = () => {
+  const sourceIndex = draggedParentIndex.value
+  let targetIndex = parentDropIndex.value
+  clearParentDrag()
+  if (sourceIndex == null || targetIndex == null) return
+  const ordered = [...parentCategories.value]
+  const [item] = ordered.splice(sourceIndex, 1)
+  if (!item) return
+  if (sourceIndex < targetIndex) targetIndex -= 1
+  if (sourceIndex === targetIndex) return
+  ordered.splice(targetIndex, 0, item)
+  highlightParent(item.id)
+  persistParentOrder(ordered)
+}
+
+const highlightParent = (id: number | string) => {
+  highlightedParentId.value = id
+  window.setTimeout(() => { if (highlightedParentId.value === id) highlightedParentId.value = null }, 700)
+}
+
 const parentCategories = computed<ParentCategory[]>(() => {
   if (!categoriesResponse.value?.data) return [];
   const items = categoriesResponse.value.data;
@@ -109,9 +191,9 @@ const parentCategories = computed<ParentCategory[]>(() => {
       expanded: false,
       children: [...(parent.children || [])]
         .filter(child => child.slug !== 'blog') 
-        .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+        .sort(compareOrder)
     }))
-    .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+    .sort(compareOrder);
 });
 
 const openCreateModal = () => {
@@ -214,3 +296,9 @@ const handlePageSave = async () => {
   toast.success('تنظیمات صفحه دسته‌بندی ذخیره شد.');
 };
 </script>
+
+<style scoped>
+.reorder-move { transition: transform 280ms ease; }
+.reorder-enter-active, .reorder-leave-active { transition: opacity 180ms ease, transform 180ms ease; }
+.reorder-enter-from, .reorder-leave-to { opacity: 0; transform: scale(.98); }
+</style>

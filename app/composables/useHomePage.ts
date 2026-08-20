@@ -38,11 +38,39 @@ export interface HomeAboutSection {
   features: HomeAboutFeature[]
 }
 
+export interface HomeOrderStep {
+  title: string
+  subtitle: string
+  description: string
+  icon: string
+}
+
+export interface HomeOrderSection {
+  eyebrow: string
+  title: string
+  steps: HomeOrderStep[]
+}
+
+export interface HomePromiseItem {
+  title: string
+  description: string
+  icon: string
+}
+
+export interface HomeBrandPromiseSection {
+  eyebrow: string
+  title: string
+  description: string
+  items: HomePromiseItem[]
+}
+
 export interface HomePageContent {
   ItemSection: ItemSection[]
   image_gallery: ImageGallery[]
   brands: HomeBrand[]
   about_section?: HomeAboutSection
+  order_process?: HomeOrderSection
+  brand_promise?: HomeBrandPromiseSection
 }
 
 export interface HomePage {

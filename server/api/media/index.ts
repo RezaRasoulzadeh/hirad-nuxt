@@ -4,7 +4,25 @@ export default defineEventHandler(async (event) => {
 
   if (method === 'GET') {
     try {
-      return await authenticatedFetch(event, '/upload/asset');
+      const query = getQuery(event)
+      const offset = Math.max(0, Number(query.offset) || 0)
+      const limit = Math.min(100, Math.max(1, Number(query.limit) || 40))
+      const response = await authenticatedFetch(event, '/upload/asset')
+      const payload = await response.json()
+      const allAssets = Array.isArray(payload) ? payload : Array.isArray(payload?.data) ? payload.data : []
+      const data = allAssets.slice(offset, offset + limit)
+
+      return {
+        ...(Array.isArray(payload) ? {} : payload),
+        success: payload?.success ?? true,
+        data,
+        pagination: {
+          offset,
+          limit,
+          total: allAssets.length,
+          has_more: offset + data.length < allAssets.length,
+        },
+      }
     } catch (error: any) {
       throw createError({
         statusCode: error.statusCode || 500,

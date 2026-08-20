@@ -28,9 +28,12 @@ export const useCategoryTree = (slug: Ref<string>) => {
   )
 
   const sortedChildren = computed(() =>
-    [...(currentCategory.value?.children ?? [])].sort(
-      (a, b) => a.sort_order - b.sort_order
-    )
+    [...(currentCategory.value?.children ?? [])].sort((a, b) => {
+      if (a.sort_order == null && b.sort_order == null) return a.name.localeCompare(b.name, 'fa')
+      if (a.sort_order == null) return 1
+      if (b.sort_order == null) return -1
+      return a.sort_order - b.sort_order
+    })
   )
 
   return {

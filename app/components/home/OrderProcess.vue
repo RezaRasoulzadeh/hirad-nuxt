@@ -17,10 +17,10 @@
       <div class="container relative z-20 mx-auto px-10 pt-16 pb-12 md:px-12 lg:px-16">
       <div class="mb-12 flex flex-col items-center text-center md:mb-16">
         <span class="mb-3 text-xs font-bold tracking-[0.2em] text-primary uppercase">
-          Order Process
+          {{ orderContent.eyebrow }}
         </span>
         <h2 class="text-3xl font-black tracking-tight text-base-content">
-          روند ثبت و تکمیل سفارش
+          {{ orderContent.title }}
         </h2>
         <div class="mt-4 h-1 w-12 rounded-full bg-primary opacity-80" />
       </div>
@@ -39,7 +39,7 @@
         <div v-for="(step, index) in steps" :key="step.id"
           class="relative z-1 flex flex-col items-center text-center">
           <div class="relative flex size-28 items-center justify-center rounded-full border border-base-300 bg-base-100 text-primary ring-8 ring-base-200/55">
-            <component :is="step.icon" class="size-12" :stroke-width="1.65" />
+            <img :src="resolveIcon(step.icon)" :alt="step.fa" class="size-12 object-contain" @error="usePlaceholder">
             <span class="absolute -top-3 -right-3 flex size-7 items-center justify-center rounded-full border border-primary bg-base-100 font-sans text-sm font-black text-primary pt-1">
               {{ step.id }}
             </span>
@@ -75,62 +75,85 @@
 </template>
 
 <script setup lang="ts">
-import {
-  PhoneCall,
-  MessageSquare,
-  FileText,
-  CheckSquare,
-  Truck,
-  ShieldCheck,
-} from 'lucide-vue-next'
 import { useCircuitGeometry } from '~/composables/useCircuitGeometry'
+import { computed } from 'vue'
+import type { HomePage } from '~/composables/useHomePage'
+import placeholderImage from '~/assets/placeholder.png'
 
 const { circuitFrameRef, topCornerOffset, bottomCornerOffset } = useCircuitGeometry()
+const props = defineProps<{ page?: HomePage | null }>()
+const config = useRuntimeConfig()
+const apiBase = config.public.apiBase || '/api'
 
-const steps = [
+const defaultSteps = [
   {
     id: 1,
     fa: 'تماس اولیه',
     en: 'Contact',
     desc: 'ارتباط اولیه و طرح موضوع با کارشناسان هیراد',
-    icon: PhoneCall,
   },
   {
     id: 2,
     fa: 'مشاوره فنی',
     en: 'Consultation',
     desc: 'بررسی دقیق قطعات، فیتینگ‌ها و فیلترهای درخواستی',
-    icon: MessageSquare,
   },
   {
     id: 3,
     fa: 'صدور پیش‌فاکتور',
     en: 'Proforma Invoice',
     desc: 'شفاف‌سازی قیمت‌ها و مشخص کردن دقیق زمان تحویل',
-    icon: FileText,
   },
   {
     id: 4,
     fa: 'ثبت نهایی درخواست',
     en: 'Order Registration',
     desc: 'نهایی کردن سفارش صنعتی و آغاز فرآیند تامین یا تولید',
-    icon: CheckSquare,
   },
   {
     id: 5,
     fa: 'بسته‌بندی و ارسال',
     en: 'Delivery',
     desc: 'بسته‌بندی استاندارد ایمن و ارسال به موقع تجهیزات مکانیکی',
-    icon: Truck,
   },
   {
     id: 6,
     fa: 'تضمین کیفیت',
     en: 'Warranty',
     desc: 'پشتیبانی فنی مهندسی و ارائه تاییدیه کنترل کیفیت نهایی',
-    icon: ShieldCheck,
   },
 ]
+
+const orderContent = computed(() => {
+  const saved = props.page?.content?.order_process
+  return {
+    eyebrow: saved?.eyebrow || 'Order Process',
+    title: saved?.title || 'روند ثبت و تکمیل سفارش',
+    steps: saved?.steps?.length
+      ? saved.steps
+      : defaultSteps.map(({ fa, en, desc }) => ({ title: fa, subtitle: en, description: desc, icon: '' })),
+  }
+})
+
+const steps = computed(() => orderContent.value.steps.map((step, index) => ({
+  id: index + 1,
+  fa: step.title,
+  en: step.subtitle,
+  desc: step.description,
+  icon: step.icon,
+})))
+
+const resolveIcon = (value?: string) => {
+  if (!value) return placeholderImage
+  if (value.startsWith('http')) return value
+  return `${apiBase}${value.startsWith('/') ? '' : '/'}${value}`
+}
+
+const usePlaceholder = (event: Event) => {
+  const image = event.currentTarget as HTMLImageElement
+  image.onerror = null
+  image.src = placeholderImage
+}
 </script>
 
 <style scoped>

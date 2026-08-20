@@ -31,7 +31,7 @@
         <!-- Solid structural CSS Grid layout -->
         <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           <button 
-            v-for="asset in assets" 
+            v-for="asset in assets"
             :key="asset.id" 
             @click="selectAsset(asset)"
             type="button"
@@ -45,6 +45,7 @@
                 :alt="asset.description" 
                 class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
                 loading="lazy"
+                decoding="async"
               />
               <div v-else class="text-xs font-black text-base-content/40 uppercase tracking-wider bg-base-300/60 px-3 py-1 rounded-md">
                 {{ getFileExtension(asset.file_url) }}
@@ -59,10 +60,14 @@
             </div>
           </button>
         </div>
+        <button v-if="hasMore" type="button" :disabled="loadingMore"
+          class="btn btn-outline btn-primary mx-auto mt-5 flex" @click="loadMore">
+          <span v-if="loadingMore" class="loading loading-spinner loading-xs" />
+          نمایش موارد بیشتر
+        </button>
       </div>
 
     </div>
-    
     <MediaUploadModal 
       v-if="isUploadModalOpen"
       @close="isUploadModalOpen = false"
@@ -93,6 +98,9 @@ const config = useRuntimeConfig();
 const assets = ref<Asset[]>([]);
 const loading = ref(false);
 const isUploadModalOpen = ref(false);
+const PAGE_SIZE = 40;
+const hasMore = ref(false);
+const loadingMore = ref(false);
 
 const isImage = (url: string): boolean => {
   const ext = getFileExtension(url);
@@ -106,16 +114,32 @@ const getFileExtension = (url: string): string => {
 const fetchAssets = async () => {
   loading.value = true;
   try {
-    const res: any = await $fetch('/api/media', { method: 'GET' });
+    const res: any = await $fetch('/api/media', { method: 'GET', query: { offset: 0, limit: PAGE_SIZE } });
     if (res?.success && res?.data) {
       assets.value = res.data;
     } else if (Array.isArray(res)) {
       assets.value = res;
     }
+    hasMore.value = Boolean(res?.pagination?.has_more);
   } catch (error) {
     assets.value = [];
   } finally {
     loading.value = false;
+  }
+};
+
+const loadMore = async () => {
+  if (loadingMore.value || !hasMore.value) return;
+  loadingMore.value = true;
+  try {
+    const res: any = await $fetch('/api/media', {
+      method: 'GET',
+      query: { offset: assets.value.length, limit: PAGE_SIZE }
+    });
+    if (Array.isArray(res?.data)) assets.value.push(...res.data);
+    hasMore.value = Boolean(res?.pagination?.has_more);
+  } finally {
+    loadingMore.value = false;
   }
 };
 

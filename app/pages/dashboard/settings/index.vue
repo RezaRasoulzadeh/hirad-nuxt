@@ -70,6 +70,12 @@ const handleFile = (url: string) => {
   } else if (mediaType.value === 'brand') {
     const item = mainPage.value?.content?.brands?.[mediaIndex.value]
     if (item) item.logo_url = url
+  } else if (mediaType.value === 'promise-icon') {
+    const item = mainPage.value?.content?.brand_promise?.items?.[mediaIndex.value]
+    if (item) item.icon = url
+  } else if (mediaType.value === 'order-icon') {
+    const item = mainPage.value?.content?.order_process?.steps?.[mediaIndex.value]
+    if (item) item.icon = url
   } else if (mediaType.value === 'cert') {
     const item = certPage.value?.content?.Certificates?.[mediaIndex.value]
     if (item) item.image = url

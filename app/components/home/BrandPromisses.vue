@@ -17,31 +17,32 @@
       <div class="container relative z-20 mx-auto px-10 pt-16 pb-20 md:px-12 lg:px-16">
     <div class="flex flex-col items-center text-center mb-10 px-4">
       <span class="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3">
-        Brand Promise
+        {{ promiseContent.eyebrow }}
       </span>
       <h2 class="text-base-content text-3xl md:text-3xl font-black tracking-tight">
-        تعهد هیراد
+        {{ promiseContent.title }}
       </h2>
       <div class="bg-primary h-1 w-12 mt-4 rounded-full opacity-80" />
       <p class="text-base-content/70 mx-auto text-sm leading-relaxed mt-4">
-        چشم‌انداز این شرکت تبدیل شدن به همکاری مورد اعتماد برای تولید کنندگان و تامین کننده‌ای مطمئن برای مشتریان می باشد.
+        {{ promiseContent.description }}
       </p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
       <div 
-        v-for="(item, index) in items" 
+        v-for="(item, index) in promiseContent.items"
         :key="index"
         class="flex flex-col items-center text-center group"
       >
         <div class="mb-6 p-4 bg-base-200 rounded-2xl group-hover:scale-105 transition-transform duration-300">
           <img 
-            :src="resolveAsset(item.filename)" 
+            :src="resolveIcon(item.icon)"
             :alt="item.title"
             width="48"
             height="48"
             class="w-12 h-12 object-contain block"
             loading="lazy"
+            @error="usePlaceholder"
           />
         </div>
         
@@ -61,45 +62,64 @@
 
 <script setup lang="ts">
 import { useCircuitGeometry } from '~/composables/useCircuitGeometry'
+import { computed } from 'vue'
+import type { HomePage } from '~/composables/useHomePage'
+import placeholderImage from '~/assets/placeholder.png'
 
 const { circuitFrameRef, topCornerOffset, bottomCornerOffset } = useCircuitGeometry()
+const props = defineProps<{ page?: HomePage | null }>()
+const config = useRuntimeConfig()
+const apiBase = config.public.apiBase || '/api'
 
 const glob = import.meta.glob('~/assets/icons/*.png', { 
   eager: true, 
   import: 'default' 
 }) as Record<string, string>
 
-interface PromiseItem {
-  title: string
-  description: string
-  filename: string
-}
-
-const items: PromiseItem[] = [
+const defaultItems = [
   {
     title: 'متعهد',
     description: 'تعهد برای ما اعتماد می‌آفریند. ما همواره به قول خود پایبندیم و باور داریم که تمامی مشتریان و همکاران می‌توانند روی ما حساب کنند.',
-    filename: 'commitment.png'
+    icon: 'commitment.png'
   },
   {
     title: 'انگیزه‌مند',
     description: 'ما همیشه در تلاشیم تا بهترین راه‌حل‌ها را برای مشتریان خود بیابیم. هدف نهایی ما رضایت کامل آن‌هاست و این بزرگترین انگیزه ماست.',
-    filename: 'motivation.png'
+    icon: 'motivation.png'
   },
   {
     title: 'با‌ صلاحیت',
     description: 'دانش تخصصی در حوزه‌های فنی و بازرگانی، پایه‌ای استوار برای توسعه و ارائه راه‌حل‌هایی دقیقاً مطابق با نیازهای واقعی مشتریان ماست.',
-    filename: 'skill.png'
+    icon: 'skill.png'
   },
   {
     title: 'منعطف',
     description: 'ما به دستورالعمل‌های خشک پایبند نیستیم. تمرکز اصلی ما بر خواسته‌های فردی مشتریان است و آن‌ها را به فرآیندهای داخلی ترجیح می‌دهیم.',
-    filename: 'flexibility.png'
+    icon: 'flexibility.png'
   }
 ]
 
-const resolveAsset = (filename: string): string => {
-  return glob[`/assets/icons/${filename}`] || ''
+const promiseContent = computed(() => {
+  const saved = props.page?.content?.brand_promise
+  return {
+    eyebrow: saved?.eyebrow || 'Brand Promise',
+    title: saved?.title || 'تعهد هیراد',
+    description: saved?.description || 'چشم‌انداز این شرکت تبدیل شدن به همکاری مورد اعتماد برای تولید کنندگان و تامین کننده‌ای مطمئن برای مشتریان می باشد.',
+    items: saved?.items?.length ? saved.items : defaultItems,
+  }
+})
+
+const resolveIcon = (value?: string): string => {
+  if (!value) return placeholderImage
+  if (value.startsWith('http')) return value
+  if (value.startsWith('/')) return `${apiBase}${value}`
+  return glob[`/assets/icons/${value}`] || placeholderImage
+}
+
+const usePlaceholder = (event: Event) => {
+  const image = event.currentTarget as HTMLImageElement
+  image.onerror = null
+  image.src = placeholderImage
 }
 </script>
 

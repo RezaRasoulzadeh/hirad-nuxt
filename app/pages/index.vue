@@ -2,10 +2,10 @@
   <div>
     <HeroSection :page="page || null" />
     <AboutSection :page="page" />
-    <OrderProcess />
+    <OrderProcess :page="page" />
     <Catalogue />
     <CertificateCarousel :data="certificatePage" />
-    <BrandPromisses />
+    <BrandPromisses :page="page" />
     <BrandsSection :brands="page?.content?.brands || []" />
   </div>
 </template>

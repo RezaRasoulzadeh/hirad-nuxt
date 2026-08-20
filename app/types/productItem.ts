@@ -19,6 +19,7 @@ export interface ProductItem {
   price?: number | null;
   discount_price?: number | null;
   stock_quantity?: number | null;
+  sort_order?: number | null;
   is_active?: boolean;
   created_at?: string | null;
   updated_at?: string | null;

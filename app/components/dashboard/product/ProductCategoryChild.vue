@@ -32,12 +32,17 @@
         در حال بارگذاری محصولات...
       </div>
 
-      <div v-else-if="childCategory.products?.length" class="space-y-2">
+      <TransitionGroup v-else-if="localProducts.length" name="reorder" tag="div" class="space-y-2">
         <div 
-          v-for="product in childCategory.products" 
+          v-for="(product, index) in localProducts"
           :key="product.id"
-          class="flex items-center justify-between p-3 bg-base-100 rounded-xl border border-base-200 hover:border-base-300 transition-all shadow-sm"
+          class="transition-all duration-200" @dragover.prevent="setDropIndex($event, index)"
+          @drop.stop.prevent="dropProduct"
         >
+          <div v-if="dropIndex === index" class="mb-2 h-14 rounded-xl border-2 border-dashed border-primary/55 bg-primary/8" />
+          <div draggable="true" @dragstart.stop="draggedIndex = index" @dragend="clearDrag"
+            class="flex items-center justify-between rounded-xl border border-base-200 bg-base-100 p-3 shadow-sm transition-all hover:border-base-300"
+            :class="{ 'opacity-45 scale-[0.99]': draggedIndex === index, 'ring-2 ring-primary/30 bg-primary/5': highlightedId === product.id }">
           <div class="flex flex-col gap-1">
             <div class="flex items-center gap-2">
               <p class="font-bold text-sm text-base-content">
@@ -54,6 +59,13 @@
           </div>
 
           <div class="flex items-center gap-1.5">
+            <span class="cursor-grab px-1 text-base-content/35 active:cursor-grabbing" title="برای جابه‌جایی بکشید">
+              <GripVertical class="size-4.5" />
+            </span>
+            <button class="btn btn-square btn-sm btn-ghost" :disabled="index === 0" title="انتقال به بالا"
+              @click.stop="moveProduct(index, -1)"><ArrowUp class="size-4" /></button>
+            <button class="btn btn-square btn-sm btn-ghost" :disabled="index === localProducts.length - 1"
+              title="انتقال به پایین" @click.stop="moveProduct(index, 1)"><ArrowDown class="size-4" /></button>
             <div class="tooltip tooltip-top" data-tip="کپی محصول">
               <button 
                 @click.stop="$emit('duplicate', product.slug)"
@@ -81,8 +93,11 @@
               </button>
             </div>
           </div>
+          </div>
+          <div v-if="index === localProducts.length - 1 && dropIndex === localProducts.length"
+            class="mt-2 h-14 rounded-xl border-2 border-dashed border-primary/55 bg-primary/8" />
         </div>
-      </div>
+      </TransitionGroup>
 
       <div v-else class="text-center text-xs text-base-content/40 py-6 bg-base-100 rounded-xl border border-dashed border-base-200">
         هیچ محصولی در این دسته‌بندی یافت نشد.
@@ -92,7 +107,8 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronRight, ChevronDown, PenSquare, Trash, Copy } from 'lucide-vue-next'
+import { ref, watch } from 'vue'
+import { ArrowDown, ArrowUp, ChevronRight, ChevronDown, Copy, GripVertical, PenSquare, Trash } from 'lucide-vue-next'
 import { useRuntimeConfig } from '#imports'
 import type { ProductItem } from '~/types/productItem'
 import type { CategoryItem } from '~/types/categoryItem'
@@ -110,6 +126,67 @@ const props = defineProps<{
 }>()
 
 const config = useRuntimeConfig()
+const localProducts = ref<ProductItem[]>([])
+const draggedIndex = ref<number | null>(null)
+const dropIndex = ref<number | null>(null)
+const highlightedId = ref<string | null>(null)
+
+watch(() => props.childCategory.products, (products) => {
+  localProducts.value = [...(products || [])].sort((a, b) => {
+    if (a.sort_order == null && b.sort_order == null) return (a.name || '').localeCompare(b.name || '', 'fa')
+    if (a.sort_order == null) return 1
+    if (b.sort_order == null) return -1
+    return a.sort_order - b.sort_order
+  })
+}, { immediate: true, deep: true })
+
+const persistOrder = async () => {
+  localProducts.value.forEach((item, index) => { item.sort_order = index })
+  await $fetch('/api/products/reorder', {
+    method: 'PUT',
+    body: { category_id: props.childCategory.id, ids: localProducts.value.map(item => item.id) },
+  })
+}
+
+const moveProduct = (index: number, offset: number) => {
+  const target = index + offset
+  if (target < 0 || target >= localProducts.value.length) return
+  const [item] = localProducts.value.splice(index, 1)
+  if (!item) return
+  localProducts.value.splice(target, 0, item)
+  highlight(item.id)
+  persistOrder()
+}
+
+const setDropIndex = (event: DragEvent, index: number) => {
+  if (draggedIndex.value == null) return
+  const bounds = (event.currentTarget as HTMLElement).getBoundingClientRect()
+  dropIndex.value = event.clientY < bounds.top + bounds.height / 2 ? index : index + 1
+}
+
+const clearDrag = () => {
+  draggedIndex.value = null
+  dropIndex.value = null
+}
+
+const dropProduct = () => {
+  const sourceIndex = draggedIndex.value
+  let targetIndex = dropIndex.value
+  clearDrag()
+  if (sourceIndex == null || targetIndex == null) return
+  const [item] = localProducts.value.splice(sourceIndex, 1)
+  if (!item) return
+  if (sourceIndex < targetIndex) targetIndex -= 1
+  if (sourceIndex === targetIndex) return
+  localProducts.value.splice(targetIndex, 0, item)
+  highlight(item.id)
+  persistOrder()
+}
+
+const highlight = (id: string) => {
+  highlightedId.value = id
+  window.setTimeout(() => { if (highlightedId.value === id) highlightedId.value = null }, 700)
+}
 
 const getImageUrl = (urlPath: string) => {
   if (urlPath.startsWith('http://') || urlPath.startsWith('https://')) {
@@ -126,3 +203,7 @@ const handleToggle = () => {
   }
 }
 </script>
+
+<style scoped>
+.reorder-move { transition: transform 280ms ease; }
+</style>

@@ -28,6 +28,7 @@ export interface Product {
   discount_price?: number
   stock_quantity?: number
   is_active?: boolean
+  sort_order?: number | null
   short_description: ProductShortDescription
 }
 
@@ -57,12 +58,17 @@ export const useProductList = (categorySlug: Ref<string>) => {
       const res = await $fetch<ApiProductResponse>(`${apiBase}/products`, {
         params: {
           category: categorySlug.value,
-          sort: 'newest',
+          sort: 'sort_order',
           only_active: true,
         },
       })
       if (!res?.success) throw new Error(res?.message || 'خطا در دریافت محصولات')
-      return res.data ?? []
+      return [...(res.data ?? [])].sort((a, b) => {
+        if (a.sort_order == null && b.sort_order == null) return a.name.localeCompare(b.name, 'fa')
+        if (a.sort_order == null) return 1
+        if (b.sort_order == null) return -1
+        return a.sort_order - b.sort_order
+      })
     },
     { watch: [categorySlug] }
   )
