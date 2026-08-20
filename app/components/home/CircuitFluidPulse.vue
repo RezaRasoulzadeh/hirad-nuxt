@@ -20,8 +20,8 @@ const pulsePath = ref('')
 let frameId: number | undefined
 let startedAt = 0
 
-const expansionRadius = 35 / 1000
-const maxExpansion = 1.75
+const expansionRadius = 27 / 1000
+const maxExpansion = 1.35
 const normalHalfWidth = 1.25 / 2
 const sampleCount = 48
 
