@@ -9,10 +9,7 @@
                         class="size-24 rounded-2xl bg-base-200 flex items-center justify-center transition-colors overflow-hidden">
                         <img :src="child.image_url ? resolveUrl(child.image_url) : placeholderImg" :alt="child.name"
                             :data-error="!child.image_url ? 'true' : undefined" @error="handleImgError"
-                            class="size-16 object-contain transition-all 
-    group-hover:not-data-error:filter-[invert(21%)_sepia(41%)_saturate(2097%)_hue-rotate(312deg)_brightness(91%)_contrast(97%)]
-    [:is([data-theme=dark],.dark)_&]:not-data-error:filter-[brightness(0)_invert(80%)]
-    [:is([data-theme=dark],.dark)_&]:group-hover:not-data-error:filter-[invert(21%)_sepia(41%)_saturate(2097%)_hue-rotate(312deg)_brightness(91%)_contrast(97%)]" loading="lazy" />
+                            class="size-16 object-contain transition-all group-hover:not-data-error:filter-[invert(21%)_sepia(41%)_saturate(2097%)_hue-rotate(312deg)_brightness(91%)_contrast(97%)]" loading="lazy" />
                     </div>
                     <div>
                         <p class="font-bold text-base-content group-hover:text-primary transition-colors leading-snug">

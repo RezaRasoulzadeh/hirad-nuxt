@@ -4,8 +4,7 @@
       <div class="card-body">
         
         <NuxtLink to="/" class="flex justify-center mb-4">
-          <img src="/assets/Logo-Light.png" alt="Logo" class="w-24 block dark:hidden" />
-          <img src="/assets/Logo-Dark.png" alt="Logo" class="w-24 hidden dark:block" />
+          <img src="/assets/Logo-Light.png" alt="Logo" class="w-24 block" />
         </NuxtLink>
 
         <h1 class="text-xl font-bold text-center mb-6">ورود به پنل مدیریت</h1>

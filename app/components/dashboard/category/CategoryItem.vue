@@ -17,8 +17,7 @@
           v-if="category.image_url" 
           :src="config.public.apiBase + category.image_url" 
           :alt="category.name"
-          class="size-6 object-contain transition-all 
-          [:is([data-theme=dark],.dark)_&]:not-data-error:filter-[brightness(0)_invert(80%)]" loading="lazy"
+          class="size-6 object-contain transition-all" loading="lazy"
         />
 
         <div class="flex flex-col">

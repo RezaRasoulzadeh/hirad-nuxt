@@ -15,13 +15,6 @@
         </div>
 
         <div class="flex items-center gap-2 sm:gap-4 justify-end">
-          <button v-if="canUseDarkMode" @click="toggleTheme" class="btn btn-ghost btn-circle btn-sm sm:btn-md">
-            <Sun v-if="currentTheme === 'dark'" class="size-5" />
-            <Moon v-else class="size-5" />
-          </button>
-          
-          <div class="h-6 w-px bg-base-300"></div>
-          
           <button @click="handleLogout" class="btn btn-ghost btn-sm text-error font-medium gap-2">
             <LogOut class="size-4" />
             <span class="hidden sm:inline">خروج</span>
@@ -54,8 +47,7 @@
         <div class="w-full">
           <div class="p-6 border-b border-base-200 flex items-center justify-center w-full bg-base-100 sticky top-0 z-10">
             <NuxtLink to="/" class="flex justify-start w-full">
-              <img src="/assets/Logo-wide.png" alt="Logo" class="w-46 max-w-full h-auto block dark:hidden" />
-              <img src="/assets/Logo-wide-dark.png" alt="Logo" class="w-46 max-w-full h-auto hidden dark:block" />
+              <img src="/assets/Logo-wide.png" alt="Logo" class="w-46 max-w-full h-auto block" />
             </NuxtLink>
           </div>
 
@@ -83,9 +75,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { 
-  Menu, LogOut, Sun, Moon, LayoutDashboard, 
+  Menu, LogOut, LayoutDashboard,
   FolderTree, Package, Image, FileText, 
   Mail, Bell, Settings 
 } from 'lucide-vue-next';
@@ -94,8 +86,6 @@ import GlobalToast from '~/components/shared/GlobalToast.vue';
 const auth = useAuth();
 const toast = useToast();
 const isDrawerOpen = ref(false);
-const currentTheme = ref('light');
-const canUseDarkMode = import.meta.dev;
 
 const navigationItems = [
   { name: 'داشبورد', path: '/dashboard', icon: LayoutDashboard },
@@ -114,27 +104,6 @@ const dockNavigationItems = [
   { name: 'محصولات', path: '/dashboard/products', icon: Package },
   { name: 'پیام‌ها', path: '/dashboard/forms', icon: Mail },
 ];
-
-onMounted(() => {
-  if (!canUseDarkMode) {
-    currentTheme.value = 'light';
-    document.documentElement.setAttribute('data-theme', 'light');
-    return;
-  }
-
-  const savedTheme = localStorage.getItem('theme') || 'light';
-  currentTheme.value = savedTheme;
-  document.documentElement.setAttribute('data-theme', savedTheme);
-});
-
-const toggleTheme = () => {
-  if (!canUseDarkMode) return;
-
-  const targetTheme = currentTheme.value === 'light' ? 'dark' : 'light';
-  currentTheme.value = targetTheme;
-  localStorage.setItem('theme', targetTheme);
-  document.documentElement.setAttribute('data-theme', targetTheme);
-};
 
 const closeDrawer = () => {
   isDrawerOpen.value = false;

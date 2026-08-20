@@ -6,9 +6,9 @@
       class="drawer-overlay"
     ></label>
     
-    <div class="w-full md:w-96 bg-base-100 text-base-content border-neutral-200 dark:border-neutral-800 flex flex-col h-[80vh] md:h-full mt-auto md:mt-0 rounded-t-3xl md:rounded-t-none border-t md:border-t-0 border-r md:border-r">
+    <div class="w-full md:w-96 bg-base-100 text-base-content border-neutral-200 flex flex-col h-[80vh] md:h-full mt-auto md:mt-0 rounded-t-3xl md:rounded-t-none border-t md:border-t-0 border-r md:border-r">
       
-      <div class="p-4 border-b border-neutral-200 dark:border-neutral-800 flex justify-between items-center shrink-0">
+      <div class="p-4 border-b border-neutral-200 flex justify-between items-center shrink-0">
         <h3 class="font-bold text-lg text-primary">دسته‌بندی محصولات</h3>
         <button @click="$emit('close')" class="btn btn-ghost btn-circle btn-sm">
           <X class="size-5" />
@@ -46,7 +46,7 @@
                   </div>
                 </summary>
                 
-                <ul class="before:right-4 before:left-auto mr-3 ml-0 pr-3 pl-0 gap-2 border-r border-neutral-200 dark:border-neutral-800">
+                <ul class="before:right-4 before:left-auto mr-3 ml-0 pr-3 pl-0 gap-2 border-r border-neutral-200">
                   <li v-for="child in [...cat.children].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))" :key="child?.id">
                     <NuxtLink 
                       :to="`/categories/${child?.slug}`" 

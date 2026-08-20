@@ -3,7 +3,7 @@
     class="relative flex items-center justify-end h-10 shrink-0 transition-[width] duration-300 ease-in-out"
     :class="isOpen ? 'w-44 sm:w-64' : 'w-10'">
     <div
-      class="flex items-center border border-neutral-200 dark:border-neutral-800 rounded-xl bg-base-100 overflow-hidden w-full h-full transition-colors duration-300 ease-in-out"
+      class="flex items-center border border-neutral-200 rounded-xl bg-base-100 overflow-hidden w-full h-full transition-colors duration-300 ease-in-out"
       :class="isOpen ? 'border-primary/50' : 'border-transparent bg-transparent'"
     >
       <button
@@ -47,7 +47,7 @@
       <div class="w-88 max-w-[90vw]">
         <div
           v-if="isOpen && (hasResults || showEmptyState || error)"
-          class="mt-1 bg-base-100 border border-neutral-200 dark:border-neutral-800 rounded-xl shadow-lg max-h-112 overflow-y-auto p-3"
+          class="mt-1 bg-base-100 border border-neutral-200 rounded-xl shadow-lg max-h-112 overflow-y-auto p-3"
         >
           <div v-if="error" class="flex flex-col items-center gap-2 py-8 text-center px-4">
             <div class="bg-error/10 rounded-full p-3">

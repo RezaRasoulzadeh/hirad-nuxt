@@ -1,14 +1,13 @@
 <template>
   <footer class="relative overflow-hidden border-t border-base-300 bg-base-100 text-base-content" dir="rtl">
     <img :src="FooterBackground" alt="" aria-hidden="true"
-      class="pointer-events-none absolute left-0 top-0 h-auto w-full origin-center -scale-x-100 object-contain object-top-left opacity-90 mix-blend-multiply lg:w-[60vw] dark:invert dark:opacity-20 dark:mix-blend-screen" />
+      class="pointer-events-none absolute left-0 top-0 h-auto w-full origin-center -scale-x-100 object-contain object-top-left opacity-90 mix-blend-multiply lg:w-[60vw]" />
 
     <div class="relative z-10 mx-auto w-full max-w-[1720px] px-5 pb-10 pt-44 sm:pt-56 md:px-8 md:pt-64 lg:pt-72 xl:pt-80">
       <div class="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.05fr_.7fr_.95fr_1.4fr] lg:gap-0">
         <aside class="flex flex-col lg:pl-9">
           <NuxtLink to="/" class="inline-flex w-fit rounded-lg focus-visible:outline-2 focus-visible:outline-primary">
-            <img :src="LogoWide" alt="تجهیز فرآیند هیراد" class="block h-auto w-64 max-w-full object-contain dark:hidden" />
-            <img :src="LogoWideDark" alt="تجهیز فرآیند هیراد" class="hidden h-auto w-64 max-w-full object-contain dark:block" />
+            <img :src="LogoWide" alt="تجهیز فرآیند هیراد" class="block h-auto w-64 max-w-full object-contain" />
           </NuxtLink>
           <span class="mt-7 h-0.5 w-11 rounded-full bg-primary" />
           <p class="mt-5 max-w-sm text-justify text-sm leading-8 text-base-content/65">
@@ -124,7 +123,6 @@ import {
 } from 'lucide-vue-next'
 
 import LogoWide from '~/assets/Logo-wide.png'
-import LogoWideDark from '~/assets/Logo-wide-dark.png'
 import FooterBackground from '~/assets/Footer-bg.png'
 import FooterPainting from '~/assets/footer-painting.png'
 import contactData from '~/data/contact.json'

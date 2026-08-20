@@ -6,8 +6,7 @@
     <div class="collapse-title flex items-center justify-between pl-12 pr-4 py-4 bg-base-100 peer-checked:border-b peer-checked:border-base-200 transition-none min-h-0">
       <div class="flex items-center gap-3">
         <img v-if="parentCategory.image_url" :src="config.public.apiBase + parentCategory.image_url"
-          :alt="parentCategory.name" class="size-8 object-contain transition-all 
-          [:is([data-theme=dark],.dark)_&]:not-data-error:filter-[brightness(0)_invert(80%)]" loading="lazy" />
+          :alt="parentCategory.name" class="size-8 object-contain transition-all" loading="lazy" />
 
         <div class="flex flex-col gap-0.5">
           <h3 class="text-base sm:text-lg font-bold text-base-content">{{ parentCategory.name }}</h3>

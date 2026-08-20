@@ -6,6 +6,8 @@
           preserveAspectRatio="none">
           <path :d="`M500 30H${18 + topCornerOffset}L18 74V552L${18 + bottomCornerOffset} 610H215`"
             class="order-circuit-line" />
+          <CircuitFluidPulse
+            :path="`M500 30H${18 + topCornerOffset}L18 74V552L${18 + bottomCornerOffset} 610H215`" />
         </svg>
         <i class="absolute top-[calc(4.286%_-_0.3125rem)] left-[calc(50%_-_0.3125rem)] size-2.5 rounded-full bg-primary" />
         <span class="absolute top-[68%] left-[calc(1.8%_-_0.3125rem)] flex flex-col gap-2">
@@ -77,6 +79,7 @@
 <script setup lang="ts">
 import { useCircuitGeometry } from '~/composables/useCircuitGeometry'
 import { computed } from 'vue'
+import CircuitFluidPulse from './CircuitFluidPulse.vue'
 import type { HomePage } from '~/composables/useHomePage'
 import placeholderImage from '~/assets/placeholder.png'
 

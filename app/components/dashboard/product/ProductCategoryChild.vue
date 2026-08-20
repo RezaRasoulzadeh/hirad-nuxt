@@ -11,8 +11,7 @@
           v-if="childCategory.image_url" 
           :src="getImageUrl(childCategory.image_url)" 
           :alt="childCategory.name || ''"
-          class="size-6 object-contain transition-all 
-          [:is([data-theme=dark],.dark)_&]:not-data-error:filter-[brightness(0)_invert(80%)]"
+          class="size-6 object-contain transition-all"
           loading="lazy"
         />
 

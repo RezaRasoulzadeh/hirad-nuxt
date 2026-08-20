@@ -8,11 +8,15 @@
           fill="none" preserveAspectRatio="none">
           <path :d="`M715 30H${982 - topCornerOffset}L982 74V${bottomLineY - 58}L${982 - bottomCornerOffset} ${bottomLineY}H785`"
             class="about-circuit-line" />
+          <CircuitFluidPulse
+            :path="`M715 30H${982 - topCornerOffset}L982 74V${bottomLineY - 58}L${982 - bottomCornerOffset} ${bottomLineY}H785`" />
         </svg>
         <svg class="absolute inset-0 hidden size-full overflow-visible lg:block" viewBox="0 0 1000 700" fill="none"
           preserveAspectRatio="none">
           <path :d="`M725 30H${982 - topCornerOffset}L982 74V${bottomLineY - 58}L${982 - bottomCornerOffset} ${bottomLineY}H785`"
             class="about-circuit-line" />
+          <CircuitFluidPulse
+            :path="`M725 30H${982 - topCornerOffset}L982 74V${bottomLineY - 58}L${982 - bottomCornerOffset} ${bottomLineY}H785`" />
         </svg>
 
         <i
@@ -67,6 +71,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { ChevronLeft, Factory, Globe2, UsersRound } from 'lucide-vue-next'
+import CircuitFluidPulse from './CircuitFluidPulse.vue'
 import type { HomeAboutSection, HomePage } from '~/composables/useHomePage'
 import { useCircuitGeometry } from '~/composables/useCircuitGeometry'
 

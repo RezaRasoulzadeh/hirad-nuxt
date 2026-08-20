@@ -6,6 +6,8 @@
           preserveAspectRatio="none">
           <path :d="`M500 30H${982 - topCornerOffset}L982 74V552L${982 - bottomCornerOffset} 610H785`"
             class="certificate-circuit-line" />
+          <CircuitFluidPulse
+            :path="`M500 30H${982 - topCornerOffset}L982 74V552L${982 - bottomCornerOffset} 610H785`" />
         </svg>
         <i class="absolute top-[calc(4.286%_-_0.3125rem)] left-[calc(50%_-_0.3125rem)] size-2.5 rounded-full bg-primary" />
         <span class="absolute top-[68%] right-[calc(1.8%_-_0.3125rem)] flex flex-col gap-2">
@@ -120,6 +122,7 @@
 <script setup lang="ts">
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import { ref, computed, onBeforeUnmount, onMounted } from 'vue'
+import CircuitFluidPulse from './CircuitFluidPulse.vue'
 import type { StyleValue } from 'vue'
 import type { CertificatePageData } from '~/composables/useCertificates'
 import { useCircuitGeometry } from '~/composables/useCircuitGeometry'

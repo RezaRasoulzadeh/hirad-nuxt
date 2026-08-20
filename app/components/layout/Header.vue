@@ -5,12 +5,10 @@
 
       <div class="flex items-center h-full shrink-0">
         <div
-          class="navbar-start w-auto shrink-0 h-full flex items-center border-l border-neutral-200 dark:border-neutral-800 rounded-l-2xl pl-4 lg:pl-6 pr-1">
+          class="navbar-start w-auto shrink-0 h-full flex items-center border-l border-neutral-200 rounded-l-2xl pl-4 lg:pl-6 pr-1">
           <NuxtLink to="/"
             class="flex items-center gap-2 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-primary">
-            <img :src="LogoWide" alt="Hirad Logo" class="h-12 w-auto select-none object-contain block dark:hidden"
-              loading="eager" />
-              <img :src="LogoWideDark" alt="Hirad Logo" class="h-12 w-auto select-none object-contain hidden dark:block"
+            <img :src="LogoWide" alt="Hirad Logo" class="h-12 w-auto select-none object-contain block"
               loading="eager" />
           </NuxtLink>
         </div>
@@ -66,7 +64,7 @@
 
                 <div class="absolute top-full left-0 right-0 hidden group-hover:block pt-2 z-50">
                   <ul
-                    class="menu bg-base-100 rounded-xl w-56 p-2 shadow-lg border border-neutral-200 dark:border-neutral-800 gap-0.5">
+                    class="menu bg-base-100 rounded-xl w-56 p-2 shadow-lg border border-neutral-200 gap-0.5">
                     <li>
                       <NuxtLink to="/about" active-class="!text-primary bg-primary/5"
                         class="py-2.5 focus:bg-transparent text-right">
@@ -127,10 +125,6 @@
       <div class="grow"></div>
 
       <div class="navbar-end w-auto shrink-0 flex items-center gap-3 justify-end">
-        <button v-if="canUseDarkMode" @click="toggleTheme" class="btn btn-ghost btn-circle swap swap-rotate" aria-label="Toggle Theme">
-          <Sun v-if="isDark" class="size-5" />
-          <Moon v-else class="size-5" />
-        </button>
         <Search />
 
         <div class="dropdown dropdown-end md:hidden">
@@ -138,7 +132,7 @@
             <Menu class="size-5" />
           </div>
           <ul tabindex="0"
-            class="dropdown-content menu bg-base-100 rounded-xl z-50 w-56 p-3 shadow-lg border border-neutral-200 dark:border-neutral-800 gap-1 mt-2">
+            class="dropdown-content menu bg-base-100 rounded-xl z-50 w-56 p-3 shadow-lg border border-neutral-200 gap-1 mt-2">
             <li>
               <NuxtLink to="/" class="p-3 text-base text-base-content hover:bg-primary/5 transition-all duration-300"
                 active-class="!text-primary border-s-2 bg-primary/5">
@@ -170,7 +164,7 @@
                     <span>درباره ما</span>
                   </div>
                 </summary>
-                <ul class="mr-4 ml-0 pr-3 pl-0 border-r border-neutral-200 dark:border-neutral-800 gap-1 my-1">
+                <ul class="mr-4 ml-0 pr-3 pl-0 border-r border-neutral-200 gap-1 my-1">
                   <li>
                     <NuxtLink to="/about" active-class="!text-primary bg-primary/5"
                       class="flex flex-col items-start gap-0"><span>معرفی شرکت</span></NuxtLink>
@@ -207,38 +201,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { House, Info, Newspaper, Phone, ShoppingBag, Sun, Moon, Menu, ChevronDown } from 'lucide-vue-next'
+import { House, Info, Newspaper, Phone, ShoppingBag, Menu, ChevronDown } from 'lucide-vue-next'
 import LogoWide from '~/assets/Logo-wide.png'
-import LogoWideDark from '~/assets/Logo-wide-dark.png'
 import Search from '../shared/Search.vue'
 
 defineEmits(['open-drawer'])
 
-const isDark = ref(false)
-const canUseDarkMode = import.meta.dev
-
-onMounted(() => {
-  if (!canUseDarkMode) {
-    document.documentElement.setAttribute('data-theme', 'light')
-    return
-  }
-
-  const savedTheme = localStorage.getItem('theme')
-  if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-    isDark.value = true
-    document.documentElement.setAttribute('data-theme', 'dark')
-  } else {
-    document.documentElement.setAttribute('data-theme', 'light')
-  }
-})
-
-const toggleTheme = () => {
-  if (!canUseDarkMode) return
-
-  isDark.value = !isDark.value
-  const themeName = isDark.value ? 'dark' : 'light'
-  document.documentElement.setAttribute('data-theme', themeName)
-  localStorage.setItem('theme', themeName)
-}
 </script>
