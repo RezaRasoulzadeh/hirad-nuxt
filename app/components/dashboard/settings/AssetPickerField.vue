@@ -5,9 +5,13 @@
         :aria-label="modelValue ? `تغییر ${label}` : `انتخاب ${label}`" @click="$emit('select')">
         <template v-if="modelValue">
           <img :src="previewUrl" :alt="label"
-            class="absolute inset-0 size-full object-contain p-2 transition duration-200 group-hover:brightness-50 group-focus-within:brightness-50"
+            class="absolute inset-0 z-0 size-full object-contain p-2"
             @error="useFallback">
-          <span class="btn btn-sm border-0 bg-base-100/90 text-base-content opacity-90 shadow-md transition md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100">
+          <span
+            class="pointer-events-none absolute inset-0 z-10 bg-black/45 opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100"
+            aria-hidden="true" />
+          <span
+            class="btn btn-sm relative z-20 border border-white/70 bg-base-100 text-base-content opacity-95 shadow-lg ring-1 ring-black/5 transition duration-200 md:scale-95 md:opacity-0 md:group-hover:scale-100 md:group-hover:opacity-100 md:group-focus-within:scale-100 md:group-focus-within:opacity-100">
             <ImagePlus class="size-4" /> تغییر تصویر
           </span>
         </template>
@@ -20,9 +24,9 @@
       </button>
 
       <button v-if="modelValue" type="button"
-        class="btn btn-circle btn-error btn-xs absolute end-2 top-2 z-30 shadow-sm"
+        class="btn btn-circle btn-error btn-xs absolute inset-e-2 top-2 z-30 shadow-sm"
         :aria-label="`حذف ${label}`" @click="$emit('update:modelValue', '')">
-        <X class="size-3.5" />
+        <Trash class="size-3.5" />
       </button>
     </div>
   </div>
@@ -30,7 +34,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { ImagePlus, X } from 'lucide-vue-next'
+import { ImagePlus, Trash } from 'lucide-vue-next'
 import { resolveAssetUrl } from '~/utils/resolveAssetUrl'
 
 const props = withDefaults(defineProps<{
