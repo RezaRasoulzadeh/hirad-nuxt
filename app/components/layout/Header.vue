@@ -1,6 +1,6 @@
 <template>
   <header
-    class="sticky top-0 z-40 bg-base-100/80 backdrop-blur-md border-t-4 border-t-primary rounded-b-2xl border-r-4 border-b border-b-base-300 border-r-primary transition-colors duration-300">
+    class="sticky top-0 z-40 bg-base-100/95 border-t-4 border-t-primary rounded-b-2xl border-r-4 border-b border-b-base-300 border-r-primary transition-colors duration-300">
     <div class="mx-auto max-w-[1920px] px-4 lg:px-4 lg:pe-12 navbar h-18 py-0 gap-4">
 
       <div class="flex items-center h-full shrink-0">
@@ -8,7 +8,7 @@
           class="navbar-start w-auto shrink-0 h-full flex items-center border-l border-neutral-200 rounded-l-2xl pl-4 lg:pl-6 pr-1">
           <NuxtLink to="/"
             class="flex items-center gap-2 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-primary">
-            <img :src="LogoWide" alt="Hirad Logo" class="h-12 w-auto select-none object-contain block"
+            <img :src="normalizeLocalAssetUrl(LogoWide)" alt="Hirad Logo" width="1359" height="407" class="h-12 w-auto select-none object-contain block"
               loading="eager" />
           </NuxtLink>
         </div>
@@ -203,6 +203,7 @@
 <script setup lang="ts">
 import { House, Info, Newspaper, Phone, ShoppingBag, Menu, ChevronDown } from 'lucide-vue-next'
 import LogoWide from '~/assets/Logo-wide.png'
+import { normalizeLocalAssetUrl } from '~/utils/resolveAssetUrl'
 import Search from '../shared/Search.vue'
 
 defineEmits(['open-drawer'])

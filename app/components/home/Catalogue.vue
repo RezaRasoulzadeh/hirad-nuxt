@@ -5,8 +5,8 @@
       <div class="relative overflow-hidden rounded-3xl border border-base-300 bg-base-200/40">
 
         <!-- Decorative Blurs -->
-        <div class="absolute -top-20 -right-20 size-64 rounded-full bg-primary/10 blur-3xl" />
-        <div class="absolute -bottom-20 -left-20 size-64 rounded-full bg-primary/5 blur-3xl" />
+        <div class="absolute -top-20 -right-20 size-64 rounded-full bg-primary/10 opacity-70 blur-3xl" />
+        <div class="absolute -bottom-20 -left-20 size-64 rounded-full bg-primary/5 opacity-70 blur-3xl" />
 
         <div class="relative flex flex-col lg:flex-row items-center gap-12 p-8 md:p-12 lg:p-16">
 
@@ -39,7 +39,8 @@
           </div>
           <!-- Catalogue -->
           <div class="w-full lg:w-5/12 flex justify-center">
-            <img src="~/assets/catalogue.png" alt="کاتالوگ هیراد"
+            <img :src="normalizeLocalAssetUrl(catalogueImage)" alt="کاتالوگ هیراد"
+              width="4894" height="2775" loading="lazy" decoding="async"
               class="max-h-105 object-contain drop-shadow-2xl transition-transform duration-300 hover:-translate-y-2 hover:scale-110" />
           </div>
 
@@ -53,4 +54,6 @@
 
 <script setup lang="ts">
 import { ArrowLeft } from 'lucide-vue-next'
+import catalogueImage from '~/assets/catalogue.png'
+import { normalizeLocalAssetUrl } from '~/utils/resolveAssetUrl'
 </script>

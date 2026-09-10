@@ -68,37 +68,44 @@ import { computed } from 'vue'
 import CircuitFluidPulse from './CircuitFluidPulse.vue'
 import type { HomePage } from '~/composables/useHomePage'
 import placeholderImage from '~/assets/placeholder.png'
+import commitmentImage from '~/assets/icons/commitment.png'
+import flexibilityImage from '~/assets/icons/flexibility.png'
+import motivationImage from '~/assets/icons/motivation.png'
+import skillImage from '~/assets/icons/skill.png'
+import { normalizeLocalAssetUrl } from '~/utils/resolveAssetUrl'
+
+const localIconsByName: Record<string, string> = {
+  'commitment.png': commitmentImage,
+  'flexibility.png': flexibilityImage,
+  'motivation.png': motivationImage,
+  'skill.png': skillImage,
+}
 
 const { circuitFrameRef, topCornerOffset, bottomCornerOffset } = useCircuitGeometry()
 const props = defineProps<{ page?: HomePage | null }>()
 const config = useRuntimeConfig()
 const apiBase = config.public.apiBase || '/api'
 
-const glob = import.meta.glob('~/assets/icons/*.png', { 
-  eager: true, 
-  import: 'default' 
-}) as Record<string, string>
-
 const defaultItems = [
   {
     title: 'متعهد',
     description: 'تعهد برای ما اعتماد می‌آفریند. ما همواره به قول خود پایبندیم و باور داریم که تمامی مشتریان و همکاران می‌توانند روی ما حساب کنند.',
-    icon: 'commitment.png'
+    icon: commitmentImage
   },
   {
     title: 'انگیزه‌مند',
     description: 'ما همیشه در تلاشیم تا بهترین راه‌حل‌ها را برای مشتریان خود بیابیم. هدف نهایی ما رضایت کامل آن‌هاست و این بزرگترین انگیزه ماست.',
-    icon: 'motivation.png'
+    icon: motivationImage
   },
   {
     title: 'با‌ صلاحیت',
     description: 'دانش تخصصی در حوزه‌های فنی و بازرگانی، پایه‌ای استوار برای توسعه و ارائه راه‌حل‌هایی دقیقاً مطابق با نیازهای واقعی مشتریان ماست.',
-    icon: 'skill.png'
+    icon: skillImage
   },
   {
     title: 'منعطف',
     description: 'ما به دستورالعمل‌های خشک پایبند نیستیم. تمرکز اصلی ما بر خواسته‌های فردی مشتریان است و آن‌ها را به فرآیندهای داخلی ترجیح می‌دهیم.',
-    icon: 'flexibility.png'
+    icon: flexibilityImage
   }
 ]
 
@@ -113,16 +120,17 @@ const promiseContent = computed(() => {
 })
 
 const resolveIcon = (value?: string): string => {
-  if (!value) return placeholderImage
+  if (!value) return normalizeLocalAssetUrl(placeholderImage)
   if (value.startsWith('http')) return value
+  if (value.startsWith('/_nuxt/')) return value
   if (value.startsWith('/')) return `${apiBase}${value}`
-  return glob[`/assets/icons/${value}`] || placeholderImage
+  return normalizeLocalAssetUrl(localIconsByName[value] || value)
 }
 
 const usePlaceholder = (event: Event) => {
   const image = event.currentTarget as HTMLImageElement
   image.onerror = null
-  image.src = placeholderImage
+  image.src = normalizeLocalAssetUrl(placeholderImage)
 }
 </script>
 

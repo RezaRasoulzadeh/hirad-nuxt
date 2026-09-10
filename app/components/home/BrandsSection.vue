@@ -10,7 +10,7 @@
         </p>
       </div>
 
-      <div class="rounded-3xl border border-base-300/70 bg-base-100/85 p-4 backdrop-blur-sm md:p-7">
+      <div class="rounded-3xl border border-base-300/70 bg-base-100/95 p-4 md:p-7">
         <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 2xl:grid-cols-10">
           <a v-for="(brand, index) in brands" :key="`${brand.name}-${index}`"
             :href="brand.website_url || undefined" :target="brand.website_url ? '_blank' : undefined"

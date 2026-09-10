@@ -7,7 +7,7 @@
     <div class="pointer-events-none absolute top-2 left-4 z-20 hidden gap-2 md:grid 2xl:left-4" dir="rtl"
       aria-label="مزیت‌های هیراد">
       <div v-for="point in qualityPoints" :key="point.title"
-        class="flex min-h-10 w-46 items-center gap-3 rounded-xl border border-base-300 bg-base-100/90 px-3 py-2 text-primary shadow-sm backdrop-blur-md"
+        class="flex min-h-10 w-46 items-center gap-3 rounded-xl border border-base-300 bg-base-100/95 px-3 py-2 text-primary shadow-sm"
         dir="ltr">
         <component :is="point.icon" class="size-8" aria-hidden="true" />
         <span class="flex w-full flex-col text-base-content">
@@ -84,7 +84,7 @@
         <div
           class="order-2 mx-4 mt-5 flex w-[calc(100%-2rem)] min-w-0 items-center md:mx-0 md:mt-0 md:w-full md:basis-[60%]"
           dir="ltr">
-          <img src="~/assets/hero.jpg" alt="مجموعه تجهیزات و شیرآلات صنعتی هیراد" fetchpriority="high"
+          <img src="~/assets/hero.jpg" alt="مجموعه تجهیزات و شیرآلات صنعتی هیراد" width="1672" height="941" loading="eager" fetchpriority="high" decoding="async"
             class="block h-auto w-full object-contain mix-blend-multiply">
         </div>
       </div>

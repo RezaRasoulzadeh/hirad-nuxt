@@ -41,7 +41,7 @@
         <div v-for="(step, index) in steps" :key="step.id"
           class="relative z-1 flex flex-col items-center text-center">
           <div class="relative flex size-28 items-center justify-center rounded-full border border-base-300 bg-base-100 text-primary ring-8 ring-base-200/55">
-            <img :src="resolveIcon(step.icon)" :alt="step.fa" class="size-12 object-contain" @error="usePlaceholder">
+            <img :src="resolveIcon(step.icon)" :alt="step.fa" class="size-16 object-contain" @error="usePlaceholder">
             <span class="absolute -top-3 -right-3 flex size-7 items-center justify-center rounded-full border border-primary bg-base-100 font-sans text-sm font-black text-primary pt-1">
               {{ step.id }}
             </span>
@@ -82,6 +82,7 @@ import { computed } from 'vue'
 import CircuitFluidPulse from './CircuitFluidPulse.vue'
 import type { HomePage } from '~/composables/useHomePage'
 import placeholderImage from '~/assets/placeholder.png'
+import { normalizeLocalAssetUrl } from '~/utils/resolveAssetUrl'
 
 const { circuitFrameRef, topCornerOffset, bottomCornerOffset } = useCircuitGeometry()
 const props = defineProps<{ page?: HomePage | null }>()
@@ -147,15 +148,16 @@ const steps = computed(() => orderContent.value.steps.map((step, index) => ({
 })))
 
 const resolveIcon = (value?: string) => {
-  if (!value) return placeholderImage
+  if (!value) return normalizeLocalAssetUrl(placeholderImage)
   if (value.startsWith('http')) return value
+  if (value.startsWith('/_nuxt/')) return value
   return `${apiBase}${value.startsWith('/') ? '' : '/'}${value}`
 }
 
 const usePlaceholder = (event: Event) => {
   const image = event.currentTarget as HTMLImageElement
   image.onerror = null
-  image.src = placeholderImage
+  image.src = normalizeLocalAssetUrl(placeholderImage)
 }
 </script>
 

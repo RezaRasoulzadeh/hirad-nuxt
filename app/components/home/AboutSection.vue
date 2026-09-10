@@ -4,19 +4,10 @@
     dir="rtl">
     <div ref="sectionContentRef" class="relative mx-auto min-h-170 max-w-[1880px] overflow-visible">
       <div class="pointer-events-none absolute inset-0 z-10 hidden md:block" aria-hidden="true">
-        <svg class="absolute inset-0 hidden size-full overflow-visible md:block lg:hidden" viewBox="0 0 1000 700"
-          fill="none" preserveAspectRatio="none">
-          <path :d="`M715 30H${982 - topCornerOffset}L982 74V${bottomLineY - 58}L${982 - bottomCornerOffset} ${bottomLineY}H785`"
-            class="about-circuit-line" />
-          <CircuitFluidPulse
-            :path="`M715 30H${982 - topCornerOffset}L982 74V${bottomLineY - 58}L${982 - bottomCornerOffset} ${bottomLineY}H785`" />
-        </svg>
-        <svg class="absolute inset-0 hidden size-full overflow-visible lg:block" viewBox="0 0 1000 700" fill="none"
+        <svg class="absolute inset-0 size-full overflow-visible" viewBox="0 0 1000 700" fill="none"
           preserveAspectRatio="none">
-          <path :d="`M725 30H${982 - topCornerOffset}L982 74V${bottomLineY - 58}L${982 - bottomCornerOffset} ${bottomLineY}H785`"
-            class="about-circuit-line" />
-          <CircuitFluidPulse
-            :path="`M725 30H${982 - topCornerOffset}L982 74V${bottomLineY - 58}L${982 - bottomCornerOffset} ${bottomLineY}H785`" />
+          <path :d="circuitPath" class="about-circuit-line" />
+          <CircuitFluidPulse :path="circuitPath" />
         </svg>
 
         <i
@@ -83,7 +74,18 @@ const {
 } = useCircuitGeometry()
 const ctaRowRef = ref<HTMLElement | null>(null)
 const bottomLineY = ref(590)
+const isLargeScreen = ref(false)
 let sectionResizeObserver: ResizeObserver | undefined
+let circuitMediaQuery: MediaQueryList | undefined
+
+const updateCircuitVariant = (event: MediaQueryListEvent) => {
+  isLargeScreen.value = event.matches
+}
+
+const circuitPath = computed(() => {
+  const startX = isLargeScreen.value ? 725 : 715
+  return `M${startX} 30H${982 - topCornerOffset.value}L982 74V${bottomLineY.value - 58}L${982 - bottomCornerOffset.value} ${bottomLineY.value}H785`
+})
 
 const defaultAbout: HomeAboutSection = {
   eyebrow: 'About Hirad',
@@ -129,6 +131,10 @@ const syncBottomLine = () => {
 }
 
 onMounted(async () => {
+  circuitMediaQuery = window.matchMedia('(min-width: 1024px)')
+  isLargeScreen.value = circuitMediaQuery.matches
+  circuitMediaQuery.addEventListener('change', updateCircuitVariant)
+
   await nextTick()
   syncBottomLine()
   sectionResizeObserver = new ResizeObserver(syncBottomLine)
@@ -136,7 +142,10 @@ onMounted(async () => {
   if (ctaRowRef.value) sectionResizeObserver.observe(ctaRowRef.value)
 })
 
-onBeforeUnmount(() => sectionResizeObserver?.disconnect())
+onBeforeUnmount(() => {
+  sectionResizeObserver?.disconnect()
+  circuitMediaQuery?.removeEventListener('change', updateCircuitVariant)
+})
 </script>
 
 <style scoped>
