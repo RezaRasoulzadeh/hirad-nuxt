@@ -47,6 +47,32 @@
       </div>
     </div>
 
+    <div v-if="totalAssets > 0" class="flex flex-col items-center justify-between gap-4 rounded-2xl border border-base-200 bg-base-100 p-4 shadow-sm sm:flex-row">
+      <p class="text-xs text-base-content/60 sm:text-sm">
+        نمایش {{ ((currentPage - 1) * PAGE_SIZE) + 1 }} تا {{ Math.min(currentPage * PAGE_SIZE, totalAssets) }} از {{ totalAssets }} رسانه
+      </p>
+
+      <div v-if="totalPages > 1" class="flex items-center gap-1" dir="ltr">
+        <button type="button" class="btn btn-sm btn-ghost" :disabled="currentPage === 1 || loading" aria-label="صفحه قبلی"
+          @click="goToPage(currentPage - 1)">
+          قبلی
+        </button>
+
+        <template v-for="(page, index) in pageNumbers" :key="`${page}-${index}`">
+          <span v-if="page === 'ellipsis'" class="px-1 text-base-content/50">…</span>
+          <button v-else type="button" class="btn btn-sm min-w-9" :class="page === currentPage ? 'btn-primary' : 'btn-ghost'"
+            :aria-current="page === currentPage ? 'page' : undefined" :disabled="loading" @click="goToPage(page)">
+            {{ page }}
+          </button>
+        </template>
+
+        <button type="button" class="btn btn-sm btn-ghost" :disabled="currentPage === totalPages || loading" aria-label="صفحه بعدی"
+          @click="goToPage(currentPage + 1)">
+          بعدی
+        </button>
+      </div>
+    </div>
+
     <MediaUploadModal v-if="showUploadModal" @close="showUploadModal = false" @asset-uploaded="handleAssetUploaded" />
     <MediaEditModal v-if="showEditModal" :asset="selectedAsset!" @close="closeEditModal" @asset-updated="handleAssetUpdated" />
     <MediaPreviewModal v-if="showPreviewModal" :asset="selectedAsset!" @close="closePreviewModal" />
@@ -54,7 +80,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import { useToast } from '~/composables/useToast';
 import MediaUploadModal from '~/components/dashboard/media/MediaUploadModal.vue';
 import MediaEditModal from '~/components/dashboard/media/MediaEditModal.vue';
@@ -73,6 +99,25 @@ const toast = useToast();
 
 const assets = ref<Asset[]>([]);
 const loading = ref(false);
+const currentPage = ref(1);
+const totalAssets = ref(0);
+const PAGE_SIZE = 40;
+const totalPages = computed(() => Math.max(1, Math.ceil(totalAssets.value / PAGE_SIZE)));
+const pageNumbers = computed<(number | 'ellipsis')[]>(() => {
+  if (totalPages.value <= 7) {
+    return Array.from({ length: totalPages.value }, (_, index) => index + 1);
+  }
+
+  if (currentPage.value <= 4) {
+    return [1, 2, 3, 4, 5, 'ellipsis', totalPages.value];
+  }
+
+  if (currentPage.value >= totalPages.value - 3) {
+    return [1, 'ellipsis', totalPages.value - 4, totalPages.value - 3, totalPages.value - 2, totalPages.value - 1, totalPages.value];
+  }
+
+  return [1, 'ellipsis', currentPage.value - 1, currentPage.value, currentPage.value + 1, 'ellipsis', totalPages.value];
+});
 
 const showUploadModal = ref(false);
 const showEditModal = ref(false);
@@ -87,14 +132,25 @@ const getFileExtension = (url: string): string => {
   return url.split('.').pop()?.toLowerCase() || '';
 };
 
-const fetchAssets = async () => {
+const fetchAssets = async (page = currentPage.value) => {
   loading.value = true;
   try {
-    const res: any = await $fetch('/api/media', { method: 'GET' });
+    const res: any = await $fetch('/api/media', {
+      method: 'GET',
+      query: { offset: (page - 1) * PAGE_SIZE, limit: PAGE_SIZE }
+    });
+
     if (res?.success && res?.data) {
       assets.value = res.data;
     } else if (Array.isArray(res)) {
       assets.value = res;
+    }
+
+    currentPage.value = page;
+    totalAssets.value = Number(res?.pagination?.total) || assets.value.length;
+
+    if (!assets.value.length && page > 1 && totalAssets.value > 0) {
+      await fetchAssets(page - 1);
     }
   } catch (error) {
     toast.error('خطا در دریافت لیست فایل‌ها.');
@@ -105,7 +161,12 @@ const fetchAssets = async () => {
 
 const handleAssetUploaded = () => {
   showUploadModal.value = false;
-  fetchAssets();
+  fetchAssets(1);
+};
+
+const goToPage = (page: number) => {
+  if (page < 1 || page > totalPages.value || page === currentPage.value) return;
+  fetchAssets(page);
 };
 
 const openEditModal = (asset: Asset) => {
