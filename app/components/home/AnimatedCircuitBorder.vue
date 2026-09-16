@@ -1,5 +1,5 @@
 <template>
-  <div ref="circuitFrameRef" class="circuit-border" aria-hidden="true">
+  <div ref="circuitFrameRef" class="circuit-border" :class="{ 'circuit-border--signal': animation === 'signal' }" aria-hidden="true">
     <svg
       class="absolute inset-0 size-full overflow-visible"
       viewBox="0 0 1000 700"
@@ -8,24 +8,32 @@
     >
       <path :d="circuitPath" class="circuit-border__halo" />
       <path :d="circuitPath" class="circuit-border__rail" />
-      <CircuitFluidPulse :path="circuitPath" :duration="duration" />
+      <CircuitFluidPulse v-if="animation === 'pulse'" :path="circuitPath" :duration="duration" />
     </svg>
 
-    <span class="circuit-border__terminal" :style="topTerminalStyle" />
+    <CircuitBorderSignal v-if="animation === 'signal'"
+      :points="circuitPoints" :frame-size="frameSize" :junction-y="junctionY"
+      :duration="duration" :show-end-node="showEndNode" />
 
-    <span class="circuit-border__junctions" :style="junctionStyle">
-      <i v-for="dot in 3" :key="dot" :class="{ 'is-active': dot === 2 }" />
-    </span>
+    <template v-else>
+      <span class="circuit-border__terminal" :style="topTerminalStyle" />
 
-    <span v-if="showEndNode" class="circuit-border__terminal" :style="endTerminalStyle" />
+      <span class="circuit-border__junctions" :style="junctionStyle">
+        <i v-for="dot in 3" :key="dot" :class="{ 'is-active': dot === 2 }" />
+      </span>
+
+      <span v-if="showEndNode" class="circuit-border__terminal" :style="endTerminalStyle" />
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 import CircuitFluidPulse from './CircuitFluidPulse.vue'
+import CircuitBorderSignal from './CircuitBorderSignal.vue'
 import { useCircuitGeometry } from '~/composables/useCircuitGeometry'
 
+// Place inside a relatively positioned section frame. Anchors use the 1000 × 700 viewBox.
 const props = withDefaults(defineProps<{
   side?: 'left' | 'right'
   topAnchorX?: number
@@ -34,19 +42,21 @@ const props = withDefaults(defineProps<{
   junctionY?: number
   duration?: number
   showEndNode?: boolean
+  animation?: 'pulse' | 'signal'
 }>(), {
   side: 'left',
   topAnchorX: 500,
-  bottomAnchorX: 215,
   bottomY: 610,
   junctionY: 476,
-  duration: 7200,
+  duration: 9000,
   showEndNode: true,
+  animation: 'signal',
 })
 
-const { circuitFrameRef, topCornerOffset, bottomCornerOffset } = useCircuitGeometry()
+const { circuitFrameRef, frameSize, topCornerOffset, bottomCornerOffset } = useCircuitGeometry()
+const bottomAnchorX = computed(() => props.bottomAnchorX ?? (props.side === 'right' ? 785 : 215))
 
-const circuitPath = computed(() => {
+const circuitPoints = computed<[number, number][]>(() => {
   const edgeX = props.side === 'left' ? 18 : 982
   const topCornerX = props.side === 'left'
     ? edgeX + topCornerOffset.value
@@ -56,14 +66,17 @@ const circuitPath = computed(() => {
     : edgeX - bottomCornerOffset.value
 
   return [
-    `M${props.topAnchorX} 30`,
-    `H${topCornerX}`,
-    `L${edgeX} 74`,
-    `V${props.bottomY - 58}`,
-    `L${bottomCornerX} ${props.bottomY}`,
-    `H${props.bottomAnchorX}`,
-  ].join('')
+    [props.topAnchorX, 30],
+    [topCornerX, 30],
+    [edgeX, 74],
+    [edgeX, props.bottomY - 58],
+    [bottomCornerX, props.bottomY],
+    [bottomAnchorX.value, props.bottomY],
+  ]
 })
+
+const circuitPath = computed(() => circuitPoints.value
+  .map(([x, y], index) => `${index === 0 ? 'M' : 'L'}${x} ${y}`).join(''))
 
 const pointStyle = (x: number, y: number) => ({
   left: `calc(${x / 10}% - 0.375rem)`,
@@ -71,7 +84,7 @@ const pointStyle = (x: number, y: number) => ({
 })
 
 const topTerminalStyle = computed(() => pointStyle(props.topAnchorX, 30))
-const endTerminalStyle = computed(() => pointStyle(props.bottomAnchorX, props.bottomY))
+const endTerminalStyle = computed(() => pointStyle(bottomAnchorX.value, props.bottomY))
 const junctionStyle = computed(() => ({
   left: props.side === 'left'
     ? 'calc(1.8% - 0.3125rem)'
@@ -93,6 +106,17 @@ const junctionStyle = computed(() => ({
 .circuit-border__rail {
   fill: none;
   vector-effect: non-scaling-stroke;
+}
+
+.circuit-border--signal .circuit-border__halo {
+  opacity: 0;
+}
+
+.circuit-border--signal .circuit-border__rail {
+  stroke: var(--color-primary);
+  stroke-width: 1;
+  opacity: 1;
+  stroke-linejoin: round;
 }
 
 .circuit-border__halo {

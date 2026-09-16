@@ -4,7 +4,7 @@
     <AboutSection :page="page" />
     <OrderProcess :page="page" />
     <Catalogue />
-    <CertificateCarousel :data="certificatePage" />
+    <CertificateCarousel :data="certificatePage" border-side="left" />
     <BrandPromisses :page="page" />
     <BrandsSection :brands="page?.content?.brands || []" />
   </div>

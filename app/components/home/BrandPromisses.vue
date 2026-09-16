@@ -1,7 +1,7 @@
 <template>
   <section class="relative w-full overflow-visible" dir="rtl">
     <div class="relative mx-auto max-w-[1880px] overflow-visible px-5">
-      <AnimatedCircuitBorder :bottom-y="650" />
+      <AnimatedCircuitBorder side="right" :bottom-y="650" />
 
       <div class="container relative z-20 mx-auto px-10 pt-16 pb-20 md:px-12 lg:px-16">
     <div class="flex flex-col items-center text-center mb-10 px-4">

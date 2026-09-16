@@ -1,7 +1,7 @@
 <template>
   <section v-if="certificates.length" class="relative overflow-x-clip overflow-y-visible bg-base-100 text-base-content select-none">
     <div class="relative mx-auto min-h-170 max-w-[1880px] overflow-visible px-5">
-      <AnimatedCircuitBorder side="right" :bottom-anchor-x="785" :bottom-y="610" />
+      <AnimatedCircuitBorder :side="borderSide" :bottom-y="610" />
 
       <div class="relative z-20 pt-16 pb-12">
     <div class="mb-12 flex flex-col items-center px-4 text-center md:mb-16">
@@ -113,9 +113,12 @@ import AnimatedCircuitBorder from './AnimatedCircuitBorder.vue'
 import type { StyleValue } from 'vue'
 import type { CertificatePageData } from '~/composables/useCertificates'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   data: CertificatePageData | null
-}>()
+  borderSide?: 'left' | 'right'
+}>(), {
+  borderSide: 'right',
+})
 
 const config = useRuntimeConfig()
 const carouselStage = ref<HTMLElement | null>(null)
