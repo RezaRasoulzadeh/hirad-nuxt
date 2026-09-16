@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full space-y-6">
+  <div class="w-full space-y-6 pb-48 sm:pb-28 lg:pb-24">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-base-100 p-6 rounded-2xl border border-base-200 shadow-sm">
       <div>
         <h1 class="text-2xl font-bold text-base-content">مدیریت رسانه‌ها</h1>
@@ -47,29 +47,31 @@
       </div>
     </div>
 
-    <div v-if="totalAssets > 0" class="flex flex-col items-center justify-between gap-4 rounded-2xl border border-base-200 bg-base-100 p-4 shadow-sm sm:flex-row">
-      <p class="text-xs text-base-content/60 sm:text-sm">
-        نمایش {{ ((currentPage - 1) * PAGE_SIZE) + 1 }} تا {{ Math.min(currentPage * PAGE_SIZE, totalAssets) }} از {{ totalAssets }} رسانه
-      </p>
+    <div v-if="totalAssets > 0" class="fixed inset-x-0 bottom-20 z-30 border-t border-base-200 bg-base-100/95 shadow-[0_-6px_20px_rgba(0,0,0,0.06)] backdrop-blur-sm lg:bottom-0 lg:right-80">
+      <div class="container mx-auto flex flex-col items-center justify-between gap-4 p-4 sm:flex-row">
+        <p class="text-xs text-base-content/60 sm:text-sm">
+          نمایش {{ ((currentPage - 1) * PAGE_SIZE) + 1 }} تا {{ Math.min(currentPage * PAGE_SIZE, totalAssets) }} از {{ totalAssets }} رسانه
+        </p>
 
-      <div v-if="totalPages > 1" class="flex items-center gap-1" dir="ltr">
-        <button type="button" class="btn btn-sm btn-ghost" :disabled="currentPage === 1 || loading" aria-label="صفحه قبلی"
-          @click="goToPage(currentPage - 1)">
-          قبلی
-        </button>
-
-        <template v-for="(page, index) in pageNumbers" :key="`${page}-${index}`">
-          <span v-if="page === 'ellipsis'" class="px-1 text-base-content/50">…</span>
-          <button v-else type="button" class="btn btn-sm min-w-9" :class="page === currentPage ? 'btn-primary' : 'btn-ghost'"
-            :aria-current="page === currentPage ? 'page' : undefined" :disabled="loading" @click="goToPage(page)">
-            {{ page }}
+        <div v-if="totalPages > 1" class="flex items-center gap-1" dir="ltr">
+          <button type="button" class="btn btn-sm btn-ghost" :disabled="currentPage === 1 || loading" aria-label="صفحه قبلی"
+            @click="goToPage(currentPage - 1)">
+            قبلی
           </button>
-        </template>
 
-        <button type="button" class="btn btn-sm btn-ghost" :disabled="currentPage === totalPages || loading" aria-label="صفحه بعدی"
-          @click="goToPage(currentPage + 1)">
-          بعدی
-        </button>
+          <template v-for="(page, index) in pageNumbers" :key="`${page}-${index}`">
+            <span v-if="page === 'ellipsis'" class="px-1 text-base-content/50">…</span>
+            <button v-else type="button" class="btn btn-sm min-w-9" :class="page === currentPage ? 'btn-primary' : 'btn-ghost'"
+              :aria-current="page === currentPage ? 'page' : undefined" :disabled="loading" @click="goToPage(page)">
+              {{ page }}
+            </button>
+          </template>
+
+          <button type="button" class="btn btn-sm btn-ghost" :disabled="currentPage === totalPages || loading" aria-label="صفحه بعدی"
+            @click="goToPage(currentPage + 1)">
+            بعدی
+          </button>
+        </div>
       </div>
     </div>
 
