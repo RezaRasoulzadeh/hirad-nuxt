@@ -16,7 +16,7 @@
       <div class="rounded-3xl border border-base-300/70 bg-base-100/95 p-4 md:p-7">
         <div ref="brandsGridViewportRef" class="brands-grid-viewport" :style="{ maxHeight: brandsGridMaxHeight }">
         <div ref="brandsGridRef" :id="brandsGridId" class="brands-grid grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 2xl:grid-cols-10">
-          <a v-for="(brand, index) in brands" :key="`${brand.name}-${index}`"
+          <a v-for="brand in shuffledBrands" :key="`${brand.name}-${brand.logo_url}`"
             :href="brand.website_url || undefined" :target="brand.website_url ? '_blank' : undefined"
             :rel="brand.website_url ? 'noopener noreferrer' : undefined"
             class="group flex min-h-20 items-center justify-center rounded-xl border border-base-300 bg-base-100 p-4 text-center"
@@ -55,15 +55,32 @@ import { ChevronDown } from 'lucide-vue-next'
 import AnimatedCircuitBorder from './AnimatedCircuitBorder.vue'
 import type { HomeBrand } from '~/composables/useHomePage'
 
-defineProps<{ brands: HomeBrand[] }>()
+const props = defineProps<{ brands: HomeBrand[] }>()
 
 const showAllBrands = ref(false)
+const shuffledBrands = ref<HomeBrand[]>(props.brands)
 const brandsPanelRef = ref<HTMLElement | null>(null)
 const brandsGridViewportRef = ref<HTMLElement | null>(null)
 const brandsGridRef = ref<HTMLElement | null>(null)
 const brandsGridMaxHeight = ref('11.75rem')
 const brandsGridId = useId()
 let brandsGridResizeObserver: ResizeObserver | undefined
+let hasMounted = false
+
+const shuffleBrands = (brands: HomeBrand[]) => {
+  const shuffled = [...brands]
+
+  for (let index = shuffled.length - 1; index > 0; index--) {
+    const randomIndex = Math.floor(Math.random() * (index + 1))
+    ;[shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]]
+  }
+
+  if (shuffled.length > 1 && shuffled.every((brand, index) => brand === brands[index])) {
+    ;[shuffled[0], shuffled[1]] = [shuffled[1], shuffled[0]]
+  }
+
+  return shuffled
+}
 
 const updateBrandsGridHeight = () => {
   if (showAllBrands.value && brandsGridRef.value) {
@@ -79,11 +96,18 @@ const collapseOnOutsideClick = (event: MouseEvent) => {
 
 onMounted(() => document.addEventListener('click', collapseOnOutsideClick))
 onMounted(() => {
+  hasMounted = true
+  shuffledBrands.value = shuffleBrands(props.brands)
+
   if (typeof ResizeObserver !== 'undefined' && brandsGridRef.value) {
     brandsGridResizeObserver = new ResizeObserver(updateBrandsGridHeight)
     brandsGridResizeObserver.observe(brandsGridRef.value)
   }
 })
+
+watch(() => props.brands, (brands) => {
+  shuffledBrands.value = hasMounted ? shuffleBrands(brands) : brands
+}, { immediate: true })
 
 watch(showAllBrands, async (expanded) => {
   await nextTick()
