@@ -1,20 +1,7 @@
 <template>
   <section class="relative w-full overflow-visible bg-base-100" dir="rtl">
-    <div ref="circuitFrameRef" class="relative mx-auto min-h-170 max-w-[1880px] overflow-visible px-5">
-      <div class="pointer-events-none absolute inset-0 z-10 hidden md:block" aria-hidden="true">
-        <svg class="absolute inset-0 size-full overflow-visible" viewBox="0 0 1000 700" fill="none"
-          preserveAspectRatio="none">
-          <path :d="`M500 30H${18 + topCornerOffset}L18 74V552L${18 + bottomCornerOffset} 610H215`"
-            class="order-circuit-line" />
-          <CircuitFluidPulse
-            :path="`M500 30H${18 + topCornerOffset}L18 74V552L${18 + bottomCornerOffset} 610H215`" />
-        </svg>
-        <i class="absolute top-[calc(4.286%_-_0.3125rem)] left-[calc(50%_-_0.3125rem)] size-2.5 rounded-full bg-primary" />
-        <span class="absolute top-[68%] left-[calc(1.8%_-_0.3125rem)] flex flex-col gap-2">
-          <i v-for="dot in 3" :key="dot" class="size-2.5 rounded-full bg-primary" />
-        </span>
-        <i class="absolute top-[calc(87.143%_-_0.3125rem)] left-[calc(21.5%_-_0.3125rem)] size-2.5 rounded-full bg-primary" />
-      </div>
+    <div class="relative mx-auto min-h-170 max-w-[1880px] overflow-visible px-5">
+      <AnimatedCircuitBorder :bottom-y="610" />
 
       <div class="container relative z-20 mx-auto px-10 pt-16 pb-12 md:px-12 lg:px-16">
       <div class="mb-12 flex flex-col items-center text-center md:mb-16">
@@ -77,14 +64,12 @@
 </template>
 
 <script setup lang="ts">
-import { useCircuitGeometry } from '~/composables/useCircuitGeometry'
 import { computed } from 'vue'
-import CircuitFluidPulse from './CircuitFluidPulse.vue'
+import AnimatedCircuitBorder from './AnimatedCircuitBorder.vue'
 import type { HomePage } from '~/composables/useHomePage'
 import placeholderImage from '~/assets/placeholder.png'
 import { normalizeLocalAssetUrl } from '~/utils/resolveAssetUrl'
 
-const { circuitFrameRef, topCornerOffset, bottomCornerOffset } = useCircuitGeometry()
 const props = defineProps<{ page?: HomePage | null }>()
 const config = useRuntimeConfig()
 const apiBase = config.public.apiBase || '/api'
@@ -160,11 +145,3 @@ const usePlaceholder = (event: Event) => {
   image.src = normalizeLocalAssetUrl(placeholderImage)
 }
 </script>
-
-<style scoped>
-.order-circuit-line {
-  stroke: var(--color-primary);
-  stroke-width: 1.25;
-  vector-effect: non-scaling-stroke;
-}
-</style>

@@ -3,19 +3,13 @@
     class="relative z-1 overflow-visible px-3 py-8 2xl:pt-16 md:bg-[url('~/assets/About-Section-BG.jpg')] md:bg-size-[70vw_auto] md:bg-center md:bg-no-repeat md:px-5 md:py-12 2xl:bg-size-[60vw_auto] 2xl:bg-position-[2rem_center]"
     dir="rtl">
     <div ref="sectionContentRef" class="relative mx-auto min-h-170 max-w-[1880px] overflow-visible">
-      <div class="pointer-events-none absolute inset-0 z-10 hidden md:block" aria-hidden="true">
-        <svg class="absolute inset-0 size-full overflow-visible" viewBox="0 0 1000 700" fill="none"
-          preserveAspectRatio="none">
-          <path :d="circuitPath" class="about-circuit-line" />
-          <CircuitFluidPulse :path="circuitPath" />
-        </svg>
-
-        <i
-          class="absolute top-[calc(4.286%-0.3125rem)] left-[calc(71.5%-0.3125rem)] size-2.5 rounded-full bg-primary lg:left-[calc(72.5%-0.3125rem)]" />
-        <span class="absolute top-[68%] right-[calc(1.8%-0.3125rem)] flex flex-col gap-2">
-          <i v-for="dot in 3" :key="dot" class="size-2.5 rounded-full bg-primary" />
-        </span>
-      </div>
+      <AnimatedCircuitBorder
+        side="right"
+        :top-anchor-x="isLargeScreen ? 725 : 715"
+        :bottom-anchor-x="785"
+        :bottom-y="bottomLineY"
+        :show-end-node="false"
+      />
 
       <div
         class="relative z-20 flex min-h-170 items-center px-5 py-10 sm:px-8 md:ml-auto md:w-[57%] md:px-12 md:py-16 lg:w-[55%] lg:px-16 2xl:px-24">
@@ -62,16 +56,11 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { ChevronLeft, Factory, Globe2, UsersRound } from 'lucide-vue-next'
-import CircuitFluidPulse from './CircuitFluidPulse.vue'
+import AnimatedCircuitBorder from './AnimatedCircuitBorder.vue'
 import type { HomeAboutSection, HomePage } from '~/composables/useHomePage'
-import { useCircuitGeometry } from '~/composables/useCircuitGeometry'
 
 const props = defineProps<{ page?: HomePage | null }>()
-const {
-  circuitFrameRef: sectionContentRef,
-  topCornerOffset,
-  bottomCornerOffset,
-} = useCircuitGeometry()
+const sectionContentRef = ref<HTMLElement | null>(null)
 const ctaRowRef = ref<HTMLElement | null>(null)
 const bottomLineY = ref(590)
 const isLargeScreen = ref(false)
@@ -81,11 +70,6 @@ let circuitMediaQuery: MediaQueryList | undefined
 const updateCircuitVariant = (event: MediaQueryListEvent) => {
   isLargeScreen.value = event.matches
 }
-
-const circuitPath = computed(() => {
-  const startX = isLargeScreen.value ? 725 : 715
-  return `M${startX} 30H${982 - topCornerOffset.value}L982 74V${bottomLineY.value - 58}L${982 - bottomCornerOffset.value} ${bottomLineY.value}H785`
-})
 
 const defaultAbout: HomeAboutSection = {
   eyebrow: 'About Hirad',
@@ -147,11 +131,3 @@ onBeforeUnmount(() => {
   circuitMediaQuery?.removeEventListener('change', updateCircuitVariant)
 })
 </script>
-
-<style scoped>
-.about-circuit-line {
-  stroke: var(--color-primary);
-  stroke-width: 1.25;
-  vector-effect: non-scaling-stroke;
-}
-</style>
