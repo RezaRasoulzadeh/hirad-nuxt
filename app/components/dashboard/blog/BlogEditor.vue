@@ -301,6 +301,7 @@ import BlogPreview from './BlogPreview.vue'
 import MediaUploadModal from '~/components/dashboard/media/MediaUploadModal.vue'
 import { ArrowDown, ArrowUp, Code2, Heading, ImageIcon, LetterTextIcon, Link, List, Quote, Video, X, Eye, WifiOff, SearchX, FilePlus, Trash } from 'lucide-vue-next'
 import { useBlogEditor, type BlockType } from '~/composables/useBlogEditor'
+import { useDashboardConfirm } from '~/composables/useDashboardConfirm'
 
 interface Asset {
   id: string
@@ -320,6 +321,7 @@ const blockTypes = [
 ]
 
 const config = useRuntimeConfig()
+const confirm = useDashboardConfirm()
 const {
   formData,
   previewMode,
@@ -351,12 +353,14 @@ const handleCancel = () => {
   navigateTo('/dashboard/blog')
 }
 
-onBeforeRouteLeave((to, from, next) => {
-  if (isDirty && !confirm('تغییرات ذخیره نشده است. آیا مایل به خروج هستید؟')) {
-    next(false)
-  } else {
-    next()
-  }
+onBeforeRouteLeave(async () => {
+  if (!isDirty) return true
+  return await confirm({
+    title: 'تغییرات ذخیره نشده',
+    message: 'تغییرات ذخیره نشده است. آیا مایل به خروج هستید؟',
+    confirmLabel: 'خروج بدون ذخیره',
+    variant: 'danger'
+  })
 })
 
 const isMediaModalOpen = ref(false)

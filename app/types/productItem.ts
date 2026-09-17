@@ -25,6 +25,11 @@ export interface ProductItem {
   updated_at?: string | null;
 }
 
+export interface ProductCategoryAction {
+  product: ProductItem;
+  categorySlug: string;
+}
+
 export interface ProductApiResponse {
   code?: number;
   success: boolean;

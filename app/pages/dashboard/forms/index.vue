@@ -119,7 +119,8 @@
                 <MailIcon v-else class="h-4 w-4" />
               </button>
               <button
-                @click="removeSubmission(item.id)"
+                @click="handleRemove(item.id)"
+                :disabled="removingSubmissionId !== null"
                 class="btn btn-ghost btn-sm text-error"
                 title="حذف"
               >
@@ -164,6 +165,7 @@ interface FormSubmission {
 }
 
 const { forms, status, error, refresh, toggleReadStatus, removeSubmission } = useForms();
+const confirm = useDashboardConfirm();
 
 const selectedDepartment = ref<string>('');
 const searchTerm = ref<string>('');
@@ -171,6 +173,7 @@ const sortBy = ref<string>('submitted_at');
 const sortDirection = ref<'asc' | 'desc'>('desc');
 const isModalOpen = ref(false);
 const selectedMessage = ref<FormSubmission | null>(null);
+const removingSubmissionId = ref<string | null>(null);
 
 const unreadCount = computed(() => forms.value.filter((s) => !s.is_processed).length);
 
@@ -223,9 +226,27 @@ const uniqueDepartments = computed(() => {
   return [...departments];
 });
 
-function handleRemove(id: string) {
-  removeSubmission(id);
-  closeModal();
+async function handleRemove(id: string) {
+  if (removingSubmissionId.value !== null) return;
+  const submission = forms.value.find(item => item.id === id);
+  if (!submission) return;
+  const isOpenSubmission = selectedMessage.value?.id === id;
+
+  removingSubmissionId.value = id;
+  try {
+    const confirmed = await confirm({
+      title: 'حذف پیام',
+      message: `آیا از حذف پیام «${submission.data.name}» اطمینان دارید؟`,
+      confirmLabel: 'حذف پیام',
+      variant: 'danger'
+    });
+    if (!confirmed) return;
+
+    const removed = await removeSubmission(id);
+    if (removed && isOpenSubmission) closeModal();
+  } finally {
+    removingSubmissionId.value = null;
+  }
 }
 
 watch(

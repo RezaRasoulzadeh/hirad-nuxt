@@ -35,10 +35,14 @@
 import { ref, watch } from 'vue'
 import { ChevronRight, ChevronDown } from 'lucide-vue-next'
 import ChildCategoryItem from '~/components/dashboard/product/ProductCategoryChild.vue'
-import type { ProductItem } from '~/types/productItem'
+import type { ProductCategoryAction, ProductItem } from '~/types/productItem'
 import type { CategoryItem } from '~/types/categoryItem'
 
-const emit = defineEmits(['edit', 'duplicate', 'remove'])
+const emit = defineEmits<{
+  edit: [slug: string]
+  duplicate: [action: ProductCategoryAction]
+  remove: [action: ProductCategoryAction]
+}>()
 
 interface ChildCategory extends CategoryItem {
   products?: ProductItem[] | null
@@ -104,12 +108,7 @@ const fetchProducts = async (categorySlug: string) => {
   }
 }
 
-const handleProductRemoval = (slug: string) => {
-  for (const child of localChildren.value) {
-    if (child.products) {
-      child.products = child.products.filter(p => p.slug !== slug)
-    }
-  }
-  emit('remove', slug)
+const handleProductRemoval = (action: ProductCategoryAction) => {
+  emit('remove', action)
 }
 </script>

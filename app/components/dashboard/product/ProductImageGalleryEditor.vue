@@ -60,6 +60,7 @@ import { computed } from 'vue'
 import { FilePlus, Trash } from 'lucide-vue-next'
 import { useRuntimeConfig } from '#imports'
 import type { ProductImage } from '~/composables/useProductList';
+import { useDashboardConfirm } from '~/composables/useDashboardConfirm'
 
 
 const props = defineProps<{
@@ -73,6 +74,7 @@ const emit = defineEmits<{
 }>()
 
 const config = useRuntimeConfig()
+const confirm = useDashboardConfirm()
 const getThumbnailUrl = (img: ProductImage) => {
   const base = config.public.apiBase || '/api'
   return `${base}${img.image_url}`
@@ -86,17 +88,23 @@ const secondaryImages = computed(() => {
     .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
 })
 
-const onRemoveImage = (assetId?: string) => {
+const onRemoveImage = async (assetId?: string) => {
   if (!assetId) return
-  if (window.confirm('آیا از حذف این تصویر اطمینان دارید؟')) {
+  const confirmed = await confirm({
+    title: 'حذف تصویر',
+    message: 'آیا از حذف این تصویر اطمینان دارید؟',
+    confirmLabel: 'حذف تصویر',
+    variant: 'danger'
+  })
+  if (confirmed) {
     emit('remove-image', assetId)
   }
 }
 
-const onRemovePrimary = () => {
+const onRemovePrimary = async () => {
   const assetId = primaryImage.value?.media_asset_id
   if (!assetId) return
-  onRemoveImage(assetId)
+  await onRemoveImage(assetId)
 }
 
 const onSetPrimary = (assetId?: string) => {

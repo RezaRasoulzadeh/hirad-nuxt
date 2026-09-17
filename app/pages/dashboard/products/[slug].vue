@@ -168,11 +168,13 @@ import MediaManagerModal from '~/components/dashboard/media/MediaSelector.vue'
 import ProductImageGalleryEditor from '~/components/dashboard/product/ProductImageGalleryEditor.vue'
 import LongDescriptionSection from '~/components/dashboard/product/ProductLongDes.vue'
 import FeaturesSection from '~/components/dashboard/product/FeaturesSection.vue'
+import { useDashboardConfirm } from '~/composables/useDashboardConfirm'
 
 definePageMeta({ layout: 'dashboard' })
 
 const route = useRoute()
 const router = useRouter()
+const confirm = useDashboardConfirm()
 const formEl = ref<HTMLFormElement | null>(null)
 const categories = ref<Array<{ id: string; name: string }>>([])
 const checkingAuth = ref(true)
@@ -280,8 +282,13 @@ const onSubmit = async () => {
   }
 }
 
-const goBack = () => {
-  if (hasUnsavedChanges.value && !window.confirm('تغییرات ذخیره نشده رها شوند؟')) return
+const goBack = async () => {
+  if (hasUnsavedChanges.value && !await confirm({
+    title: 'تغییرات ذخیره نشده',
+    message: 'تغییرات ذخیره نشده رها شوند؟',
+    confirmLabel: 'رها کردن تغییرات',
+    variant: 'danger'
+  })) return
   router.push('/dashboard/products')
 }
 

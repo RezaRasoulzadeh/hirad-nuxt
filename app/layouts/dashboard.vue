@@ -26,6 +26,11 @@
         <slot />
       </main>
       <GlobalToast />
+      <DashboardConfirmDialog
+        :request="activeConfirmation?.options ?? null"
+        @confirm="settleConfirmation(true)"
+        @cancel="settleConfirmation(false)"
+      />
 
       <div class="dock dock-md lg:hidden border-t border-base-300 bg-base-100 z-30">
         <NuxtLink 
@@ -75,17 +80,47 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { provide, ref, shallowRef } from 'vue';
 import { 
   Menu, LogOut, LayoutDashboard,
   FolderTree, Package, Image, FileText, 
   Mail, Bell, Settings 
 } from 'lucide-vue-next';
 import GlobalToast from '~/components/shared/GlobalToast.vue';
+import DashboardConfirmDialog from '~/components/dashboard/DashboardConfirmDialog.vue';
+import {
+  dashboardConfirmKey,
+  type DashboardConfirm,
+  type DashboardConfirmOptions
+} from '~/composables/useDashboardConfirm';
+
+interface PendingConfirmation {
+  options: DashboardConfirmOptions;
+  resolve: (confirmed: boolean) => void;
+}
 
 const auth = useAuth();
 const toast = useToast();
 const isDrawerOpen = ref(false);
+const activeConfirmation = shallowRef<PendingConfirmation | null>(null);
+const confirmationQueue: PendingConfirmation[] = [];
+
+const requestConfirmation: DashboardConfirm = (options) => new Promise((resolve) => {
+  confirmationQueue.push({ options, resolve });
+  if (!activeConfirmation.value) {
+    activeConfirmation.value = confirmationQueue.shift() ?? null;
+  }
+});
+
+const settleConfirmation = (confirmed: boolean) => {
+  const pending = activeConfirmation.value;
+  if (!pending) return;
+
+  activeConfirmation.value = confirmationQueue.shift() ?? null;
+  pending.resolve(confirmed);
+};
+
+provide(dashboardConfirmKey, requestConfirmation);
 
 const navigationItems = [
   { name: 'داشبورد', path: '/dashboard', icon: LayoutDashboard },

@@ -66,6 +66,7 @@ import { ref, computed, nextTick } from 'vue';
 import CategoryParentGroup from '~/components/dashboard/category/CategoryParentGroup.vue';
 import CategoryWorkspaceModal from '~/components/dashboard/category/CategoryWorkspaceModal.vue';
 import { useToast } from '~/composables/useToast';
+import { useDashboardConfirm } from '~/composables/useDashboardConfirm';
 import { getApiErrorMessage } from '~/utils/apiFeedback';
 
 definePageMeta({
@@ -93,6 +94,7 @@ interface ApiResponse {
 }
 
 const toast = useToast();
+const confirm = useDashboardConfirm();
 const isWorkspaceModalOpen = ref(false);
 const isPageEditorOpen = ref(false);
 
@@ -247,7 +249,12 @@ const removeCategory = async (categoryId: number | string) => {
     return;
   }
 
-  const confirmed = window.confirm('آیا از حذف این دسته‌بندی و تمام زیرمجموعه‌های آن اطمینان دارید؟');
+  const confirmed = await confirm({
+    title: 'حذف دسته‌بندی',
+    message: 'آیا از حذف این دسته‌بندی و تمام زیرمجموعه‌های آن اطمینان دارید؟',
+    confirmLabel: 'حذف دسته‌بندی',
+    variant: 'danger'
+  });
   if (!confirmed) return;
   const flattenDeepestFirst = (node: CategoryNode): CategoryNode[] => {
     const result: CategoryNode[] = [];

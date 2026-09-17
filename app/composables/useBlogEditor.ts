@@ -1,4 +1,5 @@
 import { ref, computed, watch } from 'vue'
+import { useDashboardConfirm } from '~/composables/useDashboardConfirm'
 
 export type BlockType = 'code' | 'link' | 'video' | 'image' | 'paragraph' | 'heading' | 'quote' | 'list'
 
@@ -44,6 +45,7 @@ export interface BlogFormData {
 }
 
 export async function useBlogEditor() {
+  const confirm = useDashboardConfirm()
   const route = useRoute()
   const router = useRouter()
   const config = useRuntimeConfig()
@@ -185,8 +187,14 @@ export async function useBlogEditor() {
     formData.value.content.body = [...formData.value.content.body, newBlock]
   }
 
-  function removeBlock(index: number): void {
-    if (!window.confirm('آیا از حذف این بلوک اطمینان دارید؟')) return
+  async function removeBlock(index: number): Promise<void> {
+    const confirmed = await confirm({
+      title: 'حذف بلوک',
+      message: 'آیا از حذف این بلوک اطمینان دارید؟',
+      confirmLabel: 'حذف بلوک',
+      variant: 'danger'
+    })
+    if (!confirmed) return
     const blocks = [...formData.value.content.body]
     blocks.splice(index, 1)
     formData.value.content.body = blocks

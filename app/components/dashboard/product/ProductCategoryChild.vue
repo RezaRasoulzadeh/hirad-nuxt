@@ -67,7 +67,7 @@
               title="انتقال به پایین" @click.stop="moveProduct(index, 1)"><ArrowDown class="size-4" /></button>
             <div class="tooltip tooltip-top" data-tip="کپی محصول">
               <button 
-                @click.stop="$emit('duplicate', product.slug)"
+                @click.stop="emit('duplicate', { product, categorySlug: childCategory.slug })"
                 class="btn btn-square btn-sm btn-ghost text-info hover:bg-info/10"
               >
                 <Copy class="w-4 h-4" />
@@ -76,7 +76,7 @@
 
             <div class="tooltip tooltip-top" data-tip="ویرایش محصول">
               <button 
-                @click.stop="$emit('edit', product.slug)"
+                @click.stop="emit('edit', product.slug)"
                 class="btn btn-square btn-sm btn-ghost text-base-content/70 hover:bg-base-content/10"
               >
                 <PenSquare class="w-4 h-4" />
@@ -85,7 +85,7 @@
 
             <div class="tooltip tooltip-top" data-tip="حذف محصول">
               <button 
-                @click.stop="$emit('remove-product', product.slug)"
+                @click.stop="emit('remove-product', { product, categorySlug: childCategory.slug })"
                 class="btn btn-square btn-sm btn-ghost text-error hover:bg-error/10"
               >
                 <Trash class="w-4 h-4" />
@@ -109,12 +109,18 @@
 import { ref, watch } from 'vue'
 import { ArrowDown, ArrowUp, ChevronRight, ChevronDown, Copy, GripVertical, PenSquare, Trash } from 'lucide-vue-next'
 import { useRuntimeConfig } from '#imports'
-import type { ProductItem } from '~/types/productItem'
+import type { ProductCategoryAction, ProductItem } from '~/types/productItem'
 import type { CategoryItem } from '~/types/categoryItem'
 import { useToast } from '~/composables/useToast'
 import { getApiErrorMessage } from '~/utils/apiFeedback'
 
-const emit = defineEmits(['toggle', 'fetch-products', 'edit', 'remove-product', 'duplicate'])
+const emit = defineEmits<{
+  toggle: [categorySlug: string]
+  'fetch-products': [categorySlug: string]
+  edit: [slug: string]
+  'remove-product': [action: ProductCategoryAction]
+  duplicate: [action: ProductCategoryAction]
+}>()
 
 interface ChildCategory extends CategoryItem {
   products?: ProductItem[] | null

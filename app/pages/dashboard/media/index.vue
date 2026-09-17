@@ -84,6 +84,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue';
 import { useToast } from '~/composables/useToast';
+import { useDashboardConfirm } from '~/composables/useDashboardConfirm';
 import MediaUploadModal from '~/components/dashboard/media/MediaUploadModal.vue';
 import MediaEditModal from '~/components/dashboard/media/MediaEditModal.vue';
 import MediaPreviewModal from '~/components/dashboard/media/MediaPreviewModal.vue';
@@ -98,6 +99,7 @@ interface Asset {
 
 const config = useRuntimeConfig();
 const toast = useToast();
+const confirm = useDashboardConfirm();
 
 const assets = ref<Asset[]>([]);
 const loading = ref(false);
@@ -197,7 +199,13 @@ const closePreviewModal = () => {
 };
 
 const removeAsset = async (assetId: string) => {
-  if (!window.confirm('آیا از حذف دائمی این رسانه اطمینان دارید؟')) return;
+  const confirmed = await confirm({
+    title: 'حذف رسانه',
+    message: 'آیا از حذف دائمی این رسانه اطمینان دارید؟',
+    confirmLabel: 'حذف رسانه',
+    variant: 'danger'
+  });
+  if (!confirmed) return;
   try {
     await $fetch(`/api/media/${assetId}`, { method: 'DELETE' });
     toast.success('رسانه مورد نظر با موفقیت حذف شد.');

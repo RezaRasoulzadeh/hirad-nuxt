@@ -125,6 +125,7 @@ interface BlogListResponse {
 
 const config = useRuntimeConfig()
 const { success: toastSuccess, error: toastError } = useToast()
+const confirm = useDashboardConfirm()
 
 const { data: blogResponse, status, error, refresh } = await useFetch<BlogListResponse>('/api/blog', {
   lazy: true
@@ -147,7 +148,13 @@ function resolveImage(url: string): string {
 }
 
 async function removeBlogPost(slug: string): Promise<void> {
-  if (!window.confirm(`آیا از حذف مقاله «${slug}» اطمینان دارید؟`)) return
+  const confirmed = await confirm({
+    title: 'حذف مقاله',
+    message: `آیا از حذف مقاله «${slug}» اطمینان دارید؟`,
+    confirmLabel: 'حذف مقاله',
+    variant: 'danger'
+  })
+  if (!confirmed) return
 
   deletingSlug.value = slug
   try {

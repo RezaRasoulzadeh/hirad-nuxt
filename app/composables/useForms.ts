@@ -57,9 +57,9 @@ export function useForms() {
     }
   }
 
-  async function removeSubmission(id: string) {
+  async function removeSubmission(id: string): Promise<boolean> {
     const list = formsData.value?.data;
-    if (!list) return;
+    if (!list) return false;
 
     try {
       await $fetch('/api/forms/submit-form', {
@@ -72,8 +72,10 @@ export function useForms() {
         : formsData.value;
 
       toast.success('پیام با موفقیت حذف شد.');
+      return true;
     } catch (err) {
       toast.error('حذف پیام با خطا مواجه شد.');
+      return false;
     }
   }
 

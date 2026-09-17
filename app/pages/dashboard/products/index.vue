@@ -40,10 +40,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, reactive } from 'vue'
 import { navigateTo } from '#imports'
 import ParentCategoryGroup from '~/components/dashboard/product/ParentCategoryGroup.vue'
 import type { CategoryItem } from '~/types/categoryItem'
+import type { ProductCategoryAction, ProductItem } from '~/types/productItem'
+import { useDashboardConfirm } from '~/composables/useDashboardConfirm'
+import { useToast } from '~/composables/useToast'
 
 definePageMeta({
   layout: 'dashboard'
@@ -67,8 +70,17 @@ interface UiParentCategory extends CategoryNode {
 const loading = ref(true)
 const fetchError = ref(false)
 const rawCategories = ref<CategoryNode[]>([])
+const confirm = useDashboardConfirm()
+const toast = useToast()
 
 const compareOrder = (a: { sort_order?: number | null; name?: string | null }, b: { sort_order?: number | null; name?: string | null }) => {
+  if (a.sort_order == null && b.sort_order == null) return (a.name || '').localeCompare(b.name || '', 'fa')
+  if (a.sort_order == null) return 1
+  if (b.sort_order == null) return -1
+  return a.sort_order - b.sort_order
+}
+
+const compareProductOrder = (a: ProductItem, b: ProductItem) => {
   if (a.sort_order == null && b.sort_order == null) return (a.name || '').localeCompare(b.name || '', 'fa')
   if (a.sort_order == null) return 1
   if (b.sort_order == null) return -1
@@ -98,7 +110,7 @@ const loadDashboardData = async () => {
 
 const parentCategories = computed<UiParentCategory[]>(() => {
   if (!rawCategories.value.length) return []
-  return [...rawCategories.value]
+  return reactive([...rawCategories.value]
     .filter(cat => !cat.parent_id && cat.slug !== 'blog') 
     .map(parent => ({
       ...parent,
@@ -113,62 +125,119 @@ const parentCategories = computed<UiParentCategory[]>(() => {
         }))
         .sort(compareOrder)
     }))
-    .sort(compareOrder)
+    .sort(compareOrder))
 })
 
 const handleEditProduct = (slug: string) => {
   navigateTo(`/dashboard/products/${encodeURIComponent(slug)}`)
 }
 
-const handleDuplicateProduct = async (slug: string) => {
-  const confirmed = window.confirm('آیا از کپی کردن این محصول اطمینان دارید؟')
+const handleDuplicateProduct = async ({ product, categorySlug }: ProductCategoryAction) => {
+  const confirmed = await confirm({
+    title: 'کپی محصول',
+    message: 'آیا از کپی کردن این محصول اطمینان دارید؟',
+    confirmLabel: 'کپی محصول',
+    variant: 'primary'
+  })
   if (!confirmed) return
+
+  const sourceCategory = parentCategories.value
+    .flatMap(parent => parent.children)
+    .find(child => child.slug === categorySlug)
 
   try {
     const response = await $fetch<{ success: boolean; data: any }>(
-      `/api/products/duplicate/${encodeURIComponent(slug)}`,
+      `/api/products/duplicate/${encodeURIComponent(product.slug)}`,
       { method: 'POST' }
     )
 
     if (response?.success && response.data) {
-      const newProduct = response.data
+      const newProduct = response.data as ProductItem & { category_slug?: string }
+      const targetCategory = sourceCategory ?? parentCategories.value
+        .flatMap(parent => parent.children)
+        .find(child => (
+          (!!newProduct.category_slug && child.slug === newProduct.category_slug)
+          || (newProduct.category_id != null && String(child.id) === String(newProduct.category_id))
+        ))
 
-      for (const parent of parentCategories.value) {
-        for (const child of parent.children) {
-          if (child.slug === newProduct.category_slug || child.id === newProduct.category_id) {
-            if (child.products) {
-              child.products.unshift(newProduct)
-            }
-            break
+      if (targetCategory) {
+        const currentProducts = targetCategory.products || []
+        const isAlreadyListed = (products: ProductItem[]) => newProduct.id != null
+          && products.some(product => String(product.id) === String(newProduct.id))
+
+        if (!isAlreadyListed(currentProducts)) {
+          targetCategory.products = [newProduct, ...currentProducts]
+        }
+        targetCategory.productsLoaded = true
+
+        try {
+          const latestResponse = await $fetch<{ data?: ProductItem[] }>('/api/products', {
+            query: { category: targetCategory.slug }
+          })
+
+          if (Array.isArray(latestResponse?.data)) {
+            const latestProducts = [...latestResponse.data]
+            if (!isAlreadyListed(latestProducts)) latestProducts.unshift(newProduct)
+            targetCategory.products = latestProducts.sort(compareProductOrder)
           }
+        } catch (refreshError) {
+          console.error('Could not refresh the product category after duplication:', refreshError)
         }
       }
-      alert('محصول با موفقیت کپی شد.')
+      toast.success('محصول با موفقیت کپی شد.')
     }
   } catch (err) {
     console.error('Duplication flow failed:', err)
-    alert('خطا در کپی برداری محصول.')
+    toast.error('خطا در کپی برداری محصول.')
   }
 }
 
-const handleProductRemoval = async (slug: string) => {
-  const confirmed = window.confirm('آیا از حذف این محصول اطمینان دارید؟')
+const handleProductRemoval = async ({ product, categorySlug }: ProductCategoryAction) => {
+  const productName = product.short_description?.name_fa || product.name || product.slug
+  const confirmed = await confirm({
+    title: 'حذف محصول',
+    message: `آیا از حذف محصول «${productName}» اطمینان دارید؟`,
+    confirmLabel: 'حذف محصول',
+    variant: 'danger'
+  })
   if (!confirmed) return
 
   try {
-    await $fetch(`/api/products/${encodeURIComponent(slug)}`, {
+    await $fetch(`/api/products/${encodeURIComponent(product.slug)}`, {
       method: 'DELETE'
     })
-    
-    for (const parent of parentCategories.value) {
-      for (const child of parent.children) {
-        if (child.products) {
-          child.products = child.products.filter(p => p.slug !== slug)
+
+    const targetCategory = parentCategories.value
+      .flatMap(parent => parent.children)
+      .find(child => child.slug === categorySlug)
+
+    if (targetCategory) {
+      try {
+        const latestResponse = await $fetch<{ data?: ProductItem[] }>('/api/products', {
+          query: { category: targetCategory.slug }
+        })
+
+        if (Array.isArray(latestResponse?.data)) {
+          targetCategory.products = [...latestResponse.data].sort(compareProductOrder)
+          targetCategory.productsLoaded = true
+        } else {
+          throw new Error('Product list refresh returned no product list.')
+        }
+      } catch (refreshError) {
+        console.error('Could not refresh the product category after deletion:', refreshError)
+        const products = targetCategory.products || []
+        const productIndex = product.id != null
+          ? products.findIndex(item => String(item.id) === String(product.id))
+          : products.findIndex(item => item.slug === product.slug)
+        if (productIndex !== -1) {
+          targetCategory.products = products.filter((_, index) => index !== productIndex)
         }
       }
     }
+    toast.success('محصول با موفقیت حذف شد.')
   } catch (err) {
     console.error('Delete target execution failed:', err)
+    toast.error('خطا در حذف محصول.')
   }
 }
 
