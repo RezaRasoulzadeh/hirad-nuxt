@@ -105,6 +105,7 @@
 <script setup lang="ts">
 import {
   Award,
+  BookOpenCheck,
   Headphones,
   Heart,
   House,
@@ -127,6 +128,7 @@ import LogoWide from '~/assets/Logo-wide.png'
 import FooterBackground from '~/assets/Footer-bg.png'
 import FooterPainting from '~/assets/footer-painting.png'
 import contactData from '~/data/contact.json'
+import { resourcesCopy } from '~/data/resources'
 import { normalizeLocalAssetUrl } from '~/utils/resolveAssetUrl'
 
 defineEmits<{
@@ -164,6 +166,7 @@ const items: FooterItem[] = [
   { label: 'صفحه اصلی', to: '/', icon: House },
   { label: 'محصولات', emit: 'open-drawer', icon: ShoppingBag },
   { label: 'مقالات و اخبار', to: '/blog', icon: Newspaper },
+  { label: resourcesCopy.nav.title.fa, to: '/resources', icon: BookOpenCheck },
   { label: 'درباره ما', to: '/about', icon: Info },
   { label: 'تماس با ما', to: '/contact', icon: Phone }
 ]

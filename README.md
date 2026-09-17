@@ -1,5 +1,9 @@
 # Project Context: Hirad Nuxt
 
+For current UI design conventions, read [UI_CONTEXT.md](UI_CONTEXT.md). AI contributors
+should also read [AGENTS.md](AGENTS.md). The UI reference and current source files take
+precedence over historical theme and framework descriptions below.
+
 Industrial valve and equipment engineering platform (B2B/Catalog) built using Nuxt 3 with a full-stack architecture (frontend public pages and backend Nitro-based proxy/dashboard routes).
 
 ## 1. System Architecture & Tech Stack

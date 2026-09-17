@@ -13,7 +13,7 @@
           </NuxtLink>
         </div>
 
-        <div class="navbar-center hidden md:flex h-full items-center min-w-0">
+        <div class="navbar-center hidden min-[1440px]:flex h-full items-center min-w-0">
           <ul class="menu menu-horizontal px-1 lg:ps-8 pt-1 pb-0 gap-0 font-medium h-full items-center whitespace-nowrap">
             <li class="h-full flex items-center">
               <NuxtLink to="/"
@@ -46,6 +46,20 @@
                 active-class="!text-primary !border-primary">
                 <Newspaper class="size-4 transition-transform duration-300 group-hover:scale-110" />
                 اخبار و مقالات
+              </NuxtLink>
+            </li>
+
+            <li class="h-full flex flex-row items-center" aria-hidden="true">
+              <div class="w-px h-1/2 p-0 bg-base-300"></div>
+            </li>
+
+            <li class="h-full flex items-center">
+              <NuxtLink to="/resources"
+                class="h-full flex items-center justify-center px-4 rounded-none text-base-content hover:bg-primary/5 hover:text-primary hover:border-primary border-b-3 border-transparent transition-all duration-300 ease-in-out gap-2 group"
+                :class="{ '!text-primary !border-primary': isResourcesRoute }"
+                active-class="!text-primary !border-primary">
+                <BookOpenCheck class="size-4 transition-transform duration-300 group-hover:scale-110" />
+                {{ resourcesCopy.nav.title.fa }}
               </NuxtLink>
             </li>
 
@@ -127,12 +141,12 @@
       <div class="navbar-end w-auto shrink-0 flex items-center gap-3 justify-end">
         <Search />
 
-        <div class="dropdown dropdown-end md:hidden">
+        <div class="dropdown dropdown-end min-[1440px]:hidden">
           <div tabindex="0" role="button" class="btn btn-ghost btn-circle" aria-label="منوی اصلی">
             <Menu class="size-5" />
           </div>
           <ul tabindex="0"
-            class="dropdown-content menu bg-base-100 rounded-xl z-50 w-56 p-3 shadow-lg border border-neutral-200 gap-1 mt-2">
+            class="dropdown-content menu flex-nowrap max-h-[calc(100dvh-6rem)] overflow-y-auto bg-base-100 rounded-xl z-50 w-56 p-3 shadow-lg border border-neutral-200 gap-1 mt-2">
             <li>
               <NuxtLink to="/" class="p-3 text-base text-base-content hover:bg-primary/5 transition-all duration-300"
                 active-class="!text-primary border-s-2 bg-primary/5">
@@ -153,6 +167,15 @@
                 active-class="!text-primary border-s-2 bg-primary/5">
                 <Newspaper class="size-5" />
                 اخبار و مقالات
+              </NuxtLink>
+            </li>
+            <li>
+              <NuxtLink to="/resources"
+                class="p-3 text-base text-base-content hover:bg-primary/5 transition-all duration-300"
+                :class="{ '!text-primary border-s-2 bg-primary/5': isResourcesRoute }"
+                active-class="!text-primary border-s-2 bg-primary/5">
+                <BookOpenCheck class="size-5" />
+                {{ resourcesCopy.nav.title.fa }}
               </NuxtLink>
             </li>
             <li>
@@ -201,11 +224,15 @@
 </template>
 
 <script setup lang="ts">
-import { House, Info, Newspaper, Phone, ShoppingBag, Menu, ChevronDown } from 'lucide-vue-next'
+import { BookOpenCheck, House, Info, Newspaper, Phone, ShoppingBag, Menu, ChevronDown } from 'lucide-vue-next'
 import LogoWide from '~/assets/Logo-wide.png'
+import { resourcesCopy } from '~/data/resources'
 import { normalizeLocalAssetUrl } from '~/utils/resolveAssetUrl'
 import Search from '../shared/Search.vue'
 
 defineEmits(['open-drawer'])
+
+const route = useRoute()
+const isResourcesRoute = computed(() => route.path === '/resources' || route.path.startsWith('/resources/'))
 
 </script>
