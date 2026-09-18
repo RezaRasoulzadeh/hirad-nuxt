@@ -15,9 +15,9 @@
             <div class="grid gap-5 sm:grid-cols-2">
               <label class="form-control min-w-0">
                 <span class="mb-2 text-sm font-bold">{{ resourcesCopy.pipeDimensions.standard.fa }}</span>
-                <select v-model="selectedStandardId" class="select select-bordered h-12 w-full rounded-lg bg-base-100 text-sm focus:border-primary focus:outline-primary" :aria-label="resourcesCopy.pipeDimensions.standard.fa">
+                <select v-model="selectedStandardId" lang="en" dir="ltr" class="select select-bordered h-12 w-full rounded-lg bg-base-100 text-start text-sm focus:border-primary focus:outline-primary" :aria-label="resourcesCopy.pipeDimensions.standard.en">
                   <option v-for="standard in pipeStandards" :key="standard.id" :value="standard.id">
-                    {{ standard.code }} — {{ standard.title.fa }}
+                    {{ standard.code }} — {{ standard.title.en }}
                   </option>
                 </select>
                 <span class="mt-2 text-xs leading-6 text-base-content/55">{{ selectedStandard?.description.fa }}</span>

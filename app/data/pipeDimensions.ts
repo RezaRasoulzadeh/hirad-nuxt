@@ -70,9 +70,9 @@ export const pipeStandards: PipeStandardDefinition[] = [
   {
     id: 'ASME_B36_19',
     code: 'ASME B36.19 / B36.19M',
-    title: { fa: 'لوله فولادی زنگ‌نزن', en: 'Stainless steel pipe' },
+    title: { fa: 'لوله استنلس استیل', en: 'Stainless steel pipe' },
     description: {
-      fa: 'ابعاد و وزن لوله‌های آستنیتی فولاد زنگ‌نزن بر اساس جدول کاتالوگ هیراد.',
+      fa: 'ابعاد و وزن لوله‌های آستنیتی استنلس استیل بر اساس جدول کاتالوگ هیراد.',
       en: 'Dimensions and weight for austenitic stainless steel pipe from the Hirad catalogue table.',
     },
     rows: [
