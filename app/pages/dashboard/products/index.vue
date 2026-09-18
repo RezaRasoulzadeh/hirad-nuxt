@@ -76,7 +76,7 @@
             :disabled="jsonImportSubmitting"
             @click="closeJsonImport"
           >
-            ×
+            <X class="size-4" aria-hidden="true" />
           </button>
         </div>
 
@@ -152,6 +152,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, reactive, watch, nextTick } from 'vue'
 import { navigateTo } from '#imports'
+import { X } from 'lucide-vue-next'
 import ParentCategoryGroup from '~/components/dashboard/product/ParentCategoryGroup.vue'
 import type { CategoryItem } from '~/types/categoryItem'
 import type { ProductCategoryAction, ProductItem } from '~/types/productItem'
