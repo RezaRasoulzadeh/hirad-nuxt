@@ -1,5 +1,5 @@
 <template>
-  <div dir="rtl" class="min-h-screen bg-base-100 text-base-content font-sans">
+  <div dir="rtl" class="min-h-screen overflow-x-clip bg-base-100 text-base-content font-sans">
     <input id="layout-drawer" type="checkbox" class="drawer-toggle" aria-label="منوی کشویی محصولات"
       v-model="isDrawerOpen" />
 

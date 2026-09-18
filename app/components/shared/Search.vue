@@ -44,7 +44,7 @@
       :class="isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'"
       dir="rtl"
     >
-      <div class="w-88 max-w-[90vw]">
+      <div class="max-w-[calc(100vw-2rem)]" :class="isOpen ? 'w-[min(22rem,calc(100vw-2rem))]' : 'w-0'">
         <div
           v-if="isOpen && (hasResults || showEmptyState || error)"
           class="mt-1 bg-base-100 border border-neutral-200 rounded-xl shadow-lg max-h-112 overflow-y-auto p-3"

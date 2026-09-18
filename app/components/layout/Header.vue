@@ -1,14 +1,14 @@
 <template>
   <header
     class="sticky top-0 z-40 bg-base-100/95 border-t-4 border-t-primary rounded-b-2xl border-r-4 border-b border-b-base-300 border-r-primary transition-colors duration-300">
-    <div class="mx-auto max-w-[1920px] px-4 lg:px-4 lg:pe-12 navbar h-18 py-0 gap-4">
+    <div class="mx-auto max-w-[1920px] px-4 lg:px-4 lg:pe-12 navbar h-18 py-0 gap-4 max-[359px]:gap-2">
 
       <div class="flex items-center h-full shrink-0">
         <div
           class="navbar-start w-auto shrink-0 h-full flex items-center border-l border-neutral-200 rounded-l-2xl pl-4 lg:pl-6 pr-1">
           <NuxtLink to="/"
             class="flex items-center gap-2 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-primary">
-            <img :src="normalizeLocalAssetUrl(LogoWide)" alt="Hirad Logo" width="1359" height="407" class="h-12 w-auto select-none object-contain block"
+            <img :src="normalizeLocalAssetUrl(LogoWide)" alt="Hirad Logo" width="1359" height="407" class="h-12 w-auto select-none object-contain block max-[359px]:h-10"
               loading="eager" />
           </NuxtLink>
         </div>
@@ -138,11 +138,11 @@
 
       <div class="grow"></div>
 
-      <div class="navbar-end w-auto shrink-0 flex items-center gap-3 justify-end">
+      <div class="navbar-end w-auto shrink-0 flex items-center gap-3 justify-end max-[359px]:gap-1">
         <Search />
 
         <div class="dropdown dropdown-end min-[1440px]:hidden">
-          <div tabindex="0" role="button" class="btn btn-ghost btn-circle" aria-label="منوی اصلی">
+          <div tabindex="0" role="button" class="btn btn-ghost btn-circle max-[359px]:size-9 max-[359px]:min-h-9 max-[359px]:min-w-9" aria-label="منوی اصلی">
             <Menu class="size-5" />
           </div>
           <ul tabindex="0"
