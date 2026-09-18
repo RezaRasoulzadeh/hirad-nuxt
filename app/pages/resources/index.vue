@@ -23,7 +23,7 @@
         <span class="mx-auto mt-4 block h-1 w-12 rounded-full bg-primary/80" aria-hidden="true" />
         <p class="mt-4 text-sm leading-8 text-base-content/65">{{ resourcesCopy.landing.categoriesDescription.fa }}</p>
       </header>
-      <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4 xl:gap-5">
+      <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3 xl:gap-5">
         <ResourceCard v-for="(item, index) in resourceCategories" :key="item.id" :item="item" :data-resource-delay="index * 70" />
       </div>
     </section>

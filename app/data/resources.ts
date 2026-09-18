@@ -8,7 +8,6 @@ import {
   FlaskConical,
   Ruler,
   Scale,
-  TableProperties,
   Wrench,
 } from 'lucide-vue-next'
 
@@ -86,8 +85,8 @@ export const resourcesCopy = {
     title: { fa: 'ابعاد و وزن لوله', en: 'Pipe Dimensions & Weight' },
     seoTitle: { fa: 'ابعاد و وزن لوله | ابزارهای مهندسی هیراد', en: 'Pipe Dimensions & Weight | Hirad Engineering Tools' },
     description: {
-      fa: 'بررسی ابعاد، ضخامت، وزن و حجم داخلی لوله بر اساس جداول ASME B36.10 و B36.19.',
-      en: 'Look up pipe dimensions, wall thickness, weight and internal volume from ASME B36.10 and B36.19 tables.',
+      fa: 'بررسی ابعاد، ضخامت، وزن و حجم داخلی لوله در جدول کاتالوگ هیراد بر پایه استانداردهای ASME B36.10 و B36.19.',
+      en: 'Look up pipe dimensions, wall thickness, weight and internal volume in Hirad catalogue tables based on ASME B36.10 and B36.19.',
     },
     standard: { fa: 'استاندارد', en: 'Standard' },
     nps: { fa: 'سایز اسمی لوله (NPS)', en: 'Nominal Pipe Size (NPS)' },
@@ -107,15 +106,16 @@ export const resourcesCopy = {
     mass: { fa: 'جرم واحد طول', en: 'Mass per unit length' },
     area: { fa: 'مساحت مقطع داخلی', en: 'Internal cross-sectional area' },
     volume: { fa: 'حجم داخلی واحد طول', en: 'Internal volume per unit length' },
+    shippingVolume: { fa: 'حجم حمل لوله', en: 'Shipping volume' },
     scheduleColumn: { fa: 'رده', en: 'Schedule' },
     unavailable: { fa: 'برای این انتخاب داده‌ای در جدول محلی موجود نیست.', en: 'No local table data is available for this selection.' },
     sourceValue: { fa: 'مقدار منبع', en: 'Source value' },
     calculatedValue: { fa: 'مقدار محاسبه‌شده', en: 'Calculated value' },
-    sourceNote: { fa: 'مقادیر ابعاد و جرم از جدول کاتالوگ هیراد خوانده شده‌اند؛ قطر داخلی، مساحت و حجم از ابعاد منبع محاسبه می‌شوند.', en: 'Dimensions and mass are transcribed from the Hirad catalogue table; inside diameter, area and volume are calculated from source dimensions.' },
+    sourceNote: { fa: 'جدول کاتالوگ هیراد بر پایه استانداردهای ASME B36.10 و B36.19 تنظیم شده است؛ ابعاد، جرم و حجم حمل از جدول گرفته می‌شوند و قطر داخلی، مساحت و حجم داخلی محاسبه می‌شوند.', en: 'Hirad catalogue tables are based on ASME B36.10 and B36.19. Dimensions, mass and shipping volume are taken from the tables; inside diameter, area and internal volume are calculated.' },
     reference: { fa: 'مرجع داده', en: 'Data reference' },
-    exportUnavailable: { fa: 'خروجی جدول در مرحله بعدی فعال می‌شود.', en: 'Table export will be enabled in a later step.' },
-    disabledExport: { fa: 'دانلود جدول', en: 'Download table' },
-    reset: { fa: 'بازنشانی', en: 'Reset' },
+    downloadSource: { fa: 'دانلود جدول کاتالوگ هیراد', en: 'Download Hirad catalogue table' },
+    downloadMetric: { fa: 'دانلود فایل', en: 'Download File' },
+    downloadImperial: { fa: 'دانلود فایل', en: 'Download File' },
   },
   standards: {
     eyebrow: { fa: 'استانداردها و مستندات فنی', en: 'Standards & Documents' },
@@ -156,16 +156,6 @@ export const resourceCategories: ResourceCardDefinition[] = [
     to: '/resources/standards',
   },
   {
-    id: 'catalogue',
-    title: { fa: 'جداول کاتالوگ هیراد', en: 'Hirad Catalogue Tables' },
-    description: {
-      fa: 'جداول تعاملی کاتالوگ محصولات برای مراجعه سریع‌تر به اطلاعات فنی.',
-      en: 'Interactive catalogue tables for faster access to product information.',
-    },
-    icon: TableProperties,
-    status: { fa: 'در حال آماده‌سازی', en: 'In preparation' },
-  },
-  {
     id: 'references',
     title: { fa: 'مراجع فنی', en: 'Technical References' },
     description: {
@@ -182,8 +172,8 @@ export const resourceTools: ResourceCardDefinition[] = [
     id: 'pipe-dimensions',
     title: { fa: 'ابعاد و وزن لوله', en: 'Pipe Dimensions & Weight' },
     description: {
-      fa: 'بررسی ابعاد، ضخامت و وزن لوله بر اساس استانداردهای ASME B36.10 و B36.19.',
-      en: 'Look up pipe dimensions, wall thickness and weight under ASME B36.10 and B36.19.',
+      fa: 'بررسی ابعاد، ضخامت و وزن لوله از جدول کاتالوگ هیراد بر پایه استانداردهای ASME B36.10 و B36.19.',
+      en: 'Look up pipe dimensions, wall thickness and weight in Hirad catalogue tables based on ASME B36.10 and B36.19.',
     },
     icon: Ruler,
     to: '/resources/tools/pipe-dimensions',

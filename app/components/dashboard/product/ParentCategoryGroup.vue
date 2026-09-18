@@ -47,6 +47,7 @@ const emit = defineEmits<{
 interface ChildCategory extends CategoryItem {
   products?: ProductItem[] | null
   productsLoaded?: boolean
+  productsLoading?: boolean
   expanded?: boolean
 }
 
@@ -71,7 +72,22 @@ watch(
       return a.sort_order - b.sort_order
     })
   },
-  { immediate: true, deep: true }
+  { immediate: true }
+)
+
+watch(
+  () => [
+    props.parentCategory.expanded,
+    ...localChildren.value.map(child => `${child.slug}:${!!child.expanded}`)
+  ],
+  () => {
+    if (!props.parentCategory.expanded) return
+
+    localChildren.value
+      .filter(child => child.expanded && !child.productsLoaded)
+      .forEach(child => { void fetchProducts(child.slug) })
+  },
+  { immediate: true }
 )
 
 const toggleParentCategory = () => {
@@ -85,10 +101,11 @@ const toggleChildCategory = (childSlug: string) => {
   }
 }
 
-const fetchProducts = async (categorySlug: string) => {
+async function fetchProducts(categorySlug: string) {
   const childCategory = localChildren.value.find(c => c.slug === categorySlug)
-  if (!childCategory || childCategory.productsLoaded) return
+  if (!childCategory || childCategory.productsLoaded || childCategory.productsLoading) return
 
+  childCategory.productsLoading = true
   try {
     const response = await $fetch<any>('/api/products', {
       query: { category: categorySlug }
@@ -105,6 +122,8 @@ const fetchProducts = async (categorySlug: string) => {
     console.error(`Error loading products for ${categorySlug}:`, err)
     childCategory.products = []
     childCategory.productsLoaded = true
+  } finally {
+    childCategory.productsLoading = false
   }
 }
 

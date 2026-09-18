@@ -84,6 +84,10 @@ The active link has primary-colored text and a thin burgundy bottom border, with
 widths they form a centered group. Keep the Resources header link active on its child
 routes too.
 
+Nested Resources tool pages use a compact interior layout: keep the shared section
+navigation at the top, omit the directory hero image and hero copy, then show the full
+route breadcrumb before the tool's own page heading and content.
+
 ## Layout, surfaces, and interaction
 
 - Resources containers use `mx-auto max-w-[1720px] px-5 md:px-8 lg:px-12`.
@@ -130,6 +134,8 @@ without changing layout or delaying navigation. No looping, parallax, or scroll 
 
 Tab underlines ease into view, and actionable cards/buttons have short hover transitions.
 Planned tools remain static on hover. Preserve the centered hero and navigation layout.
+Keep technical table rows static during page entrances and limit their scroll containers
+to horizontal overflow so row animations cannot create temporary scrollbars.
 
 ## Persian, English, and technical content
 
@@ -151,6 +157,10 @@ Write concise, customer-facing copy. Avoid implementation language such as “th
 establishes future access points.” Do not invent statistics, certifications, standard
 records, engineering values, or downloads. Existing directory cards describe planned
 tools; they do not authorize implementing datasets, calculations, APIs, or exports.
+
+Attribute pipe dimension data to Hirad catalogue tables based on ASME B36.10 and
+B36.19. Customer-facing references and download names should not expose source page
+numbers or filenames; keep detailed provenance in the source data only.
 
 Use the existing `useSeoMeta` approach for page metadata and the appropriate centralized
 copy. Do not add packages, a new theme, or a site-wide localization migration to solve a

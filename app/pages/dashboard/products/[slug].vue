@@ -1,4 +1,5 @@
 <template>
+  <div class="w-full pb-28 lg:pb-24">
   <div class="w-full bg-base-100 rounded-2xl border border-base-200 shadow-sm overflow-hidden flex flex-col relative">
     
     <div v-if="loading || checkingAuth" class="absolute inset-0 bg-base-100/70 z-50 flex flex-col items-center justify-center gap-3">
@@ -22,7 +23,7 @@
     </div>
 
     <div class="p-6">
-      <form ref="formEl" @submit.prevent="onSubmit" class="space-y-6">
+      <form id="product-form" ref="formEl" @submit.prevent="onSubmit" class="space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           <div class="form-control w-full">
             <label class="label"><span class="label-text font-semibold text-base-content/80">نام محصول (EN) *</span></label>
@@ -133,21 +134,6 @@
           @toggle-expand="(idx) => toggleExpand('faq', idx)"
         />
 
-        <div class="flex flex-col sm:flex-row items-center justify-between pt-6 border-t border-base-200 gap-4">
-          <div class="form-control">
-            <label class="label cursor-pointer gap-3 select-none">
-              <input id="isActive" type="checkbox" v-model="product.is_active" class="checkbox checkbox-primary checkbox-sm rounded-md" />
-              <span class="label-text font-bold text-sm text-base-content/80">ذخیره و انتشار آنی محصول در سایت</span>
-            </label>
-          </div>
-          <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-            <button type="button" @click="goBack" class="btn border-base-200 bg-base-100 rounded-xl px-5 h-11 min-h-0 text-sm">انصراف</button>
-            <button type="submit" :disabled="saving" class="btn btn-primary rounded-xl px-7 h-11 min-h-0 font-bold text-sm">
-              <span v-if="saving" class="loading loading-spinner loading-xs"></span>
-              {{ saving ? 'در حال ذخیره...' : 'ذخیره محصول' }}
-            </button>
-          </div>
-        </div>
       </form>
     </div>
 
@@ -157,6 +143,25 @@
       @close="closeMediaManager"
       @file-selected="handleFileSelected" 
     />
+  </div>
+
+  <div class="fixed inset-x-0 bottom-20 z-40 border-t border-base-300 bg-base-100/95 shadow-[0_-6px_20px_rgba(0,0,0,0.08)] backdrop-blur-sm lg:bottom-0 lg:right-80">
+    <div class="container mx-auto flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between lg:px-8">
+      <div class="form-control">
+        <label class="label cursor-pointer justify-start gap-3 select-none py-0">
+          <input id="isActive" type="checkbox" v-model="product.is_active" class="checkbox checkbox-primary checkbox-sm rounded-md" />
+          <span class="label-text font-bold text-sm text-base-content/80">ذخیره و انتشار آنی محصول در سایت</span>
+        </label>
+      </div>
+      <div class="flex w-full items-center justify-end gap-2 sm:w-auto">
+        <button type="button" @click="goBack" class="btn btn-ghost rounded-xl px-5 h-11 min-h-0 text-sm">بستن</button>
+        <button type="submit" form="product-form" :disabled="saving || loading || checkingAuth" class="btn btn-primary rounded-xl px-7 h-11 min-h-0 font-bold text-sm">
+          <span v-if="saving" class="loading loading-spinner loading-xs"></span>
+          {{ saving ? 'در حال ذخیره...' : isEditMode ? 'بروزرسانی محصول' : 'ذخیره محصول' }}
+        </button>
+      </div>
+    </div>
+  </div>
   </div>
 </template>
 
@@ -169,12 +174,14 @@ import ProductImageGalleryEditor from '~/components/dashboard/product/ProductIma
 import LongDescriptionSection from '~/components/dashboard/product/ProductLongDes.vue'
 import FeaturesSection from '~/components/dashboard/product/FeaturesSection.vue'
 import { useDashboardConfirm } from '~/composables/useDashboardConfirm'
+import type { ProductImage } from '~/composables/useProductList'
 
 definePageMeta({ layout: 'dashboard' })
 
 const route = useRoute()
 const router = useRouter()
 const confirm = useDashboardConfirm()
+const toast = useToast()
 const formEl = ref<HTMLFormElement | null>(null)
 const categories = ref<Array<{ id: string; name: string }>>([])
 const checkingAuth = ref(true)
@@ -228,24 +235,39 @@ const initializeForm = async () => {
   setTimeout(() => { hasUnsavedChanges.value = false }, 50)
 }
 
-const handleSetPrimary = (mediaAssetId: string) => {
+const findProductImageIndex = (images: ProductImage[], target: ProductImage) => {
+  const exactIndex = images.indexOf(target)
+  if (exactIndex !== -1) return exactIndex
+
+  if (target.media_asset_id) {
+    return images.findIndex(image => image.media_asset_id === target.media_asset_id)
+  }
+
+  return images.findIndex(image => (
+    image.image_url === target.image_url
+    && image.sort_order === target.sort_order
+    && image.is_primary === target.is_primary
+  ))
+}
+
+const handleSetPrimary = (targetImage: ProductImage) => {
   const shortDesc = product.value?.short_description
   if (!shortDesc?.images) return
 
+  const targetIndex = findProductImageIndex(shortDesc.images, targetImage)
+  if (targetIndex === -1) return
+
   shortDesc.images.forEach(img => img.is_primary = false)
-  const target = shortDesc.images.find(img => img.media_asset_id === mediaAssetId)
-  if (target) {
-    target.is_primary = true
-    shortDesc.images.sort((a, b) => (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0))
-  }
+  shortDesc.images[targetIndex]!.is_primary = true
+  shortDesc.images.sort((a, b) => (b.is_primary ? 1 : 0) - (a.is_primary ? 1 : 0))
   hasUnsavedChanges.value = true
 }
 
-const handleRemoveImage = (mediaAssetId: string) => {
+const handleRemoveImage = (targetImage: ProductImage) => {
   const images = product.value?.short_description?.images
   if (!images) return
 
-  const idx = images.findIndex(img => img.media_asset_id === mediaAssetId)
+  const idx = findProductImageIndex(images, targetImage)
   if (idx === -1) return
   
   const wasPrimary = images[idx]?.is_primary ?? false
@@ -265,18 +287,29 @@ const onSubmit = async () => {
 
   saving.value = true
   try {
-    const url = isEditMode.value ? `/api/products/${product.value.slug}` : '/api/products'
-    const method = isEditMode.value ? 'PUT' : 'POST'
+    const wasEditing = isEditMode.value
+    const url = wasEditing ? `/api/products/${product.value.slug}` : '/api/products'
+    const method = wasEditing ? 'PUT' : 'POST'
     
-    await $fetch(url, {
+    const response = await $fetch<any>(url, {
       method,
       body: product.value
     })
 
+    if (!wasEditing) {
+      const createdProduct = response?.data ?? response
+      if (createdProduct?.id && createdProduct?.slug) {
+        product.value.id = createdProduct.id
+        product.value.slug = createdProduct.slug
+        await router.replace(`/dashboard/products/${encodeURIComponent(createdProduct.slug)}`)
+      }
+    }
+
     hasUnsavedChanges.value = false
-    router.push('/dashboard/products')
+    toast.success(wasEditing ? 'محصول با موفقیت بروزرسانی شد.' : 'محصول با موفقیت ذخیره شد.')
   } catch (err) {
     console.error('Persistence layer failure writing target JSON schema values:', err)
+    toast.error('ذخیره محصول با خطا مواجه شد.')
   } finally {
     saving.value = false
   }

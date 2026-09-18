@@ -5,12 +5,17 @@ export type PipeStandardId = 'ASME_B36_10' | 'ASME_B36_19'
 export interface PipeScheduleRow {
   schedule: string
   wallThicknessMm: number
+  wallThicknessIn?: number
   massKgPerM?: number
+  massLbPerFt?: number
 }
 
 export interface PipeNpsRow {
   nps: string
   outsideDiameterMm: number
+  outsideDiameterIn?: number
+  shippingVolumeM3PerM?: string
+  shippingVolumeFt3PerFt?: string
   dn?: number
   schedules: PipeScheduleRow[]
 }
@@ -26,39 +31,29 @@ export interface PipeStandardDefinition {
 interface SourcePipeRow {
   nps: string
   od: string
-  wall_thickness: Record<string, string>
-  weight: Record<string, string>
   shipping_volume?: string
-}
-
-interface SourceReviewFlag {
-  nps: string
-  field: string
-  page?: number
-  pages?: string
-  reason: string
-  value?: string
-  metric?: string
-  imperial?: string
+  schedules: Record<string, {
+    wall_thickness: string
+    weight?: string
+  }>
 }
 
 interface SourceTable {
-  schema_version: number
   source: {
     document: string
-    catalogue_pages: number[]
-    scope: string
-    extraction_policy: string
-    review_status: string
+    pages: number[]
+    standards_as_printed: string[]
+    transcription_method: string
+    review_notice: string
+    transcription_notes: string[]
   }
-  columns: {
-    schedules: string[]
+  schema: {
+    schedule_order: string[]
     metric: { od: string; wall_thickness: string; weight: string; shipping_volume: string }
     imperial: { od: string; wall_thickness: string; weight: string; shipping_volume: string }
   }
   metric_page_32: SourcePipeRow[]
   imperial_page_33: SourcePipeRow[]
-  review_flags: SourceReviewFlag[]
 }
 
 const table = sourceTable as SourceTable
@@ -72,12 +67,6 @@ const dnByNps: Record<string, number> = {
   '26': 650, '28': 700, '30': 750, '32': 800, '34': 850, '36': 900,
   '38': 950, '40': 1000, '42': 1050, '44': 1100, '46': 1150, '48': 1200,
 }
-
-const excludedMassCells = new Set(
-  table.review_flags
-    .filter(flag => flag.field.startsWith('weight.'))
-    .map(flag => `${flag.nps}|${flag.field.slice('weight.'.length)}`),
-)
 
 function parseSourceNumber(value: string | undefined) {
   if (!value || !/^\d+(?:\.\d+)?$/.test(value)) return undefined
@@ -93,19 +82,25 @@ function isStainlessSchedule(scheduleName: string) {
 
 function createRows(standardId: PipeStandardId): PipeNpsRow[] {
   return table.metric_page_32.map((sourceRow) => {
-    const schedules = table.columns.schedules
+    const imperialRow = table.imperial_page_33.find(row => row.nps === sourceRow.nps)
+    const schedules = table.schema.schedule_order
       .filter(scheduleName => isStainlessSchedule(scheduleName) === (standardId === 'ASME_B36_19'))
       .map((scheduleName) => {
-        const wallThicknessMm = parseSourceNumber(sourceRow.wall_thickness[scheduleName])
+        const metricSchedule = sourceRow.schedules[scheduleName]
+        const imperialSchedule = imperialRow?.schedules[scheduleName]
+        const wallThicknessMm = parseSourceNumber(metricSchedule?.wall_thickness)
         if (wallThicknessMm === undefined) return undefined
 
-        const sourceMass = parseSourceNumber(sourceRow.weight[scheduleName])
-        const massKgPerM = excludedMassCells.has(`${sourceRow.nps}|${scheduleName}`) ? undefined : sourceMass
+        const massKgPerM = parseSourceNumber(metricSchedule.weight)
+        const wallThicknessIn = parseSourceNumber(imperialSchedule?.wall_thickness)
+        const massLbPerFt = parseSourceNumber(imperialSchedule?.weight)
 
         return {
           schedule: scheduleName,
           wallThicknessMm,
+          ...(wallThicknessIn === undefined ? {} : { wallThicknessIn }),
           ...(massKgPerM === undefined ? {} : { massKgPerM }),
+          ...(massLbPerFt === undefined ? {} : { massLbPerFt }),
         }
       })
       .filter((item): item is PipeScheduleRow => item !== undefined)
@@ -113,6 +108,9 @@ function createRows(standardId: PipeStandardId): PipeNpsRow[] {
     return {
       nps: sourceRow.nps,
       outsideDiameterMm: parseSourceNumber(sourceRow.od) as number,
+      outsideDiameterIn: parseSourceNumber(imperialRow?.od),
+      shippingVolumeM3PerM: sourceRow.shipping_volume,
+      shippingVolumeFt3PerFt: imperialRow?.shipping_volume,
       dn: dnByNps[sourceRow.nps],
       schedules,
     }
@@ -120,16 +118,21 @@ function createRows(standardId: PipeStandardId): PipeNpsRow[] {
 }
 
 /**
- * The raw catalogue extraction is kept in pipeDimensions.source.json. Metric
- * values are the canonical runtime data; imperial values from page 33 remain
- * available in the source file for review and are not duplicated here.
+ * The raw catalogue data is kept internally as JSON. Metric and imperial values
+ * are transcribed independently from the corresponding Hirad catalogue tables.
  */
 export const pipeDimensionsSource = {
-  ...table.source,
-  columns: table.columns,
-  reference: `${table.source.document}, pages ${table.source.catalogue_pages.join('–')}`,
-  sourceFile: 'app/data/pipeDimensions.source.json',
-  reviewFlags: table.review_flags,
+  reference: 'Hirad Catalogue',
+  downloads: {
+    metric: {
+      href: '/resources/pipe-dimensions/hirad-catalogue-metric.pdf',
+      fileName: 'Hirad-Catalogue-Metric.pdf',
+    },
+    imperial: {
+      href: '/resources/pipe-dimensions/hirad-catalogue-imperial.pdf',
+      fileName: 'Hirad-Catalogue-Imperial.pdf',
+    },
+  },
 } as const
 
 export const pipeStandards: PipeStandardDefinition[] = [
@@ -138,8 +141,8 @@ export const pipeStandards: PipeStandardDefinition[] = [
     code: 'ASME B36.10 / B36.10M',
     title: { fa: 'لوله فولادی کربنی و آلیاژی', en: 'Carbon and alloy steel pipe' },
     description: {
-      fa: 'ابعاد و وزن لوله‌های فولادی بر اساس جدول کاتالوگ هیراد.',
-      en: 'Steel pipe dimensions and weight from the Hirad catalogue table.',
+      fa: 'ابعاد و وزن لوله‌های فولادی از جدول کاتالوگ هیراد بر پایه استاندارد ASME B36.10.',
+      en: 'Steel pipe dimensions and weight from Hirad catalogue tables based on ASME B36.10.',
     },
     rows: createRows('ASME_B36_10'),
   },
@@ -148,8 +151,8 @@ export const pipeStandards: PipeStandardDefinition[] = [
     code: 'ASME B36.19 / B36.19M',
     title: { fa: 'لوله استنلس استیل', en: 'Stainless steel pipe' },
     description: {
-      fa: 'ابعاد و وزن لوله‌های آستنیتی استنلس استیل بر اساس جدول کاتالوگ هیراد.',
-      en: 'Austenitic stainless steel pipe dimensions and weight from the Hirad catalogue table.',
+      fa: 'ابعاد و وزن لوله‌های آستنیتی استنلس استیل از جدول کاتالوگ هیراد بر پایه استاندارد ASME B36.19.',
+      en: 'Austenitic stainless steel pipe dimensions and weight from Hirad catalogue tables based on ASME B36.19.',
     },
     rows: createRows('ASME_B36_19'),
   },

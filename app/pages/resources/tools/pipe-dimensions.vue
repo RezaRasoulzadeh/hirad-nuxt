@@ -1,11 +1,16 @@
 <template>
-  <ResourcePage section="tools">
+  <ResourcePage
+    section="tools"
+    compact
+    :breadcrumb-parent="{ title: resourcesCopy.tools.title.fa, to: '/resources/tools' }"
+    :breadcrumb-title="resourcesCopy.pipeDimensions.title.fa"
+  >
     <div class="space-y-8">
       <section data-resource-reveal aria-labelledby="pipe-tool-heading">
         <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
             <p class="text-xs font-bold tracking-[0.2em] text-primary uppercase" lang="en" dir="ltr">{{ resourcesCopy.pipeDimensions.eyebrow.en }}</p>
-            <h2 id="pipe-tool-heading" class="mt-2 text-2xl font-black leading-relaxed md:text-3xl">{{ resourcesCopy.pipeDimensions.title.fa }}</h2>
+            <h1 id="pipe-tool-heading" class="mt-2 text-2xl font-black leading-relaxed md:text-3xl">{{ resourcesCopy.pipeDimensions.title.fa }}</h1>
           </div>
           <span class="rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-bold text-primary" lang="en" dir="ltr">ASME B36.10 / B36.19</span>
         </div>
@@ -20,7 +25,6 @@
                     {{ standard.code }} — {{ standard.title.en }}
                   </option>
                 </select>
-                <span class="mt-2 text-xs leading-6 text-base-content/55">{{ selectedStandard?.description.fa }}</span>
               </label>
 
               <label class="form-control min-w-0">
@@ -30,7 +34,7 @@
                     NPS {{ pipe.nps }} in
                   </option>
                 </select>
-                <span class="mt-2 text-xs leading-6 text-base-content/55" lang="en" dir="ltr">OD {{ selectedNpsRow?.outsideDiameterMm.toFixed(2) }} mm</span>
+                <span class="mt-2 text-xs leading-6 text-base-content/55" lang="en" dir="ltr">OD {{ formatDimension(selectedNpsRow?.outsideDiameterMm, selectedNpsRow?.outsideDiameterIn) }} {{ dimensionUnit }}</span>
               </label>
 
               <label class="form-control min-w-0">
@@ -53,10 +57,6 @@
               </fieldset>
             </div>
 
-            <div class="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-base-300 pt-5">
-              <p class="text-xs leading-6 text-base-content/55">{{ resourcesCopy.pipeDimensions.sourceNote.fa }}</p>
-              <button type="button" class="btn btn-ghost min-h-10 rounded-lg px-4 text-xs" @click="resetTool">{{ resourcesCopy.pipeDimensions.reset.fa }}</button>
-            </div>
           </form>
 
           <aside class="rounded-xl border border-base-300 bg-base-200/60 p-5 md:p-6" aria-labelledby="pipe-reference-heading">
@@ -99,9 +99,10 @@
             <dl>
               <EngineeringValueRow :label="resourcesCopy.pipeDimensions.npsLabel.fa" :value="`NPS ${selectedNps} in`" />
               <EngineeringValueRow v-if="selectedNpsRow.dn" :label="resourcesCopy.pipeDimensions.dnLabel.fa" :value="`DN ${selectedNpsRow.dn}`" />
-              <EngineeringValueRow :label="resourcesCopy.pipeDimensions.outsideDiameter.fa" :value="formatDimension(selectedNpsRow.outsideDiameterMm)" :unit="dimensionUnit" />
-              <EngineeringValueRow :label="resourcesCopy.pipeDimensions.wallThickness.fa" :value="formatDimension(selectedScheduleRow.wallThicknessMm)" :unit="dimensionUnit" />
-              <EngineeringValueRow :label="resourcesCopy.pipeDimensions.mass.fa" :value="formatMass(selectedScheduleRow.massKgPerM)" :unit="massUnit" />
+              <EngineeringValueRow :label="resourcesCopy.pipeDimensions.outsideDiameter.fa" :value="formatDimension(selectedNpsRow.outsideDiameterMm, selectedNpsRow.outsideDiameterIn)" :unit="dimensionUnit" />
+              <EngineeringValueRow :label="resourcesCopy.pipeDimensions.wallThickness.fa" :value="formatDimension(selectedScheduleRow.wallThicknessMm, selectedScheduleRow.wallThicknessIn)" :unit="dimensionUnit" />
+              <EngineeringValueRow :label="resourcesCopy.pipeDimensions.mass.fa" :value="formatMass(selectedScheduleRow.massKgPerM, selectedScheduleRow.massLbPerFt)" :unit="massUnit" />
+              <EngineeringValueRow :label="resourcesCopy.pipeDimensions.shippingVolume.fa" :value="formatShippingVolume(selectedNpsRow.shippingVolumeM3PerM, selectedNpsRow.shippingVolumeFt3PerFt)" :unit="shippingVolumeUnit" />
             </dl>
           </div>
 
@@ -115,40 +116,42 @@
               <EngineeringValueRow :label="resourcesCopy.pipeDimensions.area.fa" :value="formatArea(calculatedValues.internalAreaMm2)" :unit="areaUnit" />
               <EngineeringValueRow :label="resourcesCopy.pipeDimensions.volume.fa" :value="formatVolume(calculatedValues.internalVolumeLPerM)" :unit="volumeUnit" />
             </dl>
-            <p class="mt-4 text-xs leading-6 text-base-content/55">{{ resourcesCopy.pipeDimensions.sourceNote.fa }}</p>
           </div>
         </div>
       </section>
 
-      <section v-if="selectedNpsRow" data-resource-reveal data-resource-delay="120" aria-labelledby="pipe-comparison-heading">
+      <section v-if="selectedNpsRow" aria-labelledby="pipe-comparison-heading">
         <div class="mb-4 flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 id="pipe-comparison-heading" class="text-xl font-bold leading-8">{{ resourcesCopy.pipeDimensions.comparisonTitle.fa }}</h2>
             <p class="mt-1 text-sm leading-7 text-base-content/60">{{ resourcesCopy.pipeDimensions.comparisonDescription.fa }}</p>
           </div>
-          <button type="button" disabled class="btn btn-outline min-h-10 rounded-lg border-base-300 px-4 text-xs text-base-content/50" :title="resourcesCopy.pipeDimensions.exportUnavailable.fa">
-            <Download class="size-4" aria-hidden="true" />
-            {{ resourcesCopy.pipeDimensions.disabledExport.fa }}
-          </button>
+          <div class="flex flex-wrap items-center gap-2" role="group" :aria-label="resourcesCopy.pipeDimensions.downloadSource.en">
+            <span class="me-1 text-xs font-bold text-base-content/55">{{ resourcesCopy.pipeDimensions.downloadSource.fa }}</span>
+            <a :href="activeDownload.href" :download="activeDownload.fileName" class="btn btn-outline btn-primary min-h-10 rounded-lg px-3 text-xs" :aria-label="activeDownload.label.en">
+              <Download class="size-4" aria-hidden="true" />
+              {{ activeDownload.label.fa }}
+            </a>
+          </div>
         </div>
 
         <TechnicalTable>
           <thead class="bg-base-200 text-xs text-base-content/65">
             <tr>
-              <th scope="col" class="px-5 py-4 font-bold">{{ resourcesCopy.pipeDimensions.scheduleColumn.fa }}</th>
-              <th scope="col" class="px-5 py-4 font-bold">{{ resourcesCopy.pipeDimensions.wallThickness.fa }}</th>
-              <th scope="col" class="px-5 py-4 font-bold">{{ resourcesCopy.pipeDimensions.insideDiameter.fa }}</th>
-              <th scope="col" class="px-5 py-4 font-bold">{{ resourcesCopy.pipeDimensions.mass.fa }}</th>
+              <th scope="col" class="px-5 py-4 text-center font-bold">{{ resourcesCopy.pipeDimensions.scheduleColumn.fa }}</th>
+              <th scope="col" class="px-5 py-4 text-center font-bold">{{ resourcesCopy.pipeDimensions.wallThickness.fa }}</th>
+              <th scope="col" class="px-5 py-4 text-center font-bold">{{ resourcesCopy.pipeDimensions.insideDiameter.fa }}</th>
+              <th scope="col" class="px-5 py-4 text-center font-bold">{{ resourcesCopy.pipeDimensions.mass.fa }}</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in availableSchedules" :key="item.schedule" class="border-t border-base-300/80 transition-colors hover:bg-base-200/60" :class="item.schedule === selectedSchedule ? 'bg-primary/[0.045]' : ''" :data-resource-reveal="true" :data-resource-delay="Math.min(index * 25, 150)">
-              <th scope="row" class="px-5 py-3 text-start font-bold" lang="en" dir="ltr">
+            <tr v-for="item in availableSchedules" :key="item.schedule" class="border-t border-base-300/80 transition-colors hover:bg-base-200/60" :class="item.schedule === selectedSchedule ? 'bg-primary/[0.045]' : ''">
+              <th scope="row" class="px-5 py-3 text-center font-bold" lang="en" dir="ltr">
                 <button type="button" class="rounded px-2 py-1 text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-primary" :aria-pressed="item.schedule === selectedSchedule" @click="selectedSchedule = item.schedule">{{ item.schedule }}</button>
               </th>
-              <td class="px-5 py-3" lang="en" dir="ltr">{{ formatDimension(item.wallThicknessMm) }} {{ dimensionUnit }}</td>
-              <td class="px-5 py-3" lang="en" dir="ltr">{{ formatDimension(calculatePipeValues(selectedNpsRow, item).insideDiameterMm) }} {{ dimensionUnit }}</td>
-              <td class="px-5 py-3" lang="en" dir="ltr">{{ formatMass(item.massKgPerM) }} {{ massUnit }}</td>
+              <td class="px-5 py-3 text-center" lang="en" dir="ltr">{{ formatDimension(item.wallThicknessMm, item.wallThicknessIn) }} {{ dimensionUnit }}</td>
+              <td class="px-5 py-3 text-center" lang="en" dir="ltr">{{ formatDimension(calculatePipeValues(selectedNpsRow, item).insideDiameterMm) }} {{ dimensionUnit }}</td>
+              <td class="px-5 py-3 text-center" lang="en" dir="ltr">{{ formatMass(item.massKgPerM, item.massLbPerFt) }} {{ massUnit }}</td>
             </tr>
           </tbody>
         </TechnicalTable>
@@ -186,6 +189,9 @@ const selectedNpsRow = computed(() => getPipeNps(selectedStandardId.value, selec
 const availableSchedules = computed(() => selectedNpsRow.value?.schedules || [])
 const selectedScheduleRow = computed(() => availableSchedules.value.find(item => item.schedule === selectedSchedule.value))
 const calculatedValues = computed(() => selectedNpsRow.value && selectedScheduleRow.value ? calculatePipeValues(selectedNpsRow.value, selectedScheduleRow.value) : undefined)
+const activeDownload = computed(() => unitSystem.value === 'metric'
+  ? { ...pipeDimensionsSource.downloads.metric, label: resourcesCopy.pipeDimensions.downloadMetric }
+  : { ...pipeDimensionsSource.downloads.imperial, label: resourcesCopy.pipeDimensions.downloadImperial })
 
 watch(selectedStandardId, () => {
   selectedNps.value = availableNps.value[0]?.nps || ''
@@ -195,24 +201,17 @@ watch([selectedStandardId, selectedNps], () => {
   selectedSchedule.value = availableSchedules.value[0]?.schedule || ''
 })
 
-function resetTool() {
-  selectedStandardId.value = 'ASME_B36_10'
-  selectedNps.value = '4'
-  selectedSchedule.value = '40'
-  unitSystem.value = 'metric'
-}
-
 function formatNumber(value: number | undefined, fractionDigits: number) {
   if (value === undefined || !Number.isFinite(value)) return '—'
   return new Intl.NumberFormat('en-US', { maximumFractionDigits: fractionDigits, minimumFractionDigits: fractionDigits }).format(value)
 }
 
-function formatDimension(value: number | undefined) {
-  return formatNumber(unitSystem.value === 'metric' ? value : (value === undefined ? undefined : millimetresToInches(value)), unitSystem.value === 'metric' ? 2 : 3)
+function formatDimension(valueMm: number | undefined, valueIn?: number) {
+  return formatNumber(unitSystem.value === 'metric' ? valueMm : (valueIn ?? (valueMm === undefined ? undefined : millimetresToInches(valueMm))), unitSystem.value === 'metric' ? 2 : 3)
 }
 
-function formatMass(value: number | undefined) {
-  return formatNumber(unitSystem.value === 'metric' ? value : (value === undefined ? undefined : kilogramsPerMetreToPoundsPerFoot(value)), unitSystem.value === 'metric' ? 2 : 2)
+function formatMass(valueKgPerM: number | undefined, valueLbPerFt?: number) {
+  return formatNumber(unitSystem.value === 'metric' ? valueKgPerM : (valueLbPerFt ?? (valueKgPerM === undefined ? undefined : kilogramsPerMetreToPoundsPerFoot(valueKgPerM))), unitSystem.value === 'metric' ? 2 : 2)
 }
 
 function formatArea(value: number) {
@@ -225,8 +224,14 @@ function formatVolume(value: number) {
 
 const dimensionUnit = computed(() => unitSystem.value === 'metric' ? 'mm' : 'in')
 const massUnit = computed(() => unitSystem.value === 'metric' ? 'kg/m' : 'lb/ft')
+const shippingVolumeUnit = computed(() => unitSystem.value === 'metric' ? 'm³/m' : 'ft³/ft')
 const areaUnit = computed(() => unitSystem.value === 'metric' ? 'mm²' : 'in²')
 const volumeUnit = computed(() => unitSystem.value === 'metric' ? 'L/m' : 'ft³/ft')
+
+function formatShippingVolume(metricValue?: string, imperialValue?: string) {
+  const value = unitSystem.value === 'metric' ? metricValue : imperialValue
+  return value || '—'
+}
 
 useSeoMeta({
   title: resourcesCopy.pipeDimensions.seoTitle.fa,

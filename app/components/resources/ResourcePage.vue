@@ -1,6 +1,6 @@
 <template>
   <div ref="pageRef" class="resource-page bg-base-100 text-base-content" dir="rtl">
-    <section class="relative isolate bg-cover bg-center" :style="{ backgroundImage: 'url(' + normalizeLocalAssetUrl(heroBackground) + ')' }"
+    <section v-if="!compact" class="relative isolate bg-cover bg-center" :style="{ backgroundImage: 'url(' + normalizeLocalAssetUrl(heroBackground) + ')' }"
       aria-labelledby="resource-title">
       <div class="mx-auto max-w-[1720px] px-5 pt-6 md:px-8 lg:px-12">
         <nav :aria-label="resourcesCopy.nav.breadcrumb.fa" class="text-xs text-base-content/60">
@@ -40,6 +40,20 @@
     </nav>
 
     <div class="mx-auto max-w-[1720px] px-5 py-12 md:px-8 md:py-16 lg:px-12">
+      <nav v-if="compact" :aria-label="resourcesCopy.nav.breadcrumb.fa" class="mb-8 text-xs text-base-content/60">
+        <ol class="flex flex-wrap items-center gap-x-2 gap-y-2 leading-6">
+          <li><NuxtLink to="/" class="rounded hover:text-primary focus-visible:outline-primary">{{ resourcesCopy.nav.home.fa }}</NuxtLink></li>
+          <li aria-hidden="true"><ChevronLeft class="size-3" /></li>
+          <li><NuxtLink to="/resources" class="rounded hover:text-primary focus-visible:outline-primary">{{ resourcesCopy.nav.title.fa }}</NuxtLink></li>
+          <template v-if="breadcrumbParent">
+            <li aria-hidden="true"><ChevronLeft class="size-3" /></li>
+            <li><NuxtLink :to="breadcrumbParent.to" class="rounded hover:text-primary focus-visible:outline-primary">{{ breadcrumbParent.title }}</NuxtLink></li>
+          </template>
+          <li aria-hidden="true"><ChevronLeft class="size-3" /></li>
+          <li aria-current="page" class="text-base-content">{{ breadcrumbTitle || copy.title.fa }}</li>
+        </ol>
+      </nav>
+
       <slot />
 
       <aside data-resource-reveal class="mt-12 flex flex-col items-center gap-5 rounded-xl border border-base-300 bg-base-200/60 p-6 text-center sm:flex-row sm:text-start md:mt-16 md:p-8">
@@ -65,7 +79,15 @@ import heroBackground from '~/assets/hero-background.jpg'
 import { resourcesCopy } from '~/data/resources'
 import { normalizeLocalAssetUrl } from '~/utils/resolveAssetUrl'
 
-const props = defineProps<{ section: 'landing' | 'tools' | 'standards' }>()
+const props = withDefaults(defineProps<{
+  section: 'landing' | 'tools' | 'standards'
+  compact?: boolean
+  breadcrumbParent?: { title: string; to: string }
+  breadcrumbTitle?: string
+}>(), {
+  compact: false,
+})
+const { compact, breadcrumbParent, breadcrumbTitle } = toRefs(props)
 const pageRef = ref<HTMLElement | null>(null)
 let observer: IntersectionObserver | undefined
 let motionPreference: MediaQueryList | undefined

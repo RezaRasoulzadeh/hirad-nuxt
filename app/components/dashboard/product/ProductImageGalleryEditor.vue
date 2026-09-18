@@ -19,15 +19,15 @@
 
       <!-- Secondary Ordered Image Loop Tiles -->
       <div 
-        v-for="img in secondaryImages" 
-        :key="img.media_asset_id"
+        v-for="(img, index) in secondaryImages"
+        :key="getImageKey(img, index)"
         class="relative group aspect-square rounded-xl border border-base-200 overflow-hidden shadow-sm bg-base-100 transition-all hover:border-neutral/40"
       >
         <img :src="getThumbnailUrl(img)" alt="Gallery node snapshot" class="w-full h-full object-cover" />
         <div class="absolute inset-0 bg-base-content/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
           <button 
             type="button"
-            @click.stop="onSetPrimary(img.media_asset_id)" 
+            @click.stop="onSetPrimary(img)"
             class="btn btn-xs btn-neutral rounded-lg font-bold text-[10px]"
           >
             تنظیم به عنوان اصلی
@@ -35,7 +35,7 @@
         </div>
         <button 
           type="button"
-          @click.stop="onRemoveImage(img.media_asset_id)"
+          @click.stop="onRemoveImage(img)"
           class="btn btn-circle btn-error btn-xs absolute top-1.5 right-1.5 shadow-md"
         >
           <Trash class="w-3 h-3 text-white" />
@@ -68,8 +68,8 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  'set-primary': [assetId: string]
-  'remove-image': [assetId: string]
+  'set-primary': [image: ProductImage]
+  'remove-image': [image: ProductImage]
   'open-modal': []
 }>()
 
@@ -88,8 +88,11 @@ const secondaryImages = computed(() => {
     .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
 })
 
-const onRemoveImage = async (assetId?: string) => {
-  if (!assetId) return
+const getImageKey = (image: ProductImage, index: number) => (
+  image.media_asset_id || `${image.image_url}-${image.sort_order ?? index}-${index}`
+)
+
+const onRemoveImage = async (image: ProductImage) => {
   const confirmed = await confirm({
     title: 'حذف تصویر',
     message: 'آیا از حذف این تصویر اطمینان دارید؟',
@@ -97,18 +100,17 @@ const onRemoveImage = async (assetId?: string) => {
     variant: 'danger'
   })
   if (confirmed) {
-    emit('remove-image', assetId)
+    emit('remove-image', image)
   }
 }
 
 const onRemovePrimary = async () => {
-  const assetId = primaryImage.value?.media_asset_id
-  if (!assetId) return
-  await onRemoveImage(assetId)
+  const image = primaryImage.value
+  if (!image) return
+  await onRemoveImage(image)
 }
 
-const onSetPrimary = (assetId?: string) => {
-  if (!assetId) return
-  emit('set-primary', assetId)
+const onSetPrimary = (image: ProductImage) => {
+  emit('set-primary', image)
 }
 </script>
