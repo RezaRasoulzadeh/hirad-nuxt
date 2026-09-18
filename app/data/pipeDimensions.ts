@@ -1,3 +1,5 @@
+import sourceTable from './pipeDimensions.source.json'
+
 export type PipeStandardId = 'ASME_B36_10' | 'ASME_B36_19'
 
 export interface PipeScheduleRow {
@@ -21,32 +23,114 @@ export interface PipeStandardDefinition {
   rows: PipeNpsRow[]
 }
 
+interface SourcePipeRow {
+  nps: string
+  od: string
+  wall_thickness: Record<string, string>
+  weight: Record<string, string>
+  shipping_volume?: string
+}
+
+interface SourceReviewFlag {
+  nps: string
+  field: string
+  page?: number
+  pages?: string
+  reason: string
+  value?: string
+  metric?: string
+  imperial?: string
+}
+
+interface SourceTable {
+  schema_version: number
+  source: {
+    document: string
+    catalogue_pages: number[]
+    scope: string
+    extraction_policy: string
+    review_status: string
+  }
+  columns: {
+    schedules: string[]
+    metric: { od: string; wall_thickness: string; weight: string; shipping_volume: string }
+    imperial: { od: string; wall_thickness: string; weight: string; shipping_volume: string }
+  }
+  metric_page_32: SourcePipeRow[]
+  imperial_page_33: SourcePipeRow[]
+  review_flags: SourceReviewFlag[]
+}
+
+const table = sourceTable as SourceTable
+
+/** NPS/DN is a nominal mapping, not a second dimension value from the source table. */
+const dnByNps: Record<string, number> = {
+  '1/8': 6, '1/4': 8, '3/8': 10, '1/2': 15, '3/4': 20, '1': 25,
+  '1 1/4': 32, '1 1/2': 40, '2': 50, '2 1/2': 65, '3': 80, '3 1/2': 90,
+  '4': 100, '5': 125, '6': 150, '8': 200, '10': 250, '12': 300,
+  '14': 350, '16': 400, '18': 450, '20': 500, '22': 550, '24': 600,
+  '26': 650, '28': 700, '30': 750, '32': 800, '34': 850, '36': 900,
+  '38': 950, '40': 1000, '42': 1050, '44': 1100, '46': 1150, '48': 1200,
+}
+
+const excludedMassCells = new Set(
+  table.review_flags
+    .filter(flag => flag.field.startsWith('weight.'))
+    .map(flag => `${flag.nps}|${flag.field.slice('weight.'.length)}`),
+)
+
+function parseSourceNumber(value: string | undefined) {
+  if (!value || !/^\d+(?:\.\d+)?$/.test(value)) return undefined
+  const number = Number(value)
+  return Number.isFinite(number) ? number : undefined
+}
+
+const stainlessScheduleNames = new Set(['5S', '10S', '40S', '80S'])
+
+function isStainlessSchedule(scheduleName: string) {
+  return stainlessScheduleNames.has(scheduleName)
+}
+
+function createRows(standardId: PipeStandardId): PipeNpsRow[] {
+  return table.metric_page_32.map((sourceRow) => {
+    const schedules = table.columns.schedules
+      .filter(scheduleName => isStainlessSchedule(scheduleName) === (standardId === 'ASME_B36_19'))
+      .map((scheduleName) => {
+        const wallThicknessMm = parseSourceNumber(sourceRow.wall_thickness[scheduleName])
+        if (wallThicknessMm === undefined) return undefined
+
+        const sourceMass = parseSourceNumber(sourceRow.weight[scheduleName])
+        const massKgPerM = excludedMassCells.has(`${sourceRow.nps}|${scheduleName}`) ? undefined : sourceMass
+
+        return {
+          schedule: scheduleName,
+          wallThicknessMm,
+          ...(massKgPerM === undefined ? {} : { massKgPerM }),
+        }
+      })
+      .filter((item): item is PipeScheduleRow => item !== undefined)
+
+    return {
+      nps: sourceRow.nps,
+      outsideDiameterMm: parseSourceNumber(sourceRow.od) as number,
+      dn: dnByNps[sourceRow.nps],
+      schedules,
+    }
+  })
+}
+
 /**
- * Source metadata is kept alongside the static table so future updates can be
- * checked against the catalogue rather than copied into a second unit table.
- * The bundled viewer exposes this sheet as page 16; it is the pipe-dimensions
- * sheet referenced by the catalogue's pipe section.
+ * The raw catalogue extraction is kept in pipeDimensions.source.json. Metric
+ * values are the canonical runtime data; imperial values from page 33 remain
+ * available in the source file for review and are not duplicated here.
  */
 export const pipeDimensionsSource = {
-  title: 'Hirad product catalogue — pipe dimensions table',
-  reference: 'Bundled catalogue scan, viewer page 16',
-  localAsset: '/flipHTML/files/page/16.jpg',
-  columns: 'NPS, OD, wall thickness, weight per metre',
-  note: 'Only source cells that are legible in the bundled catalogue sheet are included.',
+  ...table.source,
+  columns: table.columns,
+  reference: `${table.source.document}, pages ${table.source.catalogue_pages.join('–')}`,
+  sourceFile: 'app/data/pipeDimensions.source.json',
+  reviewFlags: table.review_flags,
 } as const
-
-const schedule = (name: string, wallThicknessMm: number, massKgPerM?: number): PipeScheduleRow => ({
-  schedule: name,
-  wallThicknessMm,
-  ...(massKgPerM === undefined ? {} : { massKgPerM }),
-})
-
-const nps = (name: string, outsideDiameterMm: number, dn: number, schedules: PipeScheduleRow[]): PipeNpsRow => ({
-  nps: name,
-  outsideDiameterMm,
-  dn,
-  schedules,
-})
 
 export const pipeStandards: PipeStandardDefinition[] = [
   {
@@ -54,18 +138,10 @@ export const pipeStandards: PipeStandardDefinition[] = [
     code: 'ASME B36.10 / B36.10M',
     title: { fa: 'لوله فولادی کربنی و آلیاژی', en: 'Carbon and alloy steel pipe' },
     description: {
-      fa: 'ابعاد و وزن لوله‌های فولادی بدون درز بر اساس جدول کاتالوگ هیراد.',
-      en: 'Dimensions and weight for seamless steel pipe from the Hirad catalogue table.',
+      fa: 'ابعاد و وزن لوله‌های فولادی بر اساس جدول کاتالوگ هیراد.',
+      en: 'Steel pipe dimensions and weight from the Hirad catalogue table.',
     },
-    rows: [
-      nps('1/2', 21.30, 15, [schedule('STD', 2.77, 1.27), schedule('40', 2.77, 1.27), schedule('XS', 3.73, 1.62), schedule('80', 3.73, 1.62), schedule('160', 4.78, 1.95), schedule('XXS', 7.47, 2.55)]),
-      nps('1', 33.40, 25, [schedule('STD', 3.38, 2.50), schedule('40', 3.38, 2.50), schedule('XS', 4.55, 3.24), schedule('80', 4.55, 3.24), schedule('160', 6.35, 4.24), schedule('XXS', 9.09, 5.45)]),
-      nps('2', 60.30, 50, [schedule('STD', 3.91, 5.44), schedule('40', 3.91, 5.44), schedule('XS', 5.54, 7.48), schedule('80', 5.54, 7.48), schedule('160', 8.74, 11.11), schedule('XXS', 11.07, 13.44)]),
-      nps('4', 114.30, 100, [schedule('STD', 6.02, 16.07), schedule('40', 6.02, 16.07), schedule('XS', 8.56, 22.32), schedule('80', 8.56, 22.32), schedule('120', 11.13, 28.32), schedule('160', 13.49, 33.54), schedule('XXS', 17.12, 41.03)]),
-      nps('6', 168.30, 150, [schedule('STD', 7.11, 28.26), schedule('40', 7.11, 28.26), schedule('XS', 10.97, 42.56), schedule('80', 10.97, 42.56), schedule('120', 14.27, 54.20), schedule('160', 18.26, 67.56)]),
-      nps('8', 219.10, 200, [schedule('20', 6.35, 33.31), schedule('30', 7.04, 36.81), schedule('STD', 8.18, 42.55), schedule('40', 8.18, 42.55), schedule('60', 10.31, 53.08), schedule('XS', 12.70, 64.64), schedule('80', 12.70, 64.64), schedule('100', 15.09, 75.92), schedule('120', 18.26, 90.44), schedule('140', 20.62, 100.92), schedule('160', 23.01, 111.27), schedule('XXS', 22.23, 107.92)]),
-      nps('10', 273.10, 250, [schedule('20', 6.35, 41.77), schedule('30', 7.80, 51.03), schedule('STD', 9.27, 60.31), schedule('40', 9.27, 60.31), schedule('60', 12.70, 81.55), schedule('XS', 15.09, 96.01), schedule('80', 15.09, 96.01), schedule('100', 18.26, 114.75), schedule('120', 21.44, 133.06), schedule('140', 25.40, 155.15), schedule('160', 28.58, 172.33)]),
-    ],
+    rows: createRows('ASME_B36_10'),
   },
   {
     id: 'ASME_B36_19',
@@ -73,18 +149,9 @@ export const pipeStandards: PipeStandardDefinition[] = [
     title: { fa: 'لوله استنلس استیل', en: 'Stainless steel pipe' },
     description: {
       fa: 'ابعاد و وزن لوله‌های آستنیتی استنلس استیل بر اساس جدول کاتالوگ هیراد.',
-      en: 'Dimensions and weight for austenitic stainless steel pipe from the Hirad catalogue table.',
+      en: 'Austenitic stainless steel pipe dimensions and weight from the Hirad catalogue table.',
     },
-    rows: [
-      nps('1/2', 21.30, 15, [schedule('5S', 1.65, 0.82), schedule('10S', 2.11, 1.01), schedule('40S', 2.77, 1.30), schedule('80S', 3.73, 1.65)]),
-      nps('3/4', 26.70, 20, [schedule('5S', 1.65, 1.04), schedule('10S', 2.11, 1.31), schedule('40S', 2.87, 1.71), schedule('80S', 3.91, 2.24)]),
-      nps('1', 33.40, 25, [schedule('5S', 1.65, 1.33), schedule('10S', 2.77, 2.13), schedule('40S', 3.38, 2.55), schedule('80S', 4.55, 3.29)]),
-      nps('4', 114.30, 100, [schedule('5S', 2.11, 5.96), schedule('10S', 3.05, 8.52), schedule('40S', 6.02, 16.40), schedule('80S', 8.56, 22.27)]),
-      nps('6', 168.30, 150, [schedule('5S', 2.77, 11.55), schedule('10S', 3.40, 14.13), schedule('40S', 7.11, 28.83), schedule('80S', 10.97, 43.42)]),
-      nps('8', 219.10, 200, [schedule('5S', 2.77, 15.09), schedule('10S', 3.76, 20.37), schedule('40S', 8.18, 43.39), schedule('80S', 12.70, 65.59)]),
-      nps('10', 273.10, 250, [schedule('5S', 3.40, 23.08), schedule('10S', 4.19, 28.34), schedule('40S', 9.27, 61.52)]),
-      nps('12', 323.90, 300, [schedule('5S', 3.96, 31.89), schedule('40S', 9.52, 75.52), schedule('80S', 12.70, 99.43)]),
-    ],
+    rows: createRows('ASME_B36_19'),
   },
 ]
 
