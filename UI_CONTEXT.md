@@ -166,6 +166,21 @@ Use the existing `useSeoMeta` approach for page metadata and the appropriate cen
 copy. Do not add packages, a new theme, or a site-wide localization migration to solve a
 local styling task.
 
+## Dashboard presentation
+
+- The overview at [dashboard/index.vue](app/pages/dashboard/index.vue) uses flat,
+  bordered surfaces with no shadows, as requested by the user. Keep the existing
+  light theme, burgundy accents, and Persian-first typography.
+- Keep the title and English eyebrow right-aligned with RTL direction. Group the
+  date selector and refresh button together with equal-height touch targets; let
+  the group move below the heading when space is limited.
+- Show compact linked content counts separately from the date-filtered traffic
+  report. Keep navigation cues visible on touch screens and retain keyboard focus.
+- Use consistent panel headings, legible chart axes, and contained table/chart
+  scrolling on small screens. Missing or failed data must not look like zero counts.
+- Do not restore the removed privacy card. Device and traffic-source breakdowns
+  may share a row on wide screens.
+
 ## Working and validation expectations
 
 Before editing, inspect the current diff, the page's shared layout, and the closest

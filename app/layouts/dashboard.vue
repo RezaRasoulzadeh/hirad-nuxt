@@ -2,12 +2,12 @@
   <div class="drawer lg:drawer-open min-h-screen bg-base-200" dir="rtl">
     <input id="dashboard-drawer" type="checkbox" class="drawer-toggle" v-model="isDrawerOpen" />
     
-    <div class="drawer-content flex flex-col min-h-screen pb-20 lg:pb-0">
+    <div class="drawer-content flex min-w-0 flex-col min-h-screen pb-20 lg:pb-0">
       <header class="navbar bg-base-100 border-b border-base-300 px-4 lg:px-8 sticky top-0 z-30 flex justify-between items-center w-full">
         <div class="flex items-center justify-start lg:hidden">
-          <label for="dashboard-drawer" class="btn btn-square btn-ghost drawer-button">
-            <Menu class="size-5" />
-          </label>
+          <button type="button" class="btn btn-square btn-ghost drawer-button" aria-label="باز کردن منوی مدیریت" :aria-expanded="isDrawerOpen" aria-controls="dashboard-sidebar" @click="isDrawerOpen = !isDrawerOpen">
+            <Menu class="size-5" aria-hidden="true" />
+          </button>
         </div>
 
         <div class="flex items-center justify-center flex-1">
@@ -22,7 +22,7 @@
         </div>
       </header>
 
-      <main class="flex-1 p-4 lg:p-8 mx-auto w-full container">
+      <main class="min-w-0 flex-1 p-4 lg:p-8 mx-auto w-full container">
         <slot />
       </main>
       <GlobalToast />
@@ -48,7 +48,7 @@
 
     <div class="drawer-side z-40">
       <label for="dashboard-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-      <aside class="w-80 min-h-screen bg-base-100 border-l border-base-300 flex flex-col justify-between">
+      <aside id="dashboard-sidebar" class="w-80 max-w-[calc(100vw-2rem)] min-h-screen bg-base-100 border-l border-base-300 flex flex-col justify-between">
         <div class="w-full">
           <div class="p-6 border-b border-base-200 flex items-center justify-center w-full bg-base-100 sticky top-0 z-10">
             <NuxtLink to="/" class="flex justify-start w-full">
@@ -61,7 +61,7 @@
               <NuxtLink 
                 :to="item.path" 
                 class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-150 w-full"
-                active-class="bg-primary text-primary-content font-medium shadow-sm"
+                active-class="bg-primary text-primary-content font-medium"
                 @click="closeDrawer"
               >
                 <component :is="item.icon" class="size-5 shrink-0" />

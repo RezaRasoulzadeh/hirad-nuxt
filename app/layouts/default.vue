@@ -17,6 +17,7 @@
 
     <GlobalToast />
     <FloatingContact />
+    <AnalyticsTracker />
   </div>
 </template>
 
