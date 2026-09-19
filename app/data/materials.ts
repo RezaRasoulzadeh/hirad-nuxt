@@ -1,0 +1,247 @@
+export type MaterialDatasetKind = 'pipe-welding-fittings' | 'forgings' | 'castings'
+
+export type ChemicalCompositionKey =
+  | 'C'
+  | 'Mn'
+  | 'P'
+  | 'S'
+  | 'Si'
+  | 'Cr'
+  | 'Mo'
+  | 'Ni'
+  | 'Cu'
+  | 'Other'
+
+export type MechanicalPropertyKey =
+  | 'tensileStrengthMin'
+  | 'yieldStrengthMin'
+  | 'elongationBreak'
+  | 'reductionOfArea'
+  | 'hardnessMax'
+
+export interface MaterialRecord {
+  id: string
+  sourceIdentifier: string
+  specification?: string
+  grade: string
+  category: string
+  chemicalComposition: Partial<Record<ChemicalCompositionKey, string>>
+  mechanicalProperties: Partial<Record<MechanicalPropertyKey, string>>
+  sourceNotes?: string[]
+}
+
+export interface MaterialDataset {
+  kind: MaterialDatasetKind
+  source: {
+    name: string
+    referenceTable: string
+    printedTableTitle: string
+    engineeringReferences: string
+    compositionHeading: string
+    localReferenceAsset?: string
+    internalLocation?: string
+    transcriptionMethod: string
+    reviewNotes: string[]
+  }
+  records: MaterialRecord[]
+}
+
+export const chemicalCompositionOrder: ChemicalCompositionKey[] = [
+  'C', 'Mn', 'P', 'S', 'Si', 'Cr', 'Mo', 'Ni', 'Cu', 'Other',
+]
+
+export const mechanicalPropertyOrder: MechanicalPropertyKey[] = [
+  'tensileStrengthMin',
+  'yieldStrengthMin',
+  'elongationBreak',
+  'reductionOfArea',
+  'hardnessMax',
+]
+
+/**
+ * Literal transcription of the Hirad Catalogue table. Empty printed cells and
+ * dash-only cells are omitted rather than represented as zero. No external
+ * engineering values are used to complete or normalise this dataset.
+ */
+export const pipeWeldingFittingsMaterials: MaterialDataset = {
+  kind: 'pipe-welding-fittings',
+  source: {
+    name: 'Hirad Catalogue',
+    referenceTable: 'Usual Materials for Pipe Welding Fittings',
+    printedTableTitle: 'USUAL MATERIALS FOR PIPE WEILDING FITTINGS',
+    engineeringReferences: 'ASTM specifications identified by the individual records',
+    compositionHeading: 'Chemical Compositions (Max) %',
+    localReferenceAsset: '/flipHTML/files/page/20.jpg',
+    internalLocation: 'Catalogue page 20',
+    transcriptionMethod: 'Manual structured transcription from the supplied local Hirad Catalogue table and its embedded positional text.',
+    reviewNotes: [
+      'A234 WP11 CL 2 and CL 3 print Cr as 0.44–0.65 and Mo as 1.00–1.50, unlike the CL 1 row; the printed values are preserved without correction.',
+      'A815 S32760 prints the carbon limits in the order 0.050–0.030; the printed order is preserved.',
+      'A860 WPHY 52 includes the classification qualifier “Impact Test 360LT / 27J -46°C”; it is preserved as source text.',
+      'Chemical and mechanical expressions retain the precision, unit capitalization, and range order printed in the catalogue.',
+    ],
+  },
+  records: [
+    {
+      id: 'a234-wpb', sourceIdentifier: 'A234 WPB', specification: 'A234', grade: 'WPB', category: 'Welding C.S',
+      chemicalComposition: { C: '0.35', Mn: '0.29–1.06', P: '0.050', S: '0.058', Si: '0.10 Min', Cr: '0.40', Mo: '0.15', Ni: '0.40', Cu: '0.40', Other: 'V 0.08' },
+      mechanicalProperties: { tensileStrengthMin: '415 MPa / 60 Ksi', yieldStrengthMin: '240 MPa / 35 Ksi', elongationBreak: '22–30', reductionOfArea: '20', hardnessMax: '197' },
+    },
+    {
+      id: 'a234-wpc', sourceIdentifier: 'A234 WPC', specification: 'A234', grade: 'WPC', category: 'Welding C.S',
+      chemicalComposition: { C: '0.35', Mn: '0.29–1.06', P: '0.050', S: '0.058', Si: '0.10 Min', Cr: '0.40', Mo: '0.15', Ni: '0.40', Cu: '0.40', Other: 'V 0.08' },
+      mechanicalProperties: { tensileStrengthMin: '485 MPa', yieldStrengthMin: '275 MPa', elongationBreak: '22–30', reductionOfArea: '20', hardnessMax: '197' },
+    },
+    {
+      id: 'a234-wp1', sourceIdentifier: 'A234 WP1', specification: 'A234', grade: 'WP1', category: 'Welding A.S',
+      chemicalComposition: { C: '0.28', Mn: '0.30–0.90', P: '0.045', S: '0.045', Si: '0.10–0.50', Mo: '0.44–0.65' },
+      mechanicalProperties: { tensileStrengthMin: '380 MPa', yieldStrengthMin: '205 MPa', elongationBreak: '30', reductionOfArea: '20', hardnessMax: '197' },
+    },
+    {
+      id: 'a234-wp11-cl1', sourceIdentifier: 'A234 WP11 CL 1', specification: 'A234', grade: 'WP11 CL 1', category: 'Welding A.S',
+      chemicalComposition: { C: '0.05–0.15', Mn: '0.30–0.60', P: '0.030', S: '0.030', Si: '0.50–1.00', Cr: '1.00–1.50', Mo: '0.44–0.65' },
+      mechanicalProperties: { tensileStrengthMin: '415 MPa', yieldStrengthMin: '205 MPa', elongationBreak: '22–30', reductionOfArea: '20', hardnessMax: '197' },
+    },
+    {
+      id: 'a234-wp11-cl2', sourceIdentifier: 'A234 WP11 CL 2', specification: 'A234', grade: 'WP11 CL 2', category: 'Welding A.S',
+      chemicalComposition: { C: '0.05–0.20', Mn: '0.30–0.80', P: '0.040', S: '0.040', Si: '0.50–1.00', Cr: '0.44–0.65', Mo: '1.00–1.50' },
+      mechanicalProperties: { tensileStrengthMin: '485 MPa', yieldStrengthMin: '275 MPa', elongationBreak: '22–30', reductionOfArea: '20', hardnessMax: '197' },
+    },
+    {
+      id: 'a234-wp11-cl3', sourceIdentifier: 'A234 WP11 CL 3', specification: 'A234', grade: 'WP11 CL 3', category: 'Welding A.S',
+      chemicalComposition: { C: '0.05–0.20', Mn: '0.30–0.80', P: '0.040', S: '0.040', Si: '0.50–1.00', Cr: '0.44–0.65', Mo: '1.00–1.50' },
+      mechanicalProperties: { tensileStrengthMin: '520 MPa', yieldStrengthMin: '310 MPa', elongationBreak: '22–30', reductionOfArea: '20', hardnessMax: '197' },
+    },
+    {
+      id: 'a234-wp22-cl1', sourceIdentifier: 'A234 WP22 CL 1', specification: 'A234', grade: 'WP22 CL 1', category: 'Welding A.S',
+      chemicalComposition: { C: '0.05–0.15', Mn: '0.30–0.60', P: '0.040', S: '0.040', Si: '0.50', Cr: '1.90–2.60', Mo: '0.87–1.13' },
+      mechanicalProperties: { tensileStrengthMin: '415 MPa', yieldStrengthMin: '205 MPa', elongationBreak: '22–30', reductionOfArea: '20', hardnessMax: '197' },
+    },
+    {
+      id: 'a234-wp22-cl3', sourceIdentifier: 'A234 WP22 CL 3', specification: 'A234', grade: 'WP22 CL 3', category: 'Welding A.S',
+      chemicalComposition: { C: '0.05–0.15', Mn: '0.30–0.60', P: '0.040', S: '0.040', Si: '0.50', Cr: '1.90–2.60', Mo: '0.87–1.13' },
+      mechanicalProperties: { tensileStrengthMin: '415 MPa', yieldStrengthMin: '205 MPa', elongationBreak: '22–30', reductionOfArea: '20', hardnessMax: '197' },
+    },
+    {
+      id: 'a234-wp5-cl1', sourceIdentifier: 'A234 WP5 CL 1', specification: 'A234', grade: 'WP5 CL 1', category: 'Welding A.S',
+      chemicalComposition: { C: '0.15', Mn: '0.30–0.60', P: '0.040', S: '0.030', Si: '0.50', Cr: '4.00–6.00', Mo: '0.44–0.65' },
+      mechanicalProperties: { tensileStrengthMin: '415 MPa', yieldStrengthMin: '205 MPa', elongationBreak: '22–30', reductionOfArea: '20', hardnessMax: '197' },
+    },
+    {
+      id: 'a234-wp5-cl3', sourceIdentifier: 'A234 WP5 CL 3', specification: 'A234', grade: 'WP5 CL 3', category: 'Welding A.S',
+      chemicalComposition: { C: '0.15', Mn: '0.30–0.60', P: '0.040', S: '0.030', Si: '0.50', Cr: '4.00–6.00', Mo: '0.44–0.65' },
+      mechanicalProperties: { tensileStrengthMin: '520 MPa', yieldStrengthMin: '310 MPa', elongationBreak: '22–30', reductionOfArea: '20', hardnessMax: '197' },
+    },
+    {
+      id: 'a234-wp9-cl1', sourceIdentifier: 'A234 WP9 CL 1', specification: 'A234', grade: 'WP9 CL 1', category: 'Welding A.S',
+      chemicalComposition: { C: '0.15', Mn: '0.30–0.60', P: '0.030', S: '0.030', Si: '0.50', Cr: '8.00–10.0', Mo: '0.90–1.10' },
+      mechanicalProperties: { tensileStrengthMin: '415 MPa', yieldStrengthMin: '205 MPa', elongationBreak: '22–30', reductionOfArea: '20', hardnessMax: '197' },
+    },
+    {
+      id: 'a234-wp9-cl3', sourceIdentifier: 'A234 WP9 CL 3', specification: 'A234', grade: 'WP9 CL 3', category: 'Welding A.S',
+      chemicalComposition: { C: '0.15', Mn: '0.30–0.60', P: '0.030', S: '0.030', Si: '0.50', Cr: '8.00–10.0', Mo: '0.90–1.10' },
+      mechanicalProperties: { tensileStrengthMin: '520 MPa', yieldStrengthMin: '310 MPa', elongationBreak: '22–30', reductionOfArea: '20', hardnessMax: '197' },
+    },
+    {
+      id: 'a420-wpl3', sourceIdentifier: 'A420 WPL3', specification: 'A420', grade: 'WPL3', category: 'Welding L.T.C.S',
+      chemicalComposition: { C: '0.20', Mn: '0.31–0.64', P: '0.05', S: '0.05', Si: '0.13–0.37', Ni: '3.20–3.80' },
+      mechanicalProperties: { tensileStrengthMin: '65–90 Ksi', yieldStrengthMin: '35 Ksi', elongationBreak: '30', reductionOfArea: '30', hardnessMax: '180' },
+    },
+    {
+      id: 'a420-wpl6', sourceIdentifier: 'A420 WPL6', specification: 'A420', grade: 'WPL6', category: 'Welding L.T.C.S',
+      chemicalComposition: { C: '0.30', Mn: '0.60–1.35', P: '0.035', S: '0.04', Si: '0.15–0.30', Cr: '0.30', Mo: '0.12', Ni: '0.40', Cu: '0.40', Other: 'V, Nb 0.08' },
+      mechanicalProperties: { tensileStrengthMin: '60–85 Ksi', yieldStrengthMin: '35 Ksi', elongationBreak: '30', reductionOfArea: '30', hardnessMax: '180' },
+    },
+    {
+      id: 'a420-wpl9', sourceIdentifier: 'A420 WPL9', specification: 'A420', grade: 'WPL9', category: 'Welding L.T.C.S',
+      chemicalComposition: { C: '0.20', Mn: '0.40–1.06', P: '0.030', S: '0.030', Ni: '1.60–2.24', Cu: '0.75–1.25' },
+      mechanicalProperties: { tensileStrengthMin: '63–88 Ksi', yieldStrengthMin: '46 Ksi', elongationBreak: '28', reductionOfArea: '30', hardnessMax: '180' },
+    },
+    {
+      id: 'a403-wp304', sourceIdentifier: 'A403 WP304', specification: 'A403', grade: 'WP304', category: 'Welding S.S',
+      chemicalComposition: { C: '0.08', Mn: '2.00', P: '0.045', S: '0.030', Si: '1.00', Cr: '18.00–20.00', Ni: '8.00–11.00' },
+      mechanicalProperties: { tensileStrengthMin: '515 MPa / 75 Ksi', yieldStrengthMin: '205 MPa / 30 Ksi', elongationBreak: '40', reductionOfArea: '50', hardnessMax: '201' },
+    },
+    {
+      id: 'a403-wp304l', sourceIdentifier: 'A403 WP304L', specification: 'A403', grade: 'WP304L', category: 'Welding S.S',
+      chemicalComposition: { C: '0.03', Mn: '2.00', P: '0.045', S: '0.030', Si: '1.00', Cr: '18.00–20.00', Ni: '8.00–12.00' },
+      mechanicalProperties: { tensileStrengthMin: '485 MPa / 70 Ksi', yieldStrengthMin: '170 MPa / 25 Ksi', elongationBreak: '40', reductionOfArea: '50', hardnessMax: '201' },
+    },
+    {
+      id: 'a403-wp316', sourceIdentifier: 'A403 WP316', specification: 'A403', grade: 'WP316', category: 'Welding S.S',
+      chemicalComposition: { C: '0.08', Mn: '2.00', P: '0.045', S: '0.030', Si: '1.00', Cr: '16.00–18.00', Mo: '2.00–3.00', Ni: '10.00–14.00' },
+      mechanicalProperties: { tensileStrengthMin: '515 MPa / 75 Ksi', yieldStrengthMin: '205 MPa / 30 Ksi', elongationBreak: '40', reductionOfArea: '50', hardnessMax: '217' },
+    },
+    {
+      id: 'a403-wp316l', sourceIdentifier: 'A403 WP316L', specification: 'A403', grade: 'WP316L', category: 'Welding S.S',
+      chemicalComposition: { C: '0.03', Mn: '2.00', P: '0.045', S: '0.030', Si: '1.00', Cr: '16.00–18.00', Mo: '2.00–3.00', Ni: '10.00–14.00' },
+      mechanicalProperties: { tensileStrengthMin: '485 MPa / 70 Ksi', yieldStrengthMin: '170 MPa / 25 Ksi', elongationBreak: '40', reductionOfArea: '50', hardnessMax: '217' },
+    },
+    {
+      id: 'a403-wp321', sourceIdentifier: 'A403 WP321', specification: 'A403', grade: 'WP321', category: 'Welding S.S',
+      chemicalComposition: { C: '0.08', Mn: '2.00', P: '0.045', S: '0.030', Si: '1.00', Cr: '17.00–19.00', Ni: '9.00–12.00', Other: 'Ti' },
+      mechanicalProperties: { tensileStrengthMin: '515 MPa / 75 Ksi', yieldStrengthMin: '205 MPa / 30 Ksi', elongationBreak: '40', reductionOfArea: '50', hardnessMax: '220' },
+    },
+    {
+      id: 'a403-wp904l', sourceIdentifier: 'A403 WP904L', specification: 'A403', grade: 'WP904L', category: 'Welding S.S',
+      chemicalComposition: { C: '0.02', Mn: '2.00', P: '0.045', S: '0.035', Si: '1.00', Cr: '19.00–23.00', Mo: '4.00–5.00', Ni: '23.00–28.00', Cu: '1.00–2.00' },
+      mechanicalProperties: { tensileStrengthMin: '490 MPa', yieldStrengthMin: '220 MPa', elongationBreak: '36', reductionOfArea: '40', hardnessMax: '150' },
+    },
+    {
+      id: 'a234-aisi-4130', sourceIdentifier: 'A234 AISI 4130', specification: 'A234', grade: 'AISI 4130', category: 'Welding High STR Low A.S',
+      chemicalComposition: { C: '0.28–0.33', Mn: '0.40–0.60', P: '0.035', S: '0.040', Si: '0.15–0.35', Cr: '0.80–1.10', Mo: '0.15–0.25' },
+      mechanicalProperties: { tensileStrengthMin: '1040 MPa', yieldStrengthMin: '980 MPa', elongationBreak: '26', hardnessMax: '300' },
+    },
+    {
+      id: 'a234-aisi-4140', sourceIdentifier: 'A234 AISI 4140', specification: 'A234', grade: 'AISI 4140', category: 'Welding High STR Low A.S',
+      chemicalComposition: { C: '0.38–0.43', Mn: '0.75–1.00', P: '0.035', S: '0.040', Si: '0.15–0.25', Cr: '0.80–1.10', Mo: '0.15–0.25' },
+      mechanicalProperties: { tensileStrengthMin: '1080 MPa', yieldStrengthMin: '990 MPa', elongationBreak: '26', hardnessMax: '310' },
+    },
+    {
+      id: 'a860-wphy-42', sourceIdentifier: 'A860 WPHY 42', specification: 'A860', grade: 'WPHY 42', category: 'Welding High STR B.W.F',
+      chemicalComposition: { C: '0.14', Mn: '1.35', P: '0.020', S: '0.010', Si: '0.40', Other: 'Ti 0.04' },
+      mechanicalProperties: { tensileStrengthMin: '415 MPa', yieldStrengthMin: '290 MPa', elongationBreak: '24', hardnessMax: '235' },
+    },
+    {
+      id: 'a860-wphy-52', sourceIdentifier: 'A860 WPHY 52', specification: 'A860', grade: 'WPHY 52', category: 'Welding L.T.C.S',
+      chemicalComposition: { C: '0.16', Mn: '0.90–1.45', P: '0.030', S: '0.025', Si: '0.10–0.50', Cr: '0.30', Mo: '0.08', Ni: '0.85', Cu: '0.20', Other: 'V: 0.05\nN: 0.015\nNb: 0.04' },
+      mechanicalProperties: { tensileStrengthMin: '455 MPa', yieldStrengthMin: '358 MPa', elongationBreak: '25', reductionOfArea: '30', hardnessMax: '235' },
+      sourceNotes: ['Impact Test 360LT / 27J -46°C'],
+    },
+    {
+      id: 'a860-wphy-60', sourceIdentifier: 'A860 WPHY 60', specification: 'A860', grade: 'WPHY 60', category: 'Welding High STR B.W.F',
+      chemicalComposition: { C: '0.16', Mn: '1.65', P: '0.020', S: '0.010', Si: '0.45' },
+      mechanicalProperties: { tensileStrengthMin: '520 MPa', yieldStrengthMin: '415 MPa', elongationBreak: '18', hardnessMax: '235' },
+    },
+    {
+      id: 'a860-wphy-65', sourceIdentifier: 'A860 WPHY 65', specification: 'A860', grade: 'WPHY 65', category: 'Welding High STR B.W.F',
+      chemicalComposition: { C: '0.16', Mn: '1.65', P: '0.020', S: '0.010', Si: '0.45' },
+      mechanicalProperties: { tensileStrengthMin: '550 MPa', yieldStrengthMin: '450 MPa', elongationBreak: '17', hardnessMax: '235' },
+    },
+    {
+      id: 'a815-s31803', sourceIdentifier: 'A815-S-31803', specification: 'A815', grade: 'S31803', category: 'Welding Duplex S.S',
+      chemicalComposition: { C: '0.030', Mn: '2.00', P: '0.030', S: '0.020', Si: '1.00', Cr: '21.00–23.00', Mo: '2.50–3.50', Ni: '4.50–6.50', Other: 'N 0.08–0.20' },
+      mechanicalProperties: { tensileStrengthMin: '620 MPa', yieldStrengthMin: '450 MPa', elongationBreak: '23–29', hardnessMax: '235' },
+    },
+    {
+      id: 'a815-s32750', sourceIdentifier: 'A815-S-32750', specification: 'A815', grade: 'S32750', category: 'Welding Super Duplex S.S',
+      chemicalComposition: { C: '0.030', Mn: '1.20', P: '0.035', S: '0.020', Si: '0.80', Cr: '24.00–26.00', Mo: '3.00–5.00', Ni: '6.00–8.00', Other: 'N 0.24–0.43' },
+      mechanicalProperties: { tensileStrengthMin: '800 MPa', yieldStrengthMin: '520 MPa', elongationBreak: '15', hardnessMax: '235' },
+    },
+    {
+      id: 'a815-s32760', sourceIdentifier: 'A815-S-32760', specification: 'A815', grade: 'S32760', category: 'Welding Super Duplex S.S',
+      chemicalComposition: { C: '0.050–0.030', Mn: '1.00', P: '0.035', S: '0.010', Si: '1.00', Cr: '24.00–26.00', Mo: '3.00–4.00', Ni: '6.00–8.00', Cu: '0.50–1.00', Other: 'N: 0.20–0.30\nW: 0.50–1.00' },
+      mechanicalProperties: { tensileStrengthMin: '750 MPa', yieldStrengthMin: '550 MPa', elongationBreak: '25', hardnessMax: '235' },
+    },
+    {
+      id: 'c71500-cw354h-cn107', sourceIdentifier: 'C-71500 / CW354H / CN107', grade: 'C-71500 / CW354H / CN107', category: 'Welding Cu-Ni 70/30',
+      chemicalComposition: { Mn: '1.00', Ni: '29.00–33.00', Cu: '63.5–70.6', Other: 'Fe: 0.40–1.00\nZn: 1.00\nPb: 0.05' },
+      mechanicalProperties: { tensileStrengthMin: '620 MPa', yieldStrengthMin: '250 MPa', elongationBreak: '30–34', hardnessMax: '80–120' },
+    },
+    {
+      id: 'c70600-cw352h-cn102', sourceIdentifier: 'C-70600 / CW352H / CN102', grade: 'C-70600 / CW352H / CN102', category: 'Welding Cu-Ni 90/10',
+      chemicalComposition: { Mn: '1.00', Ni: '9.00–11.00', Cu: '84.7–90.0', Other: 'Fe: 1.00–1.80\nZn: 1.00\nPb: 0.05' },
+      mechanicalProperties: { tensileStrengthMin: '570 MPa', yieldStrengthMin: '270 MPa', elongationBreak: '27–30', hardnessMax: '70–120' },
+    },
+  ],
+}
