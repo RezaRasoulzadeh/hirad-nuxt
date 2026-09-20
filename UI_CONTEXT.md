@@ -95,6 +95,12 @@ or manual entry; the displayed results are calculated values. Keep numerical
 logic in the tested utility module and distinguish source dimensions from user
 inputs in the UI.
 
+The Engineering Unit Converters tool also uses the compact layout. Keep its searchable
+quantity list, single direct-conversion workspace, simultaneous equivalent-unit results,
+and visible definition note for ambiguous units. Unit metadata belongs in the shared
+definition module and conversion behavior in the tested utility module so calculators
+and converters do not acquire conflicting factors.
+
 ## Layout, surfaces, and interaction
 
 - Resources containers use `mx-auto max-w-[1720px] px-5 md:px-8 lg:px-12`.

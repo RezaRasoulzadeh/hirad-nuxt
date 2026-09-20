@@ -11,6 +11,11 @@
  * Cv/Kv: https://www.emerson.com/is/content/emerson/en/final-control/flow-controls/documents/cat12_s2.pdf
  */
 
+import { KV_PER_CV, type UnitConversionCategoryId } from '../data/unitConversions.ts'
+import { UnitConversionError, convertUnitValue } from './unitConversions.ts'
+
+export { KV_PER_CV }
+
 export type DiameterUnit = 'mm' | 'in'
 export type LengthUnit = 'm' | 'ft'
 export type FlowUnit = 'm3h' | 'ls' | 'usgpm'
@@ -30,12 +35,6 @@ export class CalculationError extends Error {
   }
 }
 
-const INCH_M = 0.0254
-const FOOT_M = 0.3048
-const POUND_KG = 0.45359237
-const US_GALLON_M3 = 0.003785411784
-export const KV_PER_CV = 0.865
-
 function assertFinite(value: number) {
   if (!Number.isFinite(value)) throw new CalculationError('finite')
 }
@@ -43,6 +42,15 @@ function assertFinite(value: number) {
 function finiteResult(value: number) {
   assertFinite(value)
   return value
+}
+
+function convertEngineeringUnit(category: UnitConversionCategoryId, value: number, from: string, to: string) {
+  try {
+    return convertUnitValue(category, value, from, to)
+  } catch (error) {
+    if (error instanceof UnitConversionError && error.code === 'finite') throw new CalculationError('finite')
+    throw error
+  }
 }
 
 function assertPositive(value: number, code: CalculationErrorCode) {
@@ -57,51 +65,47 @@ function assertNonNegative(value: number, code: CalculationErrorCode) {
 
 export function diameterToMeters(value: number, unit: DiameterUnit) {
   assertFinite(value)
-  return finiteResult(value * (unit === 'in' ? INCH_M : 0.001))
+  return finiteResult(convertEngineeringUnit('length', value, unit, 'm'))
 }
 
 export function metersToDiameter(value: number, unit: DiameterUnit) {
   assertFinite(value)
-  return finiteResult(value / (unit === 'in' ? INCH_M : 0.001))
+  return finiteResult(convertEngineeringUnit('length', value, 'm', unit))
 }
 
 export function lengthToMeters(value: number, unit: LengthUnit) {
   assertFinite(value)
-  return finiteResult(value * (unit === 'ft' ? FOOT_M : 1))
+  return finiteResult(convertEngineeringUnit('length', value, unit, 'm'))
 }
 
 export function flowToCubicMetersPerSecond(value: number, unit: FlowUnit) {
   assertFinite(value)
-  if (unit === 'm3h') return finiteResult(value / 3600)
-  if (unit === 'ls') return finiteResult(value / 1000)
-  return finiteResult(value * US_GALLON_M3 / 60)
+  return finiteResult(convertEngineeringUnit('volumetricFlow', value, unit, 'm3s'))
 }
 
 export function cubicMetersPerSecondToFlow(value: number, unit: FlowUnit) {
   assertFinite(value)
-  if (unit === 'm3h') return finiteResult(value * 3600)
-  if (unit === 'ls') return finiteResult(value * 1000)
-  return finiteResult(value * 60 / US_GALLON_M3)
+  return finiteResult(convertEngineeringUnit('volumetricFlow', value, 'm3s', unit))
 }
 
 export function velocityToMetersPerSecond(value: number, unit: VelocityUnit) {
   assertFinite(value)
-  return finiteResult(value * (unit === 'fts' ? FOOT_M : 1))
+  return finiteResult(convertEngineeringUnit('velocity', value, unit, 'ms'))
 }
 
 export function metersPerSecondToVelocity(value: number, unit: VelocityUnit) {
   assertFinite(value)
-  return finiteResult(value / (unit === 'fts' ? FOOT_M : 1))
+  return finiteResult(convertEngineeringUnit('velocity', value, 'ms', unit))
 }
 
 export function densityToKilogramsPerCubicMeter(value: number, unit: DensityUnit) {
   assertFinite(value)
-  return finiteResult(value * (unit === 'gcm3' ? 1000 : 1))
+  return finiteResult(convertEngineeringUnit('density', value, unit, 'kgm3'))
 }
 
 export function viscosityToPascalSeconds(value: number, unit: ViscosityUnit) {
   assertFinite(value)
-  return finiteResult(value * (unit === 'mpas' ? 0.001 : 1))
+  return finiteResult(convertEngineeringUnit('dynamicViscosity', value, unit, 'pas'))
 }
 
 export interface PipeGeometry {
@@ -165,20 +169,22 @@ export function calculateReynolds(velocityMs: number, insideDiameterM: number, d
 
 export function cvToKv(cv: number) {
   assertNonNegative(cv, 'coefficient')
-  return finiteResult(cv * KV_PER_CV)
+  return finiteResult(convertEngineeringUnit('flowCoefficient', cv, 'cv', 'kv'))
 }
 
 export function kvToCv(kv: number) {
   assertNonNegative(kv, 'coefficient')
-  return finiteResult(kv / KV_PER_CV)
+  return finiteResult(convertEngineeringUnit('flowCoefficient', kv, 'kv', 'cv'))
 }
 
 export function kilogramsToPounds(value: number) {
   assertFinite(value)
-  return finiteResult(value / POUND_KG)
+  return finiteResult(convertEngineeringUnit('mass', value, 'kg', 'lb'))
 }
 
 export function kilogramsPerMeterToPoundsPerFoot(value: number) {
   assertFinite(value)
-  return finiteResult(value * FOOT_M / POUND_KG)
+  const pounds = convertEngineeringUnit('mass', value, 'kg', 'lb')
+  const feet = convertEngineeringUnit('length', 1, 'm', 'ft')
+  return finiteResult(pounds / feet)
 }
