@@ -75,10 +75,6 @@ export const resourcesCopy = {
       fa: 'مجموعه‌ای از ابزارهای کاربردی برای بررسی سریع داده‌ها و تصمیم‌گیری در پروژه‌های مهندسی.',
       en: 'Practical tools for quick checks and informed decisions in engineering projects.',
     },
-    note: {
-      fa: 'ابزارهای منتخب هم‌اکنون قابل استفاده‌اند و سایر بخش‌ها به‌تدریج تکمیل می‌شوند.',
-      en: 'Selected tools are available now, with more sections being prepared.',
-    },
     directoryTitle: { fa: 'فهرست ابزارها', en: 'Tool directory' },
   },
   pipeDimensions: {
