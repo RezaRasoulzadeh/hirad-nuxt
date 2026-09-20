@@ -82,11 +82,32 @@
               <ChartNoAxesColumn class="size-5 shrink-0 text-primary/70" aria-hidden="true" />
             </div>
             <div class="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-xs text-base-content/65">
-              <span class="flex items-center gap-2"><i class="h-0.5 w-5 rounded bg-primary" aria-hidden="true"></i>بازدید صفحات</span>
-              <span class="flex items-center gap-2"><i class="w-5 border-t-2 border-dashed border-secondary" aria-hidden="true"></i>بازدیدکننده یکتا</span>
+              <button
+                type="button"
+                class="flex items-center gap-2 rounded px-1 py-1 transition-colors hover:text-base-content focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                :class="{ 'text-base-content/40': !showViews }"
+                :aria-pressed="showViews"
+                :disabled="!showVisitors"
+                @click="toggleViews"
+              >
+                <i class="h-0.5 w-5 rounded bg-primary" :class="{ 'opacity-35': !showViews }" aria-hidden="true"></i>
+                بازدید صفحات
+              </button>
+              <button
+                type="button"
+                class="flex items-center gap-2 rounded px-1 py-1 transition-colors hover:text-base-content focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                :class="{ 'text-base-content/40': !showVisitors }"
+                :aria-pressed="showVisitors"
+                :disabled="!showViews"
+                @click="toggleVisitors"
+              >
+                <i class="w-5 border-t-2 border-dashed border-secondary" :class="{ 'opacity-35': !showVisitors }" aria-hidden="true"></i>
+                بازدیدکننده یکتا
+              </button>
             </div>
             <div v-if="hasDailyData" class="chart-scroll mt-4 overflow-x-auto" tabindex="0" role="region" aria-label="نمودار روزانه؛ برای مشاهده کامل در نمایشگر کوچک پیمایش کنید">
-              <svg class="block w-full min-w-[480px]" viewBox="0 0 720 270" role="img" aria-labelledby="traffic-chart-title" dir="ltr">
+              <div class="chart-canvas relative min-w-[480px]">
+                <svg class="block w-full" viewBox="0 0 720 270" role="img" aria-labelledby="traffic-chart-title" dir="ltr">
                 <title id="traffic-chart-title">روند روزانه بازدید در {{ fa(analytics.range) }} روز گذشته؛ {{ fa(analytics.summary.pageViews) }} بازدید و {{ fa(analytics.summary.uniqueVisitors) }} بازدیدکننده یکتا</title>
                 <defs>
                   <linearGradient id="views-area" x1="0" x2="0" y1="0" y2="1">
@@ -98,14 +119,61 @@
                   <line x1="48" :y1="tick.y" x2="692" :y2="tick.y" stroke="var(--color-base-300)" stroke-dasharray="3 5" />
                   <text x="35" :y="tick.y + 4" text-anchor="end" fill="currentColor" class="text-[11px] text-base-content/55">{{ fa(tick.value) }}</text>
                 </g>
-                <path :d="areaPath" fill="url(#views-area)" />
-                <polyline :points="viewsPoints" fill="none" stroke="var(--color-primary)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" />
-                <polyline :points="visitorsPoints" fill="none" stroke="var(--color-secondary)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke-dasharray="5 5" />
-                <circle v-for="(day, index) in analytics.daily" :key="day.date" :cx="chartX(index)" :cy="chartY(day.pageViews)" r="3" fill="var(--color-base-100)" stroke="var(--color-primary)" stroke-width="1.5">
-                  <title>{{ shortDate(day.date) }}: {{ fa(day.pageViews) }} بازدید، {{ fa(day.uniqueVisitors) }} بازدیدکننده یکتا</title>
-                </circle>
+                <path v-if="showViews" :d="areaPath" fill="url(#views-area)" />
+                <line v-if="activeChartPoint !== null" :x1="chartX(activeChartPoint)" y1="28" :x2="chartX(activeChartPoint)" y2="218" stroke="var(--color-primary)" stroke-dasharray="2 4" stroke-opacity="0.35" />
+                <polyline v-if="showViews" :points="viewsPoints" fill="none" stroke="var(--color-primary)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" />
+                <polyline v-if="showVisitors" :points="visitorsPoints" fill="none" stroke="var(--color-secondary)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke-dasharray="5 5" />
+                <template v-for="(day, index) in analytics.daily" :key="day.date">
+                  <circle
+                    v-if="showViews"
+                    :cx="chartX(index)"
+                    :cy="chartY(day.pageViews)"
+                    :r="activeChartPoint === index ? 5 : 3"
+                    fill="var(--color-base-100)"
+                    stroke="var(--color-primary)"
+                    stroke-width="1.5"
+                    tabindex="0"
+                    role="button"
+                    :aria-label="`${shortDate(day.date)}: ${fa(day.pageViews)} بازدید صفحه، ${fa(day.uniqueVisitors)} بازدیدکننده یکتا`"
+                    @mouseenter="setActiveChartPoint(index)"
+                    @mouseleave="clearActiveChartPoint"
+                    @focus="setActiveChartPoint(index)"
+                    @blur="clearActiveChartPoint"
+                    @click="setActiveChartPoint(index)"
+                  >
+                    <title>{{ shortDate(day.date) }}: {{ fa(day.pageViews) }} بازدید، {{ fa(day.uniqueVisitors) }} بازدیدکننده یکتا</title>
+                  </circle>
+                  <circle
+                    v-if="showVisitors"
+                    :cx="chartX(index)"
+                    :cy="chartY(day.uniqueVisitors)"
+                    :r="activeChartPoint === index ? 4 : 2.5"
+                    fill="var(--color-base-100)"
+                    stroke="var(--color-secondary)"
+                    stroke-width="1.25"
+                    tabindex="0"
+                    role="button"
+                    :aria-label="`${shortDate(day.date)}: ${fa(day.uniqueVisitors)} بازدیدکننده یکتا، ${fa(day.pageViews)} بازدید صفحه`"
+                    @mouseenter="setActiveChartPoint(index)"
+                    @mouseleave="clearActiveChartPoint"
+                    @focus="setActiveChartPoint(index)"
+                    @blur="clearActiveChartPoint"
+                    @click="setActiveChartPoint(index)"
+                  />
+                </template>
                 <text v-for="label in chartLabels" :key="label.date" :x="label.x" y="255" :text-anchor="label.anchor" fill="currentColor" class="text-[11px] text-base-content/55">{{ shortDate(label.date) }}</text>
-              </svg>
+                </svg>
+                <div
+                  v-if="activeChartPoint !== null"
+                  class="chart-tooltip pointer-events-none absolute z-10 min-w-36 rounded-lg border border-base-300 bg-base-100 px-3 py-2 text-xs shadow-sm"
+                  :style="chartTooltipStyle"
+                  dir="rtl"
+                >
+                  <p class="font-bold text-base-content">{{ shortDate(activeChartPointData.date) }}</p>
+                  <p v-if="showViews" class="mt-1 text-primary">بازدید صفحات: <bdi dir="ltr" class="font-bold">{{ fa(activeChartPointData.pageViews) }}</bdi></p>
+                  <p v-if="showVisitors" class="text-secondary">بازدیدکننده یکتا: <bdi dir="ltr" class="font-bold">{{ fa(activeChartPointData.uniqueVisitors) }}</bdi></p>
+                </div>
+              </div>
             </div>
             <div v-else class="empty-state min-h-60">
               <ChartNoAxesColumn class="size-8 text-primary/40" :stroke-width="1.5" aria-hidden="true" />
@@ -218,6 +286,9 @@ interface ContentStats {
 }
 
 const selectedRange = ref(7)
+const showViews = ref(true)
+const showVisitors = ref(true)
+const activeChartPoint = ref<number | null>(null)
 const { data: analytics, status, error, refresh } = await useFetch('/api/analytics/stats', {
   lazy: true,
   query: computed(() => ({ range: selectedRange.value })),
@@ -268,6 +339,7 @@ const contentCards = computed(() => {
 })
 
 const hasDailyData = computed(() => analytics.value?.daily.some(day => day.pageViews > 0) ?? false)
+const activeChartPointData = computed(() => analytics.value?.daily[activeChartPoint.value ?? 0] ?? { date: '', pageViews: 0, uniqueVisitors: 0, sessions: 0 })
 const pagesPerSession = computed(() => analytics.value?.summary.sessions ? fa(analytics.value.summary.pageViews / analytics.value.summary.sessions) : '—')
 const chartMax = computed(() => Math.max(3, Math.ceil(Math.max(0, ...(analytics.value?.daily.map(day => day.pageViews) ?? [])) / 3) * 3))
 const chartX = (index: number) => 48 + index / Math.max(1, (analytics.value?.daily.length ?? 1) - 1) * 644
@@ -279,9 +351,23 @@ const areaPath = computed(() => viewsPoints.value ? `M 48,218 L ${viewsPoints.va
 const chartLabels = computed(() => {
   const days = analytics.value?.daily ?? []
   return days.flatMap((day, index) => [0, Math.floor((days.length - 1) / 2), days.length - 1].includes(index)
-    ? [{ date: day.date, x: chartX(index), anchor: index === 0 ? 'start' : index === days.length - 1 ? 'end' : 'middle' }]
+    ? [{
+        date: day.date,
+        // Center endpoint labels inside a generous inset so Persian month names cannot spill out.
+        x: index === 0 ? 82 : index === days.length - 1 ? 652 : chartX(index),
+        anchor: 'middle',
+      }]
     : [])
 })
+const chartTooltipStyle = computed(() => ({
+  left: `${chartX(activeChartPoint.value ?? 0) / 720 * 100}%`,
+  top: `${Math.max(8, chartY(Math.max(activeChartPointData.value.pageViews, activeChartPointData.value.uniqueVisitors)) / 270 * 100 - 2)}%`,
+  transform: activeChartPoint.value === 0 ? 'translateX(0)' : activeChartPoint.value === (analytics.value?.daily.length ?? 1) - 1 ? 'translateX(-100%)' : 'translateX(-50%)',
+}))
+const setActiveChartPoint = (index: number) => { activeChartPoint.value = index }
+const clearActiveChartPoint = () => { activeChartPoint.value = null }
+const toggleViews = () => { if (showVisitors.value) showViews.value = !showViews.value }
+const toggleVisitors = () => { if (showViews.value) showVisitors.value = !showVisitors.value }
 </script>
 
 <style scoped>
@@ -301,6 +387,7 @@ const chartLabels = computed(() => {
 .panel-heading h3 { font-size: 1rem; font-weight: 700; line-height: 1.75; }
 .panel-heading p { margin-top: .25rem; font-size: .75rem; line-height: 1.75; color: color-mix(in srgb, var(--color-base-content) 60%, transparent); }
 .empty-state { display: flex; min-height: 11rem; flex-direction: column; align-items: center; justify-content: center; gap: .75rem; padding: 2rem 1rem; text-align: center; font-size: .8125rem; line-height: 1.75; color: color-mix(in srgb, var(--color-base-content) 60%, transparent); }
+.chart-tooltip { white-space: nowrap; }
 .dashboard-overview :is(a, button, select, [tabindex]):focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }
 @media (min-width: 640px) { .content-grid, .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .header-controls { width: 20rem; } }
 @media (min-width: 768px) { .panel { padding: 1.5rem; } }

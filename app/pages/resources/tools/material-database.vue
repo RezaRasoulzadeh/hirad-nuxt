@@ -14,7 +14,7 @@
               <h1 id="material-tool-heading" class="mt-2 text-2xl font-black leading-relaxed md:text-3xl">{{ copy.title.fa }}</h1>
             </div>
             <span class="shrink-0 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-[11px] font-bold text-primary" lang="en" dir="ltr">
-              Hirad Catalogue · ASTM References
+              ASTM References · Industry basis
             </span>
           </div>
         </div>
@@ -132,28 +132,12 @@
             </div>
           </form>
 
-          <aside class="min-w-0 rounded-xl border border-base-300 bg-base-200/60 p-5 md:p-6" aria-labelledby="material-reference-summary">
-            <div class="flex items-start gap-3">
-              <span class="flex size-11 shrink-0 items-center justify-center rounded-lg bg-primary/5 text-primary">
-                <BookOpenCheck class="size-5" :stroke-width="1.6" aria-hidden="true" />
-              </span>
-              <div class="min-w-0">
-                <h2 id="material-reference-summary" class="text-base font-bold leading-7">{{ copy.reference.fa }}</h2>
-                <p class="mt-1 text-xs leading-6 text-base-content/60" lang="en" dir="ltr">{{ dataset.source.name }}</p>
-              </div>
-            </div>
-            <p class="mt-5 text-sm leading-8 text-base-content/65 text-justify">{{ copy.referenceNote.fa }}</p>
-            <a
-              v-if="dataset.source.localReferenceAsset"
-              :href="dataset.source.localReferenceAsset"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="btn btn-outline btn-primary mt-5 min-h-11 rounded-lg px-4 text-xs"
-            >
-              <ExternalLink class="size-4" aria-hidden="true" />
-              {{ copy.viewOriginal.fa }}
-            </a>
-          </aside>
+          <ToolReferencePanel
+            id="material-reference-summary"
+            :title-fa="copy.reference.fa"
+            :basis-fa="copy.referenceBasis.fa"
+            :description-fa="copy.referenceNote.fa"
+          />
         </div>
       </section>
 
@@ -167,9 +151,9 @@
             </span>
           </header>
 
-          <div v-if="filteredMaterials.length" class="divide-y divide-base-300 xl:max-h-[72rem] xl:overflow-y-auto">
-            <article v-for="material in filteredMaterials" :key="material.id" class="relative p-4 md:p-5" :class="selectedMaterial?.id === material.id ? 'bg-primary/[0.025]' : ''">
-              <span v-if="selectedMaterial?.id === material.id" class="absolute inset-y-4 start-0 w-0.75 rounded-e-full bg-primary" aria-hidden="true" />
+          <div v-if="filteredMaterials.length" class="divide-y divide-base-300 xl:max-h-288 xl:overflow-y-auto">
+            <article v-for="material in filteredMaterials" :key="material.id" class="relative p-4 md:p-5" :class="selectedMaterial?.id === material.id ? 'bg-primary/2.5' : ''">
+              <span v-if="selectedMaterial?.id === material.id" class="absolute inset-y-4 inset-s-0 w-0.75 rounded-e-full bg-primary" aria-hidden="true" />
               <button
                 type="button"
                 class="block w-full rounded-lg text-start focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
@@ -265,7 +249,7 @@
                     <dd class="mt-2 text-sm font-bold" lang="en" dir="ltr">{{ selectedMaterial.category }}</dd>
                   </div>
                 </dl>
-                <div v-if="selectedMaterial.sourceNotes?.length" class="mt-4 rounded-lg border border-primary/15 bg-primary/[0.025] p-4">
+                <div v-if="selectedMaterial.sourceNotes?.length" class="mt-4 rounded-lg border border-primary/15 bg-primary/2.5 p-4">
                   <p class="text-xs font-bold text-primary">{{ copy.sourceNotes.fa }}</p>
                   <ul class="mt-2 space-y-1 text-sm leading-7 text-base-content/70" lang="en" dir="ltr">
                     <li v-for="note in selectedMaterial.sourceNotes" :key="note">{{ note }}</li>
@@ -281,7 +265,7 @@
                 <dl class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
                   <div v-for="entry in presentComposition(selectedMaterial)" :key="entry.key" class="min-w-0 rounded-lg border border-base-300 bg-base-100 p-3 text-center">
                     <dt class="text-xs font-bold text-primary" :lang="entry.key === 'Other' ? undefined : 'en'" dir="ltr">{{ chemicalLabel(entry.key) }}</dt>
-                    <dd class="mt-2 whitespace-pre-line break-words text-xs font-bold leading-6 text-base-content" lang="en" dir="ltr">{{ entry.value }}</dd>
+                    <dd class="mt-2 whitespace-pre-line wrap-break-word text-xs font-bold leading-6 text-base-content" lang="en" dir="ltr">{{ entry.value }}</dd>
                   </div>
                 </dl>
               </section>
@@ -298,15 +282,6 @@
                 </dl>
               </section>
 
-              <section aria-labelledby="material-reference-heading" class="rounded-xl border border-base-300 bg-base-200/60 p-5">
-                <div class="flex items-start gap-3">
-                  <FileText class="mt-0.5 size-5 shrink-0 text-primary" :stroke-width="1.5" aria-hidden="true" />
-                  <div>
-                    <h3 id="material-reference-heading" class="text-base font-bold">{{ copy.referenceTitle.fa }}</h3>
-                    <p class="mt-2 text-sm leading-8 text-base-content/65">{{ copy.referenceNote.fa }}</p>
-                  </div>
-                </div>
-              </section>
             </div>
           </div>
         </section>
@@ -413,8 +388,9 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowLeft, BookOpenCheck, Check, ExternalLink, FileText, GitCompareArrows, Plus, RotateCcw, Search, SearchX, X } from 'lucide-vue-next'
+import { ArrowLeft, Check, GitCompareArrows, Plus, RotateCcw, Search, SearchX, X } from 'lucide-vue-next'
 import ResourcePage from '~/components/resources/ResourcePage.vue'
+import ToolReferencePanel from '~/components/resources/ToolReferencePanel.vue'
 import EngineeringValueRow from '~/components/resources/EngineeringValueRow.vue'
 import {
   chemicalCompositionOrder,

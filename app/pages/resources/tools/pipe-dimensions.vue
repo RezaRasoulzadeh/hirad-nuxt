@@ -16,7 +16,7 @@
         </div>
 
         <div class="grid gap-5 xl:grid-cols-[minmax(0,1.25fr)_minmax(19rem,0.75fr)]">
-          <form class="rounded-xl border border-base-300 bg-base-100 p-5 shadow-sm md:p-6" @submit.prevent>
+          <form class="rounded-xl border border-base-300 bg-base-100 p-5 md:p-6" @submit.prevent>
             <div class="grid gap-5 sm:grid-cols-2">
               <label class="form-control min-w-0">
                 <span class="mb-2 text-sm font-bold">{{ resourcesCopy.pipeDimensions.standard.fa }}</span>
@@ -50,7 +50,7 @@
               <fieldset class="min-w-0">
                 <legend class="mb-2 text-sm font-bold">{{ resourcesCopy.pipeDimensions.unitSystem.fa }}</legend>
                 <div class="grid grid-cols-2 gap-2 rounded-lg bg-base-200 p-1" role="radiogroup" :aria-label="resourcesCopy.pipeDimensions.unitSystem.fa">
-                  <button v-for="unit in units" :key="unit.id" type="button" role="radio" :aria-checked="unitSystem === unit.id" class="min-h-10 rounded-md px-3 text-xs font-bold transition-colors focus-visible:outline-2 focus-visible:outline-primary" :class="unitSystem === unit.id ? 'bg-primary text-primary-content shadow-sm' : 'text-base-content/60 hover:text-primary'" @click="unitSystem = unit.id">
+                  <button v-for="unit in units" :key="unit.id" type="button" role="radio" :aria-checked="unitSystem === unit.id" class="min-h-10 rounded-md px-3 text-xs font-bold transition-colors focus-visible:outline-2 focus-visible:outline-primary" :class="unitSystem === unit.id ? 'bg-primary text-primary-content' : 'text-base-content/60 hover:text-primary'" @click="unitSystem = unit.id">
                     {{ unit.fa }} <span class="ms-1 font-medium opacity-80" lang="en" dir="ltr">{{ unit.en }}</span>
                   </button>
                 </div>
@@ -59,22 +59,13 @@
 
           </form>
 
-          <aside class="rounded-xl border border-base-300 bg-base-200/60 p-5 md:p-6" aria-labelledby="pipe-reference-heading">
-            <div class="flex items-start gap-3">
-              <span class="flex size-11 shrink-0 items-center justify-center rounded-lg bg-primary/5 text-primary">
-                <FileText class="size-5" :stroke-width="1.6" aria-hidden="true" />
-              </span>
-              <div>
-                <h3 id="pipe-reference-heading" class="text-base font-bold leading-7">{{ resourcesCopy.pipeDimensions.reference.fa }}</h3>
-                <p class="mt-1 text-xs leading-6 text-base-content/60" lang="en" dir="ltr">{{ pipeDimensionsSource.reference }}</p>
-              </div>
-            </div>
-            <p class="mt-5 text-sm leading-8 text-base-content/65">{{ resourcesCopy.pipeDimensions.sourceNote.fa }}</p>
-            <div class="mt-5 border-t border-base-300 pt-4 text-xs leading-6 text-base-content/55">
-              <span class="font-bold text-base-content/75">{{ resourcesCopy.pipeDimensions.standard.fa }}:</span>
-              <span class="ms-1" lang="en" dir="ltr">{{ selectedStandard?.code }}</span>
-            </div>
-          </aside>
+          <ToolReferencePanel
+            id="pipe-reference-heading"
+            :title-fa="resourcesCopy.pipeDimensions.reference.fa"
+            :basis-fa="resourcesCopy.pipeDimensions.referenceBasis.fa"
+            :description-fa="resourcesCopy.pipeDimensions.sourceNote.fa"
+            :detail-fa="`${resourcesCopy.pipeDimensions.standard.fa}: ${selectedStandard?.code || '—'}`"
+          />
         </div>
       </section>
 
@@ -165,8 +156,9 @@
 </template>
 
 <script setup lang="ts">
-import { Calculator, Download, FileText } from 'lucide-vue-next'
+import { Calculator, Download } from 'lucide-vue-next'
 import ResourcePage from '~/components/resources/ResourcePage.vue'
+import ToolReferencePanel from '~/components/resources/ToolReferencePanel.vue'
 import EngineeringValueRow from '~/components/resources/EngineeringValueRow.vue'
 import TechnicalTable from '~/components/resources/TechnicalTable.vue'
 import { getPipeNps, getPipeStandard, pipeDimensionsSource, pipeStandards, type PipeStandardId } from '~/data/pipeDimensions'
