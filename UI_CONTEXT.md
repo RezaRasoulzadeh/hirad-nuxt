@@ -88,6 +88,13 @@ Nested Resources tool pages use a compact interior layout: keep the shared secti
 navigation at the top, omit the directory hero image and hero copy, then show the full
 route breadcrumb before the tool's own page heading and content.
 
+The Engineering Calculators tool uses this compact layout. Its scrollable tab strip
+opens a single input and result workspace, with formula and assumptions beside the
+results. Pipe dimensions can come from the existing ASME B36.10 / B36.19 dataset
+or manual entry; the displayed results are calculated values. Keep numerical
+logic in the tested utility module and distinguish source dimensions from user
+inputs in the UI.
+
 ## Layout, surfaces, and interaction
 
 - Resources containers use `mx-auto max-w-[1720px] px-5 md:px-8 lg:px-12`.
