@@ -40,20 +40,15 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useToast } from '~/composables/useToast';
+import type { DashboardMediaAsset } from '~/utils/mediaAssets';
 
-interface Asset {
-  id: string;
-  file_url: string;
-  description: string;
-}
-
-const props = defineProps<{ asset: Asset }>();
+const props = defineProps<{ asset: DashboardMediaAsset }>();
 const emit = defineEmits(['close', 'asset-updated']);
 const toast = useToast();
 
 // Use global window inference here as well
 const file = ref<Blob | null>(null);
-const editedDescription = ref(props.asset.description);
+const editedDescription = ref(props.asset.description || '');
 const updating = ref(false);
 
 const handleFileChange = (event: Event) => {

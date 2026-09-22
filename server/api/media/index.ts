@@ -1,4 +1,6 @@
 // server/api/dashboard/media/index.ts
+import { matchesMediaAssetKind, normalizeMediaAssetKind } from '../../../app/utils/mediaAssets'
+
 export default defineEventHandler(async (event) => {
   const method = getMethod(event);
 
@@ -7,10 +9,12 @@ export default defineEventHandler(async (event) => {
       const query = getQuery(event)
       const offset = Math.max(0, Number(query.offset) || 0)
       const limit = Math.min(100, Math.max(1, Number(query.limit) || 40))
+      const kind = normalizeMediaAssetKind(query.kind)
       const response = await authenticatedFetch(event, '/upload/asset')
       const payload = await response.json()
       const allAssets = Array.isArray(payload) ? payload : Array.isArray(payload?.data) ? payload.data : []
-      const data = allAssets.slice(offset, offset + limit)
+      const filteredAssets = allAssets.filter(asset => matchesMediaAssetKind(asset, kind))
+      const data = filteredAssets.slice(offset, offset + limit)
 
       return {
         ...(Array.isArray(payload) ? {} : payload),
@@ -19,8 +23,8 @@ export default defineEventHandler(async (event) => {
         pagination: {
           offset,
           limit,
-          total: allAssets.length,
-          has_more: offset + data.length < allAssets.length,
+          total: filteredAssets.length,
+          has_more: offset + data.length < filteredAssets.length,
         },
       }
     } catch (error: any) {

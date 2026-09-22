@@ -1,6 +1,5 @@
 import type { Component } from 'vue'
 import {
-  BookOpen,
   Calculator,
   CircleGauge,
   Factory,
@@ -26,8 +25,10 @@ export interface ResourceCardDefinition {
   status?: ResourceText
 }
 
-export interface StandardCategoryDefinition {
-  code: string
+export interface StandardOrganizationDefinition {
+  id: string
+  codes: string[]
+  label: string
   title: ResourceText
   description: ResourceText
 }
@@ -57,8 +58,8 @@ export const resourcesCopy = {
     categoriesEyebrow: { fa: 'منابع تخصصی', en: 'Technical Resources' },
     categoriesTitle: { fa: 'از اطلاعات فنی تا انتخاب تجهیزات', en: 'From technical information to equipment selection' },
     categoriesDescription: {
-      fa: 'منابع موردنیاز خود را در چهار بخش تخصصی دنبال کنید.',
-      en: 'Explore four dedicated areas of engineering knowledge.',
+      fa: 'ابزارهای کاربردی و مراجع استاندارد موردنیاز پروژه را در دو بخش تخصصی دنبال کنید.',
+      en: 'Explore practical engineering tools and standards references in two focused sections.',
     },
     supportTitle: { fa: 'همراه شما در انتخاب تجهیزات', en: 'Support for equipment selection' },
     supportDescription: {
@@ -371,12 +372,35 @@ export const resourcesCopy = {
       fa: 'مرجع سازمان‌یافته‌ای برای استانداردها، مشخصات فنی و مستندات مورد استفاده در صنایع فرآیندی.',
       en: 'A structured reference for standards, specifications and technical documents used in process industries.',
     },
-    emptyTitle: { fa: 'مجموعه مستندات در حال آماده‌سازی است', en: 'The document collection is in preparation' },
+    emptyTitle: { fa: 'هنوز استانداردی منتشر نشده است', en: 'No standards have been published yet' },
     emptyDescription: {
-      fa: 'هنوز مستندی در این بخش منتشر نشده است. منابع فنی پس از بررسی، در دسته‌بندی‌های بالا قرار خواهند گرفت.',
-      en: 'No documents have been published yet. Technical references will be added to these categories after review.',
+      fa: 'مراجع فنی پس از بررسی و انتشار مدیر محتوا در این بخش نمایش داده می‌شوند.',
+      en: 'Technical references appear here after editorial review and publication.',
     },
-    familiesTitle: { fa: 'دسته‌بندی مراجع', en: 'Reference categories' },
+    familiesTitle: { fa: 'دسته‌بندی بر اساس سازمان', en: 'Browse by organization' },
+    organizationCount: { fa: 'مرجع منتشرشده', en: 'published references' },
+    organization: { fa: 'سازمان', en: 'Organization' },
+    category: { fa: 'موضوع', en: 'Topic' },
+    resultCount: { fa: 'مرجع', en: 'references' },
+    allStandards: { fa: 'نمایش همه استانداردها', en: 'Show all standards' },
+    selectedOrganizationEmpty: { fa: 'برای این سازمان هنوز استانداردی منتشر نشده است.', en: 'No standards have been published for this organization yet.' },
+    viewDetails: { fa: 'مشاهده جزئیات', en: 'View details' },
+    featured: { fa: 'مرجع منتخب', en: 'Featured reference' },
+    referenceEyebrow: { fa: 'مرجع استاندارد مهندسی', en: 'Engineering Standard Reference' },
+    referenceFacts: { fa: 'مشخصات مرجع استاندارد', en: 'Standard reference facts' },
+    edition: { fa: 'ویرایش / بازنگری', en: 'Edition / revision' },
+    publicationYear: { fa: 'سال انتشار', en: 'Publication year' },
+    officialSource: { fa: 'مشاهده منبع رسمی', en: 'View official source' },
+    overviewTitle: { fa: 'درباره این مرجع', en: 'Reference overview' },
+    summaryTitle: { fa: 'خلاصه مرجع', en: 'Reference summary' },
+    relatedResources: { fa: 'پیوندها و منابع مرتبط', en: 'Related links and resources' },
+    relatedResourcesDescription: { fa: 'دسترسی‌های ثبت‌شده برای این مرجع', en: 'Available links for this reference' },
+    accessNoteTitle: { fa: 'دسترسی به متن معتبر', en: 'Accessing the authoritative text' },
+    resourceNotice: { fa: 'هیراد این استاندارد را منتشر نمی‌کند. برای دریافت متن معتبر، وضعیت ویرایش و شرایط مجوز، به منبع رسمی ناشر مراجعه کنید.', en: 'Hirad does not publish this standard. Consult the official publisher for the authoritative text, revision status, and licensing terms.' },
+    backToDirectory: { fa: 'بازگشت به فهرست استانداردها', en: 'Back to standards directory' },
+    loadErrorTitle: { fa: 'دریافت استانداردها انجام نشد', en: 'Standards could not be loaded' },
+    loadErrorDescription: { fa: 'لطفاً دوباره تلاش کنید یا در صورت ادامه مشکل با هیراد تماس بگیرید.', en: 'Please try again or contact Hirad if the problem continues.' },
+    retry: { fa: 'تلاش مجدد', en: 'Try again' },
   },
 } as const
 
@@ -400,16 +424,6 @@ export const resourceCategories: ResourceCardDefinition[] = [
     },
     icon: FileCheck2,
     to: '/resources/standards',
-  },
-  {
-    id: 'references',
-    title: { fa: 'مراجع فنی', en: 'Technical References' },
-    description: {
-      fa: 'راهنماها و مطالب فنی منتخب برای پشتیبانی از طراحی و تأمین.',
-      en: 'Selected guides and technical material to support design and procurement.',
-    },
-    icon: BookOpen,
-    status: { fa: 'در حال آماده‌سازی', en: 'In preparation' },
   },
 ]
 
@@ -486,13 +500,13 @@ export const resourceTools: ResourceCardDefinition[] = [
   },
 ]
 
-export const standardCategories: StandardCategoryDefinition[] = [
-  { code: 'API', title: { fa: 'استانداردهای API', en: 'API Standards' }, description: { fa: 'استانداردهای مؤسسه نفت آمریکا', en: 'American Petroleum Institute standards' } },
-  { code: 'ASME', title: { fa: 'استانداردهای ASME', en: 'ASME Standards' }, description: { fa: 'کدها و استانداردهای مهندسی مکانیک', en: 'Mechanical engineering codes and standards' } },
-  { code: 'ASTM', title: { fa: 'استانداردهای ASTM', en: 'ASTM Standards' }, description: { fa: 'استانداردهای مواد و آزمون‌ها', en: 'Materials and testing standards' } },
-  { code: 'NACE', title: { fa: 'استانداردهای NACE', en: 'NACE Standards' }, description: { fa: 'مراجع خوردگی و حفاظت از مواد', en: 'Corrosion and materials protection references' } },
-  { code: 'MSS', title: { fa: 'استانداردهای MSS', en: 'MSS Standards' }, description: { fa: 'استانداردهای انجمن استانداردسازی تولیدکنندگان', en: 'Manufacturers Standardization Society standards' } },
-  { code: 'ISO', title: { fa: 'استانداردهای ISO', en: 'ISO Standards' }, description: { fa: 'استانداردهای بین‌المللی', en: 'International standards' } },
-  { code: 'DIN', title: { fa: 'استانداردهای DIN', en: 'DIN Standards' }, description: { fa: 'استانداردهای مؤسسه استاندارد آلمان', en: 'German Institute for Standardization references' } },
-  { code: 'BS', title: { fa: 'استانداردهای BS', en: 'BS Standards' }, description: { fa: 'استانداردهای بریتانیا', en: 'British Standards references' } },
+export const standardOrganizations: StandardOrganizationDefinition[] = [
+  { id: 'api', codes: ['API'], label: 'API', title: { fa: 'استانداردهای API', en: 'API Standards' }, description: { fa: 'مؤسسه نفت آمریکا', en: 'American Petroleum Institute' } },
+  { id: 'asme', codes: ['ASME'], label: 'ASME', title: { fa: 'استانداردهای ASME', en: 'ASME Standards' }, description: { fa: 'مهندسی مکانیک و تجهیزات', en: 'Mechanical engineering and equipment' } },
+  { id: 'astm', codes: ['ASTM'], label: 'ASTM', title: { fa: 'استانداردهای ASTM', en: 'ASTM Standards' }, description: { fa: 'مواد، مشخصات و آزمون‌ها', en: 'Materials, specifications, and testing' } },
+  { id: 'mss', codes: ['MSS'], label: 'MSS', title: { fa: 'استانداردهای MSS', en: 'MSS Standards' }, description: { fa: 'استانداردهای سازندگان تجهیزات', en: 'Manufacturers standardization references' } },
+  { id: 'ampp-nace', codes: ['AMPP', 'NACE', 'NACE / AMPP'], label: 'AMPP / NACE', title: { fa: 'استانداردهای AMPP و NACE', en: 'AMPP & NACE Standards' }, description: { fa: 'خوردگی و حفاظت از مواد', en: 'Corrosion and materials protection' } },
+  { id: 'iso', codes: ['ISO'], label: 'ISO', title: { fa: 'استانداردهای ISO', en: 'ISO Standards' }, description: { fa: 'استانداردهای بین‌المللی', en: 'International standards' } },
+  { id: 'bsi', codes: ['BSI', 'BS'], label: 'BSI', title: { fa: 'استانداردهای BSI', en: 'BSI Standards' }, description: { fa: 'مؤسسه استاندارد بریتانیا', en: 'British Standards Institution' } },
+  { id: 'igs', codes: ['IGS'], label: 'IGS', title: { fa: 'استانداردهای IGS', en: 'IGS Standards' }, description: { fa: 'مشخصات فنی صنعت گاز', en: 'Gas industry specifications' } },
 ]

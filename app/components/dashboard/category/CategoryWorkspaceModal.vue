@@ -158,7 +158,7 @@
       </template>
 
     </div>
-    <MediaManagerModal v-if="isMediaSelectorOpen" modalTitle="انتخاب رسانه دیجیتال" @close="isMediaSelectorOpen = false" @file-selected="captureFileAttachment" />
+    <MediaManagerModal v-if="isMediaSelectorOpen" modal-title="انتخاب رسانه دیجیتال" default-kind="image" @close="isMediaSelectorOpen = false" @file-selected="captureFileAttachment" />
   </div>
 </template>
 

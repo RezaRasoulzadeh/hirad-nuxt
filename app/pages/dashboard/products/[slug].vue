@@ -140,6 +140,7 @@
     <MediaManagerModal 
       v-if="isMediaManagerOpen" 
       modal-title="انتخاب فایل رسانه" 
+      default-kind="image"
       @close="closeMediaManager"
       @file-selected="handleFileSelected" 
     />

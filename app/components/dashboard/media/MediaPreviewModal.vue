@@ -13,7 +13,7 @@
         <img 
           v-if="isImage" 
           :src="config.public.apiBase + asset.file_url" 
-          :alt="asset?.description" 
+          :alt="asset?.description || ''"
           class="max-w-full max-h-full object-contain rounded-lg" 
         />
 
@@ -43,19 +43,15 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { X } from 'lucide-vue-next';
+import type { DashboardMediaAsset } from '~/utils/mediaAssets';
+import { getMediaFileExtension, isImageMediaAsset } from '~/utils/mediaAssets';
 
-interface Asset {
-  id: string;
-  file_url: string;
-  description: string;
-}
-
-const props = defineProps<{ asset: Asset }>();
+const props = defineProps<{ asset: DashboardMediaAsset }>();
 defineEmits(['close']);
 
 const config = useRuntimeConfig();
 
-const ext = computed(() => props.asset?.file_url.split('.').pop()?.toLowerCase() || '');
-const isImage = computed(() => ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'].includes(ext.value));
+const ext = computed(() => getMediaFileExtension(props.asset.file_url));
+const isImage = computed(() => isImageMediaAsset(props.asset));
 const isPdf = computed(() => ext.value === 'pdf');
 </script>

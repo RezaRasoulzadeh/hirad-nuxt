@@ -31,7 +31,7 @@ brand treatment.
 | Section headings and industrial presentation | [AboutSection.vue](app/components/home/AboutSection.vue), [Catalogue.vue](app/components/home/Catalogue.vue), [OrderProcess.vue](app/components/home/OrderProcess.vue) |
 | Approved Resources hero, tabs, container, support block | [ResourcePage.vue](app/components/resources/ResourcePage.vue) |
 | Resource and tool cards | [ResourceCard.vue](app/components/resources/ResourceCard.vue) |
-| Standards categories and empty state | [standards.vue](app/pages/resources/standards.vue) |
+| Dynamic Standards directory | [standards.vue](app/pages/resources/standards.vue), [standard detail](app/pages/resources/standards/[slug].vue) |
 | Resources copy and directory definitions | [resources.ts](app/data/resources.ts) |
 
 The current stack is Nuxt 4, Vue 3, TypeScript, Tailwind CSS 4, daisyUI 5, and
@@ -78,6 +78,10 @@ Do not restore the split hero, equipment illustration, image frame, or floating 
 caption on Resources. The homepage retains its own equipment illustration and layout;
 this Resources decision does not call for redesigning the homepage.
 
+The Resources overview exposes two centered, shadow-free entry cards: Engineering Tools
+and Standards & Technical Documents. Do not restore the removed Technical References
+placeholder card without a new explicit product decision.
+
 The section navigation uses actual route links, not simulated tabs or pill buttons.
 The active link has primary-colored text and a thin burgundy bottom border, with
 `aria-current="page"`. At mobile widths the links share the available row; at larger
@@ -123,8 +127,8 @@ and converters do not acquire conflicting factors.
 - Use Lucide icons with consistent proportions and roughly 1.5 stroke width for
   decorative feature icons. Mark purely decorative icons `aria-hidden="true"`.
 - Empty states are calm informational panels with a small icon, short title, and one
-  explanation. The standards page has compact category tiles and one shared empty
-  state, not eight repeated empty-message cards.
+  explanation. The standards page builds its compact organization cards from published
+  page-backed records and uses one shared empty state, not repeated empty-message cards.
 - Reuse local imagery and `normalizeLocalAssetUrl` for imported asset URLs. Do not
   introduce remote images or generated artwork merely to fill space.
 - Avoid oversized display titles, huge rounded containers, glassmorphism, saturated
@@ -179,6 +183,23 @@ Use the existing `useSeoMeta` approach for page metadata and the appropriate cen
 copy. Do not add packages, a new theme, or a site-wide localization migration to solve a
 local styling task.
 
+Standards are managed as existing backend `pages` records whose slugs use the
+`standard-` prefix. Native page fields own publication status and Persian SEO; the
+versioned page-content JSON stores organization, designation, bilingual titles and
+descriptions, topic, edition/year, featured/order fields, English SEO, and authorized
+resource links. Public API adapters must exclude drafts and internal page identifiers.
+Organization cards are the primary public discovery control: only organizations with at
+least one published record are shown, selecting one filters the records below, and
+organizations outside the predefined list are appended from published content. Keep sparse
+organization filters centered rather than leaving empty fixed-grid columns. The standards
+directory uses a centered two-column reading width, with a single filtered record centered.
+Individual records
+use `/resources/standards/:slug`, retain LTR isolation for identifiers, and present the
+designation as the primary technical anchor with a compact facts panel, readable Persian
+overview, clearly separated resource links, and the publisher/licensing notice. Dashboard
+forms auto-generate that slug while permitting deliberate edits and also accept the same
+Standards schema through a direct JSON import flow.
+
 ## Dashboard presentation
 
 - The overview at [dashboard/index.vue](app/pages/dashboard/index.vue) uses flat,
@@ -193,6 +214,10 @@ local styling task.
   scrolling on small screens. Missing or failed data must not look like zero counts.
 - Do not restore the removed privacy card. Device and traffic-source breakdowns
   may share a row on wide screens.
+- Dashboard media libraries use the shared coarse file-type control: All Files,
+  Images, and Documents. Reuse it in the main asset page and every asset selector;
+  do not expose a tab for every individual extension. Image-oriented editors open
+  on Images, while Standards resource selection opens on Documents.
 
 ## Working and validation expectations
 

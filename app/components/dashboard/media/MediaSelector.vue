@@ -12,7 +12,8 @@
       </div>
 
       <!-- Action Sub-header Strip -->
-      <div class="p-4 bg-base-100 border-b border-base-200 flex justify-end shrink-0">
+      <div class="flex shrink-0 flex-col gap-3 border-b border-base-200 bg-base-100 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <MediaTypeFilter v-model="activeKind" :disabled="loading || loadingMore" />
         <button @click="isUploadModalOpen = true" type="button" class="btn btn-primary btn-sm rounded-xl font-bold px-5">
           بارگذاری فایل جدید
         </button>
@@ -25,7 +26,7 @@
         </div>
 
         <div v-else-if="!assets.length" class="h-full min-h-75 flex flex-col items-center justify-center text-center p-8">
-          <p class="text-sm text-base-content/50">هیچ رسانه یا فایلی در سیستم پیدا نشد.</p>
+          <p class="text-sm text-base-content/50">{{ emptyMessage }}</p>
         </div>
 
         <!-- Solid structural CSS Grid layout -->
@@ -40,7 +41,7 @@
             <!-- Image containment slot with forced 1:1 view bounds -->
             <div class="w-full aspect-square bg-base-200/50 overflow-hidden relative flex items-center justify-center shrink-0">
               <img 
-                v-if="isImage(asset.file_url)" 
+                v-if="isImageMediaAsset(asset)"
                 :src="config.public.apiBase + asset.file_url" 
                 :alt="asset.description" 
                 class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
@@ -48,7 +49,7 @@
                 decoding="async"
               />
               <div v-else class="text-xs font-black text-base-content/40 uppercase tracking-wider bg-base-300/60 px-3 py-1 rounded-md">
-                {{ getFileExtension(asset.file_url) }}
+                {{ getMediaFileExtension(asset.file_url) }}
               </div>
             </div>
 
@@ -77,44 +78,46 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { computed, ref, onMounted, watch } from 'vue';
 import { X } from 'lucide-vue-next';
 import MediaUploadModal from '~/components/dashboard/media/MediaUploadModal.vue';
+import MediaTypeFilter from '~/components/dashboard/media/MediaTypeFilter.vue';
+import type { DashboardMediaAsset, MediaAssetKind } from '~/utils/mediaAssets';
+import { getMediaFileExtension, isImageMediaAsset } from '~/utils/mediaAssets';
 
-interface Asset {
-  id: string;
-  file_url: string;
-  description: string;
-}
-
-defineProps({
-  modalTitle: { type: String, default: 'انتخاب رسانه دیجیتال' },
-  isOpen: { type: Boolean, default: true }
+const props = withDefaults(defineProps<{
+  modalTitle?: string
+  isOpen?: boolean
+  defaultKind?: MediaAssetKind
+}>(), {
+  modalTitle: 'انتخاب رسانه دیجیتال',
+  isOpen: true,
+  defaultKind: 'all',
 });
+
+const { modalTitle, isOpen } = toRefs(props);
 
 const emit = defineEmits(['close', 'file-selected']);
 const config = useRuntimeConfig();
 
-const assets = ref<Asset[]>([]);
+const assets = ref<DashboardMediaAsset[]>([]);
 const loading = ref(false);
 const isUploadModalOpen = ref(false);
+const activeKind = ref<MediaAssetKind>(props.defaultKind);
 const PAGE_SIZE = 40;
 const hasMore = ref(false);
 const loadingMore = ref(false);
 
-const isImage = (url: string): boolean => {
-  const ext = getFileExtension(url);
-  return ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'].includes(ext);
-};
-
-const getFileExtension = (url: string): string => {
-  return url.split('.').pop()?.toLowerCase() || '';
-};
+const emptyMessage = computed(() => {
+  if (activeKind.value === 'image') return 'تصویری برای انتخاب پیدا نشد.';
+  if (activeKind.value === 'document') return 'سندی برای انتخاب پیدا نشد.';
+  return 'هیچ رسانه یا فایلی در سیستم پیدا نشد.';
+});
 
 const fetchAssets = async () => {
   loading.value = true;
   try {
-    const res: any = await $fetch('/api/media', { method: 'GET', query: { offset: 0, limit: PAGE_SIZE } });
+    const res: any = await $fetch('/api/media', { method: 'GET', query: { offset: 0, limit: PAGE_SIZE, kind: activeKind.value } });
     if (res?.success && res?.data) {
       assets.value = res.data;
     } else if (Array.isArray(res)) {
@@ -134,7 +137,7 @@ const loadMore = async () => {
   try {
     const res: any = await $fetch('/api/media', {
       method: 'GET',
-      query: { offset: assets.value.length, limit: PAGE_SIZE }
+      query: { offset: assets.value.length, limit: PAGE_SIZE, kind: activeKind.value }
     });
     if (Array.isArray(res?.data)) assets.value.push(...res.data);
     hasMore.value = Boolean(res?.pagination?.has_more);
@@ -143,7 +146,7 @@ const loadMore = async () => {
   }
 };
 
-const selectAsset = (asset: Asset) => {
+const selectAsset = (asset: DashboardMediaAsset) => {
   emit('file-selected', asset.file_url, asset.id);
   emit('close');
 };
@@ -156,4 +159,6 @@ const handleAssetUploaded = () => {
 onMounted(() => {
   fetchAssets();
 });
+
+watch(activeKind, () => fetchAssets());
 </script>

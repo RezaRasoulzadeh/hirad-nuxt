@@ -18,7 +18,7 @@
     <CompanyTab v-if="activeTab === 'company'" v-model="companyPage" @select-media="openMedia"
       @save="savePage('about-company', companyPage)" />
 
-    <MediaManagerModal v-if="isMediaOpen" modalTitle="Select Asset" @close="isMediaOpen = false"
+    <MediaManagerModal v-if="isMediaOpen" modal-title="انتخاب رسانه" default-kind="image" @close="isMediaOpen = false"
       @file-selected="handleFile" />
   </div>
 </template>

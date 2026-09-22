@@ -228,68 +228,13 @@
       </div>
     </div>
 
-    <!-- Media Library Asset Picker Modal -->
-    <div v-if="isMediaModalOpen" class="modal modal-open bg-black/60 z-60 transition-all duration-200">
-      <div class="modal-box max-w-4xl w-full h-[80vh] p-0 flex flex-col overflow-hidden bg-base-100 rounded-2xl border border-base-200 shadow-xl">
-        <div class="p-5 border-b border-base-200 flex items-center justify-between bg-base-50/50 shrink-0">
-          <h3 class="text-lg font-bold text-base-content">انتخاب رسانه دیجیتال</h3>
-          <button @click="isMediaModalOpen = false" type="button" class="btn btn-sm btn-circle btn-ghost">
-            <X class="size-5" />
-          </button>
-        </div>
-
-        <div class="p-4 bg-base-100 border-b border-base-200 flex justify-end shrink-0">
-          <button @click="isUploadModalOpen = true" type="button" class="btn btn-primary btn-sm rounded-xl font-bold px-5">
-            بارگذاری فایل جدید
-          </button>
-        </div>
-
-        <div class="flex-1 overflow-y-auto p-4 bg-base-50/30">
-          <div v-if="mediaLoading" class="h-full min-h-75 flex items-center justify-center">
-            <span class="loading loading-spinner loading-md text-primary"></span>
-          </div>
-
-          <div v-else-if="!assets.length" class="h-full min-h-75 flex flex-col items-center justify-center text-center p-8">
-            <p class="text-sm text-base-content/50">هیچ رسانه یا فایلی در سیستم پیدا نشد.</p>
-          </div>
-
-          <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            <button 
-              v-for="asset in assets" 
-              :key="asset.id" 
-              @click="selectAsset(asset)"
-              type="button"
-              class="group bg-base-100 rounded-xl border border-base-200 overflow-hidden flex flex-col cursor-pointer hover:border-primary hover:shadow-md transition-all duration-200 text-right w-full"
-            >
-              <div class="w-full aspect-square bg-base-200/50 overflow-hidden relative flex items-center justify-center shrink-0">
-                <img 
-                  v-if="isImage(asset.file_url)" 
-                  :src="config.public.apiBase + asset.file_url" 
-                  :alt="asset.description" 
-                  class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
-                  loading="lazy"
-                />
-                <div v-else class="text-xs font-black text-base-content/40 uppercase tracking-wider bg-base-300/60 px-3 py-1 rounded-md">
-                  {{ getFileExtension(asset.file_url) }}
-                </div>
-              </div>
-
-              <div class="p-2.5 w-full bg-base-100 border-t border-base-100 group-hover:border-base-200 truncate">
-                <p class="text-xs font-medium text-base-content truncate select-none">
-                  {{ asset.description || 'بدون توضیحات' }}
-                </p>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-      
-      <MediaUploadModal 
-        v-if="isUploadModalOpen"
-        @close="isUploadModalOpen = false"
-        @asset-uploaded="handleAssetUploaded"
-      />
-    </div>
+    <MediaSelector
+      v-if="isMediaModalOpen"
+      modal-title="انتخاب رسانه دیجیتال"
+      default-kind="image"
+      @close="isMediaModalOpen = false"
+      @file-selected="selectAsset"
+    />
   </div>
 </template>
 
@@ -298,16 +243,10 @@ import { ref, watch, onMounted } from 'vue'
 import { onBeforeRouteLeave } from '#app'
 import { useRuntimeConfig } from '#imports'
 import BlogPreview from './BlogPreview.vue'
-import MediaUploadModal from '~/components/dashboard/media/MediaUploadModal.vue'
+import MediaSelector from '~/components/dashboard/media/MediaSelector.vue'
 import { ArrowDown, ArrowUp, Code2, Heading, ImageIcon, LetterTextIcon, Link, List, Quote, Video, X, Eye, WifiOff, SearchX, FilePlus, Trash } from 'lucide-vue-next'
 import { useBlogEditor, type BlockType } from '~/composables/useBlogEditor'
 import { useDashboardConfirm } from '~/composables/useDashboardConfirm'
-
-interface Asset {
-  id: string
-  file_url: string
-  description: string
-}
 
 const blockTypes = [
   { type: 'paragraph' as BlockType, label: 'پاراگراف متن', icon: LetterTextIcon },
@@ -364,56 +303,22 @@ onBeforeRouteLeave(async () => {
 })
 
 const isMediaModalOpen = ref(false)
-const isUploadModalOpen = ref(false)
-const mediaLoading = ref(false)
-const assets = ref<Asset[]>([])
 const activeTargetBlockIndex = ref<number>(-1) 
-
-const isImage = (url: string): boolean => {
-  const ext = getFileExtension(url)
-  return ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'].includes(ext)
-}
-
-const getFileExtension = (url: string): string => {
-  return url.split('.').pop()?.toLowerCase() || ''
-}
-
-const fetchAssets = async () => {
-  mediaLoading.value = true
-  try {
-    const res: any = await $fetch('/api/media', { method: 'GET' })
-    if (res?.success && res?.data) {
-      assets.value = res.data
-    } else if (Array.isArray(res)) {
-      assets.value = res
-    }
-  } catch (err) {
-    assets.value = []
-  } finally {
-    mediaLoading.value = false
-  }
-}
 
 const openMediaPicker = (index: number) => {
   activeTargetBlockIndex.value = index
   isMediaModalOpen.value = true
-  fetchAssets()
 }
 
-const selectAsset = (asset: Asset) => {
+const selectAsset = (fileUrl: string) => {
   if (activeTargetBlockIndex.value === -1) {
-    formData.value.cover_image_url = asset.file_url
+    formData.value.cover_image_url = fileUrl
   } else {
     const block = formData.value.content.body[activeTargetBlockIndex.value]
     if (block && block.type === 'image') {
-      block.src = asset.file_url
+      block.src = fileUrl
     }
   }
   isMediaModalOpen.value = false
-}
-
-const handleAssetUploaded = () => {
-  isUploadModalOpen.value = false
-  fetchAssets()
 }
 </script>

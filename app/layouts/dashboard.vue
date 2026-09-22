@@ -84,7 +84,7 @@ import { provide, ref, shallowRef } from 'vue';
 import { 
   Menu, LogOut, LayoutDashboard,
   FolderTree, Package, Image, FileText, 
-  Mail, Bell, Settings 
+  Mail, Bell, Settings, BookMarked
 } from 'lucide-vue-next';
 import GlobalToast from '~/components/shared/GlobalToast.vue';
 import DashboardConfirmDialog from '~/components/dashboard/DashboardConfirmDialog.vue';
@@ -128,6 +128,7 @@ const navigationItems = [
   { name: 'محصولات', path: '/dashboard/products', icon: Package },
   { name: 'مدیریت رسانه', path: '/dashboard/media', icon: Image },
   { name: 'بلاگ', path: '/dashboard/blog', icon: FileText },
+  { name: 'استانداردها', path: '/dashboard/standards', icon: BookMarked },
   { name: 'پیام‌ها', path: '/dashboard/forms', icon: Mail },
   { name: 'خبرنامه', path: '/dashboard/subscribers', icon: Bell },
   { name: 'تنظیمات', path: '/dashboard/settings', icon: Settings },

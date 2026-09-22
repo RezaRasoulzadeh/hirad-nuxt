@@ -10,26 +10,34 @@
       </button>
     </div>
 
+    <section class="flex flex-col gap-3 rounded-2xl border border-base-200 bg-base-100 p-4 sm:flex-row sm:items-center sm:justify-between" aria-labelledby="media-type-filter-title">
+      <div>
+        <h2 id="media-type-filter-title" class="text-sm font-bold">نوع فایل</h2>
+        <p class="mt-1 text-xs text-base-content/50">نمایش همه فایل‌ها یا تفکیک ساده تصاویر و اسناد.</p>
+      </div>
+      <MediaTypeFilter v-model="activeKind" :disabled="loading" />
+    </section>
+
     <div v-if="loading" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
       <div v-for="n in 4" :key="n" class="aspect-square bg-base-100 rounded-2xl border border-base-200 animate-pulse"></div>
     </div>
 
     <div v-else-if="!assets.length" class="flex flex-col items-center justify-center py-16 bg-base-100 rounded-2xl border border-base-200 shadow-sm">
-      <p class="text-sm text-base-content/50">هیچ فایلی بارگذاری نشده است.</p>
+      <p class="text-sm text-base-content/50">{{ emptyMessage }}</p>
     </div>
 
     <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
       <div v-for="asset in assets" :key="asset.id" class="group bg-base-100 rounded-2xl border border-base-200 shadow-xs overflow-hidden flex flex-col transition-all hover:shadow-md">
         <button @click="openPreviewModal(asset)" type="button" class="w-full aspect-video flex items-center justify-center bg-base-200/40 relative overflow-hidden focus:outline-hidden">
           <img 
-            v-if="isImage(asset.file_url)" 
+            v-if="isImageMediaAsset(asset)"
             :src="config.public.apiBase + asset.file_url" 
             :alt="asset.description" 
             class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-102" 
             loading="lazy"
           />
           <div v-else class="text-sm font-black text-base-content/40 uppercase tracking-wider bg-base-300 px-4 py-1.5 rounded-lg">
-            {{ getFileExtension(asset.file_url) }}
+            {{ getMediaFileExtension(asset.file_url) }}
           </div>
         </button>
         
@@ -82,27 +90,25 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue';
+import { computed, ref, onMounted, watch } from 'vue';
 import { useToast } from '~/composables/useToast';
 import { useDashboardConfirm } from '~/composables/useDashboardConfirm';
 import MediaUploadModal from '~/components/dashboard/media/MediaUploadModal.vue';
 import MediaEditModal from '~/components/dashboard/media/MediaEditModal.vue';
 import MediaPreviewModal from '~/components/dashboard/media/MediaPreviewModal.vue';
+import MediaTypeFilter from '~/components/dashboard/media/MediaTypeFilter.vue';
+import type { DashboardMediaAsset, MediaAssetKind } from '~/utils/mediaAssets';
+import { getMediaFileExtension, isImageMediaAsset } from '~/utils/mediaAssets';
 
 definePageMeta({ layout: 'dashboard' });
-
-interface Asset {
-  id: string;
-  file_url: string;
-  description: string;
-}
 
 const config = useRuntimeConfig();
 const toast = useToast();
 const confirm = useDashboardConfirm();
 
-const assets = ref<Asset[]>([]);
+const assets = ref<DashboardMediaAsset[]>([]);
 const loading = ref(false);
+const activeKind = ref<MediaAssetKind>('all');
 const currentPage = ref(1);
 const totalAssets = ref(0);
 const PAGE_SIZE = 40;
@@ -126,22 +132,19 @@ const pageNumbers = computed<(number | 'ellipsis')[]>(() => {
 const showUploadModal = ref(false);
 const showEditModal = ref(false);
 const showPreviewModal = ref(false);
-const selectedAsset = ref<Asset | null>(null);
-
-const isImage = (url: string): boolean => {
-  return ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'].includes(getFileExtension(url));
-};
-
-const getFileExtension = (url: string): string => {
-  return url.split('.').pop()?.toLowerCase() || '';
-};
+const selectedAsset = ref<DashboardMediaAsset | null>(null);
+const emptyMessage = computed(() => {
+  if (activeKind.value === 'image') return 'هنوز تصویری بارگذاری نشده است.';
+  if (activeKind.value === 'document') return 'هنوز سندی بارگذاری نشده است.';
+  return 'هیچ فایلی بارگذاری نشده است.';
+});
 
 const fetchAssets = async (page = currentPage.value) => {
   loading.value = true;
   try {
     const res: any = await $fetch('/api/media', {
       method: 'GET',
-      query: { offset: (page - 1) * PAGE_SIZE, limit: PAGE_SIZE }
+      query: { offset: (page - 1) * PAGE_SIZE, limit: PAGE_SIZE, kind: activeKind.value }
     });
 
     if (res?.success && res?.data) {
@@ -173,7 +176,7 @@ const goToPage = (page: number) => {
   fetchAssets(page);
 };
 
-const openEditModal = (asset: Asset) => {
+const openEditModal = (asset: DashboardMediaAsset) => {
   selectedAsset.value = asset;
   showEditModal.value = true;
 };
@@ -188,7 +191,7 @@ const handleAssetUpdated = () => {
   fetchAssets();
 };
 
-const openPreviewModal = (asset: Asset) => {
+const openPreviewModal = (asset: DashboardMediaAsset) => {
   selectedAsset.value = asset;
   showPreviewModal.value = true;
 };
@@ -215,5 +218,6 @@ const removeAsset = async (assetId: string) => {
   }
 };
 
+watch(activeKind, () => fetchAssets(1));
 onMounted(fetchAssets);
 </script>

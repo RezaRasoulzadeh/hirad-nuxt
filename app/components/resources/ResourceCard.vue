@@ -2,7 +2,9 @@
   <component :is="item.to ? NuxtLink : 'article'" v-bind="item.to ? { to: item.to } : {}"
     data-resource-reveal
     class="relative flex h-full min-w-0 flex-col rounded-xl border border-base-300 bg-base-100 p-6 text-start"
-    :class="item.to ? 'group shadow-sm transition duration-300 ease-out hover:border-primary/25 hover:shadow-md motion-safe:hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary' : ''">
+    :class="item.to ? flat
+      ? 'group transition-colors duration-300 hover:border-primary/25 hover:bg-primary/[0.015] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary'
+      : 'group shadow-sm transition duration-300 ease-out hover:border-primary/25 hover:shadow-md motion-safe:hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary' : ''">
     <span v-if="item.to" class="absolute inset-y-6 start-0 w-0.75 rounded-e-full bg-primary" aria-hidden="true" />
     <div class="flex items-center gap-4">
       <span class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary/5 text-primary transition-colors duration-300 group-hover:bg-primary/10">
@@ -32,5 +34,10 @@ import { NuxtLink } from '#components'
 import { ArrowLeft, Clock3 } from 'lucide-vue-next'
 import { resourcesCopy, type ResourceCardDefinition } from '~/data/resources'
 
-defineProps<{ item: ResourceCardDefinition }>()
+withDefaults(defineProps<{
+  item: ResourceCardDefinition
+  flat?: boolean
+}>(), {
+  flat: false,
+})
 </script>
