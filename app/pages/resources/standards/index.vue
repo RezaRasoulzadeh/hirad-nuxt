@@ -23,12 +23,12 @@
         </ul>
       </div>
 
-      <div v-if="selectedOrganization" data-resource-reveal class="mx-auto mb-5 flex max-w-6xl items-center justify-between gap-4">
+      <div v-if="selectedOrganization" data-resource-reveal class="mx-auto mb-5 flex w-full items-center justify-between gap-4">
         <p class="text-sm font-semibold text-base-content/60"><bdi>{{ filteredStandards.length.toLocaleString('fa-IR') }}</bdi> {{ copy.resultCount.fa }}</p>
         <button type="button" class="btn btn-ghost btn-sm rounded-lg text-primary" @click="selectedOrganization = ''">{{ copy.allStandards.fa }}</button>
       </div>
 
-      <div v-if="status === 'pending'" class="mx-auto mt-7 grid max-w-6xl gap-5 md:grid-cols-2" aria-live="polite">
+      <div v-if="status === 'pending'" class="mx-auto mt-7 grid w-full gap-5 md:grid-cols-2 2xl:grid-cols-3" aria-live="polite">
         <div v-for="item in 4" :key="item" class="h-72 animate-pulse rounded-xl border border-base-300 bg-base-200/60" />
       </div>
 
@@ -42,7 +42,7 @@
       <ul
         v-else-if="filteredStandards.length"
         class="mx-auto grid gap-5"
-        :class="filteredStandards.length === 1 ? 'max-w-2xl' : 'max-w-6xl md:grid-cols-2'"
+        :class="filteredStandards.length === 1 ? 'max-w-2xl' : 'w-full md:grid-cols-2 2xl:grid-cols-3'"
       >
         <li v-for="(standard, index) in filteredStandards" :key="standard.slug" data-resource-reveal :data-resource-delay="(index % 3) * 70">
           <NuxtLink :to="`/resources/standards/${standard.slug}`" class="group relative flex h-full overflow-hidden rounded-xl border border-base-300 bg-base-100 transition-colors duration-200 hover:border-primary/35 hover:bg-primary/[0.015] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary">
