@@ -5,9 +5,14 @@
         <h1 class="text-2xl font-bold text-base-content">مدیریت مقالات وبلاگ</h1>
         <p class="text-xs sm:text-sm text-base-content/60 mt-1">ایجاد، ویرایش و حذف مقالات منتشر شده در وبلاگ.</p>
       </div>
-      <NuxtLink to="/dashboard/blog/new" class="btn btn-primary font-bold px-6 h-12 rounded-xl text-sm">
-        افزودن مقاله جدید
-      </NuxtLink>
+      <div class="flex flex-col sm:flex-row gap-2">
+        <NuxtLink to="/dashboard/blog/new?import=json" class="btn btn-outline btn-primary font-bold px-5 h-12 rounded-xl text-sm">
+          افزودن مقاله با JSON
+        </NuxtLink>
+        <NuxtLink to="/dashboard/blog/new" class="btn btn-primary font-bold px-6 h-12 rounded-xl text-sm">
+          افزودن مقاله جدید
+        </NuxtLink>
+      </div>
     </div>
 
     <div v-if="status === 'pending'" class="space-y-3">

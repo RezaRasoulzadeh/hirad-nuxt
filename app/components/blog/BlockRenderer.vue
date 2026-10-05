@@ -85,6 +85,19 @@
       </div>
     </template>
 
+    <template v-else-if="block.type === 'html'">
+      <div class="my-6 overflow-hidden rounded-xl border border-base-300 bg-base-100">
+        <iframe
+          :srcdoc="htmlBlockDocument"
+          sandbox=""
+          referrerpolicy="no-referrer"
+          loading="lazy"
+          title="محتوای HTML و CSS ایستا"
+          class="block h-80 w-full bg-white"
+        />
+      </div>
+    </template>
+
   </div>
 </template>
 
@@ -95,12 +108,14 @@ import { resolveAssetUrl } from '~/utils/resolveAssetUrl'
 import placeholderImg from '~/assets/placeholder.png'
 
 interface BlogBlock {
-  type: 'heading' | 'paragraph' | 'quote' | 'image' | 'list' | 'code' | 'link' | 'video'
+  type: 'heading' | 'paragraph' | 'quote' | 'image' | 'list' | 'code' | 'link' | 'video' | 'html'
   level?: number
   text: string
   text_fa?: string
   author?: string
   src?: string 
+  html?: string
+  css?: string
 }
 
 const props = defineProps<{
@@ -110,6 +125,21 @@ const props = defineProps<{
 const imageUrl = computed(() => {
   const path = props.block.text || props.block.src
   return path ? resolveAssetUrl(path) : placeholderImg
+})
+
+const htmlBlockDocument = computed(() => {
+  const html = props.block.html || ''
+  const css = props.block.css || ''
+  return `<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline'; font-src data:; connect-src 'none'; form-action 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>html,body{margin:0;padding:0}body{font-family:Arial,sans-serif;padding:16px;box-sizing:border-box}${css}</style>
+</head>
+<body>${html}</body>
+</html>`
 })
 
 const handleImageError = (event: Event) => {

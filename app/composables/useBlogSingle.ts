@@ -1,9 +1,12 @@
 export interface BlogBlock {
-  type: 'heading' | 'paragraph' | 'quote' | 'list' | 'code' | 'link' | 'video'
+  type: 'heading' | 'paragraph' | 'quote' | 'list' | 'code' | 'link' | 'video' | 'image' | 'html'
   level?: number
   text: string
   text_fa?: string
   author?: string
+  src?: string
+  html?: string
+  css?: string
 }
 
 export interface BlogPostSingle {

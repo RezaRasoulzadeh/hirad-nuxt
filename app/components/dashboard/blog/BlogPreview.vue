@@ -60,12 +60,14 @@ import { resolveAssetUrl } from '~/utils/resolveAssetUrl'
 import BlogBlockRenderer from '~/components/blog/BlockRenderer.vue'
 
 interface BlogContentBlock {
-  type: 'heading' | 'paragraph' | 'quote' | 'image' | 'list' | 'code' | 'link' | 'video'
+  type: 'heading' | 'paragraph' | 'quote' | 'image' | 'list' | 'code' | 'link' | 'video' | 'html'
   level?: number
   text: string
   text_fa?: string
   author?: string
   src?: string
+  html?: string
+  css?: string
 }
 
 interface BlogContent {
@@ -90,7 +92,7 @@ interface Props {
 const props = defineProps<Props>()
 
 const KNOWN_BLOCK_TYPES = new Set([
-  'heading', 'paragraph', 'quote', 'image', 'list', 'code', 'link', 'video',
+  'heading', 'paragraph', 'quote', 'image', 'list', 'code', 'link', 'video', 'html',
 ])
 
 function isKnownBlockType(type: string): boolean {

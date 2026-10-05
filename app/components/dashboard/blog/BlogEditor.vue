@@ -32,6 +32,9 @@
                 <span class="label-text font-bold text-xs sm:text-sm text-base-content/80">نمایش و انتشار آنی در وبلاگ</span>
               </label>
             </div>
+            <button ref="jsonImportTrigger" type="button" class="btn btn-outline btn-primary font-bold rounded-xl text-sm h-11 min-h-0 px-4" @click="openJsonImport()">
+              ورود JSON
+            </button>
             <button @click="previewMode = !previewMode" class="btn btn-secondary btn-soft font-bold rounded-xl text-sm h-11 min-h-0 px-5">
               {{ previewMode ? 'ویرایش متن' : 'پیش‌نمایش مطلب' }}
             </button>
@@ -85,7 +88,7 @@
 
           <div class="form-control w-full">
             <label class="label"><span class="label-text font-semibold text-base-content/80">نامک پیوند (Slug) *</span></label>
-            <input v-model="formData.slug" type="text" class="input input-bordered w-full rounded-xl focus:input-primary font-mono" dir="ltr" :disabled="isEditMode" />
+            <input v-model="formData.slug" type="text" class="input input-bordered w-full rounded-xl focus:input-primary font-mono" dir="ltr" />
           </div>
 
           <div class="form-control w-full">
@@ -213,6 +216,18 @@
                   <input v-model="block.url" type="url" placeholder="Streaming Resource Frame Host Link URL" class="input input-bordered input-sm w-full rounded-xl font-mono text-xs" dir="ltr">
                   <input v-model="block.caption" type="text" placeholder="توضیحات زیر ویدیو ضمیمه شده (اختیاری)" class="input input-bordered input-sm w-full rounded-xl text-xs">
                 </div>
+
+                <div v-else-if="block.type === 'html'" class="space-y-3">
+                  <p class="alert alert-info rounded-xl py-2 text-xs leading-6">این بلوک فقط HTML و CSS ایستا را نمایش می‌دهد. اسکریپت‌ها و منابع خارجی در پیش‌نمایش و وب‌سایت اجرا یا بارگذاری نمی‌شوند.</p>
+                  <div class="form-control">
+                    <label class="label py-1"><span class="label-text font-semibold">HTML</span></label>
+                    <textarea v-model="block.html" placeholder="<section class=&quot;custom-card&quot;>...</section>" rows="8" class="textarea textarea-bordered textarea-sm w-full rounded-xl font-mono text-xs leading-6" dir="ltr" spellcheck="false"></textarea>
+                  </div>
+                  <div class="form-control">
+                    <label class="label py-1"><span class="label-text font-semibold">CSS</span></label>
+                    <textarea v-model="block.css" placeholder=".custom-card { padding: 1rem; border: 1px solid #ddd; }" rows="8" class="textarea textarea-bordered textarea-sm w-full rounded-xl font-mono text-xs leading-6" dir="ltr" spellcheck="false"></textarea>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -222,10 +237,86 @@
               <SearchX class="size-6" />
             </div>
             <h3 class="text-sm font-bold text-base-content/50">هیچ بلوک محتوایی برای این پست ایجاد نشده است</h3>
-            <p class="text-xs text-base-content/40">با استفاده از منوی زیر می‌توانید انواع بلوک‌های متنی، تصویری یا کدهای برنامه را اضافه کنید.</p>
+            <p class="text-xs text-base-content/40">با استفاده از منوی زیر می‌توانید بلوک‌های متنی، تصویری، کد یا HTML و CSS ایستا اضافه کنید.</p>
           </div>
         </div>
       </div>
+    </div>
+
+    <div
+      v-if="isJsonImportOpen"
+      class="modal modal-open z-[100] bg-black/50"
+      role="presentation"
+      @click.self="closeJsonImport"
+      @keydown.esc.stop.prevent="closeJsonImport"
+      @keydown="trapJsonImportFocus"
+    >
+      <section
+        class="modal-box w-11/12 max-w-3xl rounded-2xl border border-base-300 bg-base-100 p-5 sm:p-6"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="blog-json-title"
+        aria-describedby="blog-json-help"
+        dir="rtl"
+      >
+        <div class="mb-5 flex items-start justify-between gap-4 border-b border-base-200 pb-4">
+          <div>
+            <h2 id="blog-json-title" class="text-lg font-bold text-base-content">{{ isDirectJsonImport ? 'ثبت مطلب با JSON' : 'ورود JSON مطلب' }}</h2>
+            <p class="mt-1 text-sm leading-6 text-base-content/65">
+              {{ isDirectJsonImport ? 'JSON کامل مطلب را وارد کنید یا قالب آماده را ویرایش کنید؛ پس از ثبت، مطلب به‌صورت پیش‌نویس ذخیره می‌شود.' : 'JSON مطلب را وارد کنید یا از قالب آماده استفاده کنید. داده‌ها در ویرایشگر بارگذاری می‌شوند تا پیش از ذخیره بررسی‌شان کنید.' }}
+            </p>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm btn-circle" aria-label="بستن پنجره" :disabled="saving" @click="closeJsonImport">
+            <X class="size-4" aria-hidden="true" />
+          </button>
+        </div>
+
+        <div class="space-y-4">
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex flex-wrap items-center gap-2">
+              <button type="button" class="btn btn-sm btn-outline btn-primary rounded-lg" :disabled="saving" @click="jsonFileInput?.click()">انتخاب فایل JSON</button>
+              <span v-if="jsonFilename" class="max-w-56 truncate text-xs text-base-content/60">{{ jsonFilename }}</span>
+              <span v-else class="text-xs text-base-content/50">فایل با پسوند .json</span>
+              <input ref="jsonFileInput" type="file" accept=".json,application/json" class="sr-only" :disabled="saving" @change="handleJsonFileSelected" />
+            </div>
+            <button type="button" class="btn btn-ghost btn-sm rounded-lg" :disabled="saving" @click="loadJsonTemplate">نمایش قالب مطلب</button>
+          </div>
+
+          <label for="blog-json-input" class="label pb-1">
+            <span class="label-text font-semibold">محتوای JSON مطلب</span>
+          </label>
+          <textarea
+            id="blog-json-input"
+            ref="jsonEditor"
+            v-model="jsonText"
+            dir="ltr"
+            spellcheck="false"
+            autocomplete="off"
+            class="textarea textarea-bordered min-h-72 w-full rounded-xl font-mono text-xs leading-6 focus:textarea-primary"
+            placeholder="قالب JSON را نمایش دهید یا ساختار مطلب را اینجا وارد کنید..."
+            :disabled="saving"
+            @input="jsonImportError = ''"
+          />
+
+          <p v-if="jsonImportError" class="alert alert-error rounded-xl py-3 text-sm" role="alert">{{ jsonImportError }}</p>
+          <div id="blog-json-help" class="space-y-1 text-xs leading-6 text-base-content/55">
+            <p>فیلدهای title، slug و content.body الزامی هستند. بلوک‌های پشتیبانی‌شده: heading، paragraph، quote، image، list، code، link، video و html؛ بلوک html فیلدهای رشته‌ای html و css دارد.</p>
+            <p>برای متن‌ها از text و text_fa استفاده کنید. در image نشانی فایل را در src و text بگذارید؛ در list متن هر زبان را با خط جدید جدا کنید و همان موارد را در items هم قرار دهید.</p>
+            <p>در code متن را در text و content قرار دهید؛ در link، فیلد text نشانی مقصد و text_fa عنوان نمایشی است؛ در video، text نشانی embed مانند youtube.com/embed/... است.</p>
+            <p>بلوک html فقط HTML و CSS ایستا را در iframe ایزوله نمایش می‌دهد؛ اسکریپت و بارگذاری منابع خارجی مجاز نیست.</p>
+            <p>برای SEO، meta_title و meta_description را بنویسید؛ این دو مقدار در عنوان و توضیحات صفحه، Open Graph و Twitter استفاده می‌شوند. cover_image_url تصویر پیش‌نمایش شبکه‌های اجتماعی است.</p>
+            <p>ورود JSON فقط فرم فعلی را پر می‌کند؛ برای ثبت مطلب، دکمه ذخیره و انتشار را بزنید.</p>
+          </div>
+        </div>
+
+        <div class="modal-action mt-6">
+          <button type="button" class="btn btn-ghost rounded-xl" :disabled="saving" @click="closeJsonImport">بستن</button>
+          <button type="button" class="btn btn-primary rounded-xl px-6 font-bold" :disabled="!jsonText.trim() || saving" @click="applyJsonImport">
+            <span v-if="saving" class="loading loading-spinner loading-xs"></span>
+            {{ isDirectJsonImport ? 'ثبت مطلب' : 'بارگذاری در ویرایشگر' }}
+          </button>
+        </div>
+      </section>
     </div>
 
     <MediaSelector
@@ -239,7 +330,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, nextTick, onMounted } from 'vue'
 import { onBeforeRouteLeave } from '#app'
 import { useRuntimeConfig } from '#imports'
 import BlogPreview from './BlogPreview.vue'
@@ -257,10 +348,13 @@ const blockTypes = [
   { type: 'code' as BlockType, label: 'بلوک سورس کد', icon: Code2 },
   { type: 'link' as BlockType, label: 'پیوند خارجی', icon: Link },
   { type: 'video' as BlockType, label: 'ویدیو پلیر', icon: Video },
+  { type: 'html' as BlockType, label: 'HTML و CSS ایستا', icon: Code2 },
 ]
 
 const config = useRuntimeConfig()
+const route = useRoute()
 const confirm = useDashboardConfirm()
+const toast = useToast()
 const {
   formData,
   previewMode,
@@ -277,29 +371,334 @@ const {
   addListItem,
   removeListItem
 } = await useBlogEditor()
+const isDirectJsonImport = route.query.import === 'json' && !isEditMode.value
 
+let savedSnapshot = JSON.stringify(formData.value)
 let isDirty = false
 watch(formData, () => {
-  isDirty = true
+  isDirty = JSON.stringify(formData.value) !== savedSnapshot
 }, { deep: true })
+
+watch(status, async (currentStatus) => {
+  if (currentStatus !== 'success') return
+  await nextTick()
+  savedSnapshot = JSON.stringify(formData.value)
+  isDirty = false
+})
 
 const handleSave = async () => {
   await saveData()
   isDirty = false
 }
 
-const handleCancel = () => {
-  navigateTo('/dashboard/blog')
+const handleCancel = async () => {
+  if (isDirty) {
+    const confirmed = await confirm({
+      title: 'تغییرات ذخیره نشده',
+      message: 'تغییرات ذخیره نشده است. آیا مایل به خروج هستید؟',
+      confirmLabel: 'خروج بدون ذخیره',
+      variant: 'danger'
+    })
+    if (!confirmed) return
+    isDirty = false
+  }
+
+  await navigateTo('/dashboard/blog')
 }
 
-onBeforeRouteLeave(async () => {
-  if (!isDirty) return true
-  return await confirm({
+onBeforeRouteLeave(async (_to, _from, next) => {
+  if (!isDirty) {
+    next()
+    return
+  }
+
+  const confirmed = await confirm({
     title: 'تغییرات ذخیره نشده',
     message: 'تغییرات ذخیره نشده است. آیا مایل به خروج هستید؟',
     confirmLabel: 'خروج بدون ذخیره',
     variant: 'danger'
   })
+  next(confirmed)
+})
+
+const isJsonImportOpen = ref(false)
+const jsonText = ref('')
+const jsonFilename = ref('')
+const jsonImportError = ref('')
+const jsonFileInput = ref<HTMLInputElement | null>(null)
+const jsonEditor = ref<HTMLTextAreaElement | null>(null)
+const jsonImportTrigger = ref<HTMLButtonElement | null>(null)
+
+const blogJsonTemplate = () => ({
+  title: '',
+  slug: '',
+  summary: '',
+  is_published: false,
+  cover_image_url: '',
+  meta_title: '',
+  meta_description: '',
+  content: {
+    title: '',
+    title_fa: '',
+    summary: '',
+    summary_fa: '',
+    body: [
+      {
+        type: 'heading',
+        level: 2,
+        text: 'Section heading in English',
+        text_fa: 'عنوان بخش به فارسی'
+      },
+      {
+        type: 'paragraph',
+        text: 'English paragraph. Provide the full technical explanation here.',
+        text_fa: 'متن پاراگراف به فارسی'
+      },
+      {
+        type: 'quote',
+        text: 'Quoted text',
+        text_fa: 'متن نقل قول',
+        author: 'Source or author'
+      },
+      {
+        type: 'image',
+        src: '/uploads/example-image.jpg',
+        text: '/uploads/example-image.jpg',
+        alt: 'Image description',
+        caption: 'Image caption',
+        text_fa: 'توضیح تصویر'
+      },
+      {
+        type: 'list',
+        text: 'First item\nSecond item',
+        text_fa: 'مورد اول\nمورد دوم',
+        style: 'unordered',
+        items: [
+          { text: 'First item', text_fa: 'مورد اول' },
+          { text: 'Second item', text_fa: 'مورد دوم' }
+        ]
+      },
+      {
+        type: 'code',
+        language: 'text',
+        text: 'Paste code or technical text here.',
+        content: 'Paste code or technical text here.'
+      },
+      {
+        type: 'link',
+        text: 'https://example.com/technical-reference',
+        url: 'https://example.com/technical-reference',
+        text_fa: 'عنوان پیوند'
+      },
+      {
+        type: 'video',
+        text: 'https://www.youtube.com/embed/VIDEO_ID',
+        url: 'https://www.youtube.com/embed/VIDEO_ID',
+        caption: 'Video description'
+      },
+      {
+        type: 'html',
+        html: '<section class="feature-card"><h2>عنوان بخش</h2><p>توضیحات کوتاه این بخش.</p></section>',
+        css: '.feature-card { padding: 1.5rem; border: 1px solid #ddd; border-radius: 1rem; }\n.feature-card h2 { margin: 0 0 0.75rem; font-size: 1.25rem; }'
+      }
+    ]
+  }
+})
+
+const openJsonImport = async (showTemplate = false) => {
+  jsonText.value = JSON.stringify(showTemplate ? blogJsonTemplate() : formData.value, null, 2)
+  jsonFilename.value = ''
+  jsonImportError.value = ''
+  if (jsonFileInput.value) jsonFileInput.value.value = ''
+  isJsonImportOpen.value = true
+  await nextTick()
+  jsonEditor.value?.focus()
+}
+
+const closeJsonImport = () => {
+  if (saving.value) return
+  isJsonImportOpen.value = false
+  nextTick(() => jsonImportTrigger.value?.focus())
+}
+
+const trapJsonImportFocus = (event: KeyboardEvent) => {
+  if (event.key !== 'Tab') return
+
+  const modal = event.currentTarget as HTMLElement
+  const focusable = Array.from(modal.querySelectorAll<HTMLElement>(
+    'button:not(:disabled), input:not(:disabled), textarea:not(:disabled)'
+  ))
+  const first = focusable[0]
+  const last = focusable[focusable.length - 1]
+  if (!first || !last) return
+
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault()
+    last.focus()
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault()
+    first.focus()
+  }
+}
+
+const loadJsonTemplate = () => {
+  jsonText.value = JSON.stringify(blogJsonTemplate(), null, 2)
+  jsonFilename.value = ''
+  jsonImportError.value = ''
+  if (jsonFileInput.value) jsonFileInput.value.value = ''
+}
+
+const handleJsonFileSelected = async (event: Event) => {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+
+  if (!file.name.toLowerCase().endsWith('.json')) {
+    jsonImportError.value = 'فقط فایل با پسوند .json قابل انتخاب است.'
+    input.value = ''
+    return
+  }
+
+  try {
+    jsonText.value = await file.text()
+    jsonFilename.value = file.name
+    jsonImportError.value = ''
+  } catch {
+    jsonImportError.value = 'خواندن فایل JSON انجام نشد. دوباره تلاش کنید.'
+  }
+}
+
+const isJsonObject = (value: unknown): value is Record<string, unknown> => (
+  value !== null && typeof value === 'object' && !Array.isArray(value)
+)
+
+const importedString = (value: unknown, field: string, fallback = '') => {
+  if (value == null) return fallback
+  if (typeof value !== 'string') throw new Error(`فیلد ${field} باید متن باشد.`)
+  return value
+}
+
+const normalizeImportedBlog = (value: unknown) => {
+  if (!isJsonObject(value)) throw new Error('JSON باید یک شیء مطلب باشد.')
+  if (typeof value.title !== 'string' || !value.title.trim()) throw new Error('فیلد title الزامی است و باید متن باشد.')
+  if (typeof value.slug !== 'string' || !value.slug.trim()) throw new Error('فیلد slug الزامی است و باید متن باشد.')
+
+  let rawContent = value.content
+  if (typeof rawContent === 'string') {
+    try {
+      rawContent = JSON.parse(rawContent)
+    } catch {
+      throw new Error('فیلد content شامل JSON معتبر نیست.')
+    }
+  }
+  if (!isJsonObject(rawContent) || !Array.isArray(rawContent.body)) {
+    throw new Error('فیلد content باید یک شیء با آرایه body باشد.')
+  }
+
+  const supportedTypes = new Set<BlockType>(['paragraph', 'heading', 'image', 'quote', 'list', 'code', 'link', 'video', 'html'])
+  const body = rawContent.body.map((entry, index) => {
+    if (!isJsonObject(entry) || typeof entry.type !== 'string' || !supportedTypes.has(entry.type as BlockType)) {
+      throw new Error(`نوع بلوک شماره ${index + 1} معتبر نیست.`)
+    }
+
+    const stringFields = ['text', 'text_fa', 'src', 'alt', 'caption', 'author', 'language', 'content', 'url', 'style', 'html', 'css']
+    const strings = Object.fromEntries(stringFields.map(field => [field, importedString(entry[field], `content.body[${index}].${field}`)]))
+    const level = entry.level == null ? 2 : entry.level
+    if (typeof level !== 'number' || !Number.isInteger(level) || level < 1 || level > 6) {
+      throw new Error(`سطح عنوان بلوک شماره ${index + 1} باید عددی بین 1 تا 6 باشد.`)
+    }
+
+    let items: { text: string; text_fa: string }[] = []
+    if (entry.items != null) {
+      if (!Array.isArray(entry.items)) throw new Error(`فیلد items در بلوک شماره ${index + 1} باید آرایه باشد.`)
+      items = entry.items.map((item, itemIndex) => {
+        if (!isJsonObject(item)) throw new Error(`آیتم ${itemIndex + 1} در بلوک شماره ${index + 1} معتبر نیست.`)
+        return {
+          text: importedString(item.text, `items[${itemIndex}].text`),
+          text_fa: importedString(item.text_fa, `items[${itemIndex}].text_fa`)
+        }
+      })
+    }
+
+    return {
+      type: entry.type as BlockType,
+      level,
+      ...strings,
+      style: strings.style || (entry.type === 'list' ? 'unordered' : ''),
+      items: entry.type === 'list' && items.length === 0 ? [{ text: '', text_fa: '' }] : items
+    }
+  })
+
+  if (value.is_published != null && typeof value.is_published !== 'boolean') {
+    throw new Error('فیلد is_published باید true یا false باشد.')
+  }
+
+  return {
+    title: value.title,
+    slug: value.slug,
+    summary: importedString(value.summary, 'summary'),
+    is_published: value.is_published === true,
+    cover_image_url: importedString(value.cover_image_url, 'cover_image_url'),
+    meta_title: importedString(value.meta_title, 'meta_title'),
+    meta_description: importedString(value.meta_description, 'meta_description'),
+    content: {
+      body,
+      title: importedString(rawContent.title, 'content.title'),
+      title_fa: importedString(rawContent.title_fa, 'content.title_fa'),
+      summary: importedString(rawContent.summary, 'content.summary'),
+      summary_fa: importedString(rawContent.summary_fa, 'content.summary_fa')
+    }
+  }
+}
+
+const applyJsonImport = async () => {
+  jsonImportError.value = ''
+  try {
+    const imported = normalizeImportedBlog(JSON.parse(jsonText.value))
+    if (isDirectJsonImport) {
+      saving.value = true
+      const response = await $fetch<any>('/api/pages', {
+        method: 'POST',
+        body: {
+          category_id: 'b2139ae7-e352-441e-99b6-910114d2f9a7',
+          ...imported,
+          is_published: false
+        }
+      })
+      if (response?.success === false) throw new Error(response.message || 'ثبت مطلب انجام نشد.')
+      isDirty = false
+      saving.value = false
+      closeJsonImport()
+      toast.success('مطلب با JSON ثبت و به‌صورت پیش‌نویس ذخیره شد.')
+      await navigateTo('/dashboard/blog')
+      return
+    }
+
+    if (isDirty) {
+      const confirmed = await confirm({
+        title: 'جایگزینی محتوای مطلب',
+        message: 'بارگذاری این JSON جایگزین همه تغییرات فعلی و ذخیره‌نشده مطلب می‌شود. ادامه می‌دهید؟',
+        confirmLabel: 'جایگزینی اطلاعات',
+        variant: 'danger'
+      })
+      if (!confirmed) return
+    }
+
+    formData.value = {
+      ...formData.value,
+      ...imported,
+      category_id: 'b2139ae7-e352-441e-99b6-910114d2f9a7'
+    }
+    closeJsonImport()
+  } catch (error) {
+    jsonImportError.value = error instanceof Error ? error.message : 'JSON مطلب معتبر نیست.'
+  } finally {
+    saving.value = false
+  }
+}
+
+onMounted(() => {
+  if (route.query.import === 'json') void openJsonImport(true)
 })
 
 const isMediaModalOpen = ref(false)

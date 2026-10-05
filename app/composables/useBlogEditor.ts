@@ -1,7 +1,7 @@
 import { ref, computed, watch } from 'vue'
 import { useDashboardConfirm } from '~/composables/useDashboardConfirm'
 
-export type BlockType = 'code' | 'link' | 'video' | 'image' | 'paragraph' | 'heading' | 'quote' | 'list'
+export type BlockType = 'code' | 'link' | 'video' | 'image' | 'paragraph' | 'heading' | 'quote' | 'list' | 'html'
 
 export interface ListItem {
   text: string
@@ -22,6 +22,8 @@ export interface Block {
   language: string
   content: string
   url: string
+  html: string
+  css: string
 }
 
 export interface BlogContent {
@@ -94,7 +96,9 @@ export async function useBlogEditor() {
                 items: Array.isArray(b.items) ? b.items.map((i: any) => ({ text: i.text || '', text_fa: i.text_fa || '' })) : [],
                 language: b.language || '',
                 content: b.content || '',
-                url: b.url || ''
+                url: b.url || '',
+                html: b.html || '',
+                css: b.css || ''
               }))
             : []
 
@@ -182,7 +186,9 @@ export async function useBlogEditor() {
       items: type === 'list' ? [{ text: '', text_fa: '' }] : [],
       language: '',
       content: '',
-      url: ''
+      url: '',
+      html: '',
+      css: ''
     }
     formData.value.content.body = [...formData.value.content.body, newBlock]
   }

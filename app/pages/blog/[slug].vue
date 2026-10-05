@@ -81,6 +81,7 @@ import { resolveAssetUrl } from '~/utils/resolveAssetUrl'
 import BlogBlockRenderer from '~/components/blog/BlockRenderer.vue'
 
 const route = useRoute()
+const requestUrl = useRequestURL()
 const { fetchPostByRawSlug } = useBlogSingle()
 
 const rawSlugSegment = computed(() => {
@@ -97,11 +98,33 @@ const { data: response, status, error, refresh } = await useAsyncData(
 )
 
 const post = computed(() => response.value?.data || null)
+const canonicalUrl = computed(() => new URL(route.path, requestUrl.origin).toString())
+const socialImage = computed(() => {
+  if (!post.value?.cover_image_url) return undefined
+  return new URL(resolveAssetUrl(post.value.cover_image_url), requestUrl.origin).toString()
+})
+const seoTitle = computed(() => post.value?.meta_title || post.value?.title || 'وبلاگ هیراد')
+const seoDescription = computed(() => post.value?.meta_description || post.value?.summary || '')
 
 useSeoMeta({
-  title: () => post.value?.title || post.value?.meta_title || 'وبلاگ هیراد',
-  description: () => post.value?.summary || post.value?.meta_description || ''
+  title: () => seoTitle.value,
+  description: () => seoDescription.value,
+  ogType: 'article',
+  ogUrl: () => canonicalUrl.value,
+  ogTitle: () => seoTitle.value,
+  ogDescription: () => seoDescription.value,
+  ogImage: () => socialImage.value,
+  ogImageAlt: () => post.value?.title,
+  twitterCard: 'summary_large_image',
+  twitterTitle: () => seoTitle.value,
+  twitterDescription: () => seoDescription.value,
+  twitterImage: () => socialImage.value,
+  twitterImageAlt: () => post.value?.title
 })
+
+useHead(() => ({
+  link: [{ rel: 'canonical', href: canonicalUrl.value }]
+}))
 
 function formatDate(dateStr: string) {
   if (!dateStr) return ''
