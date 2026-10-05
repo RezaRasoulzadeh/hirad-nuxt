@@ -21,6 +21,9 @@ import CertificateCarousel from '~/components/home/CertificateCarousel.vue'
 import { useHomePage } from '~/composables/useHomePage'
 import { useCertificates } from '~/composables/useCertificates'
 import BrandPromisses from '~/components/home/BrandPromisses.vue'
+import HeroImage from '~/assets/hero.jpg'
+import LogoImage from '~/assets/Logo.png'
+import { normalizeLocalAssetUrl } from '~/utils/resolveAssetUrl'
 
 const { page, fetchHomePage } = useHomePage()
 const { certificatePage, fetchCertificates } = useCertificates()
@@ -41,25 +44,65 @@ if (data.value) {
   certificatePage.value = data.value.certificates
 }
 
-const seoTitle = computed(() => page.value?.title || 'تجهیزات صنعتی هیراد')
-const seoDesc = computed(() => page.value?.summary || '')
-const ogTitleEn = computed(() => page.value?.meta_title || '')
-const ogDescEn = computed(() => page.value?.meta_description || '')
+const requestUrl = useRequestURL()
+const homepageUrl = computed(() => new URL('/', requestUrl.origin).toString())
+const seoTitle = computed(() => page.value?.title?.trim() || 'تجهیز فرآیند هیراد | تجهیزات صنعتی')
+const seoDesc = computed(() => page.value?.summary?.trim()
+  || page.value?.meta_description?.trim()
+  || 'تجهیز فرآیند هیراد، تأمین‌کننده شیرآلات صنعتی، اتصالات، فلنج و تجهیزات موردنیاز صنایع نفت، گاز و پتروشیمی.')
+const ogTitle = computed(() => page.value?.meta_title?.trim() || seoTitle.value)
+const ogDesc = computed(() => page.value?.meta_description?.trim() || seoDesc.value)
+const socialImage = computed(() => new URL(normalizeLocalAssetUrl(HeroImage), requestUrl.origin).toString())
+const organizationLogo = computed(() => new URL(normalizeLocalAssetUrl(LogoImage), requestUrl.origin).toString())
 
 useSeoMeta({
   title: seoTitle,
   description: seoDesc,
-  ogTitle: ogTitleEn,
-  ogDescription: ogDescEn,
+  ogTitle,
+  ogDescription: ogDesc,
+  ogSiteName: 'تجهیز فرآیند هیراد',
+  ogLocale: 'fa_IR',
+  ogUrl: homepageUrl,
+  ogImage: socialImage,
+  ogImageAlt: 'تجهیز فرآیند هیراد؛ تأمین تجهیزات صنعتی',
+  twitterCard: 'summary_large_image',
   twitterTitle: seoTitle,
   twitterDescription: seoDesc,
-  ogType: 'website',
+  twitterImage: socialImage,
+  twitterImageAlt: 'تجهیز فرآیند هیراد؛ تأمین تجهیزات صنعتی',
+  ogType: 'website'
 })
 
 useHead({
   htmlAttrs: {
     lang: 'fa',
     dir: 'rtl'
-  }
+  },
+  link: [{ rel: 'canonical', href: homepageUrl.value }],
+  script: [{
+    type: 'application/ld+json',
+    innerHTML: JSON.stringify({
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'WebSite',
+          '@id': `${homepageUrl.value}#website`,
+          url: homepageUrl.value,
+          name: 'تجهیز فرآیند هیراد',
+          alternateName: 'Hirad',
+          inLanguage: 'fa-IR',
+          publisher: { '@id': `${homepageUrl.value}#organization` }
+        },
+        {
+          '@type': 'Organization',
+          '@id': `${homepageUrl.value}#organization`,
+          url: homepageUrl.value,
+          name: 'شرکت تجهیز فرآیند هیراد',
+          alternateName: 'HIRAD Process Equipment Co.',
+          logo: organizationLogo.value
+        }
+      ]
+    }).replace(/</g, '\\u003c')
+  }]
 })
 </script>
