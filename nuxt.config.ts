@@ -12,6 +12,9 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
+    "/fonts/**": {
+      headers: { "cache-control": "public, max-age=31536000, immutable" },
+    },
     "/flipHTML/**": { ssr: false, static: true },
   },
   app: {
